@@ -54,7 +54,8 @@ local function process_purchase(player_inv, shop_inv, pay_name, pay_stack, stack
 		end
 	end
 	if is_unlimited then
-		player_inv:add_item("main", pay_name)
+		player_inv:add_item("main", get_name)
+		player_inv:remove_item("main", pay_name)
 	else
 		local sold_thing = shop_inv:remove_item(stack_to_use, get_name)
 		local payment    = player_inv:remove_item("main", pay_name)
