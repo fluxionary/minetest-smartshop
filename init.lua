@@ -1,51 +1,37 @@
-smartshop = {}
-smartshop.redo = true
-smartshop.version = "20210220.0"
-
 local modname = minetest.get_current_modname()
-smartshop.modname = modname
-smartshop.modpath = minetest.get_modpath(modname)
+local modpath = minetest.get_modpath(modname)
 
-function smartshop.log(level, message, ...)
-    message = message:format(...)
-    minetest.log(level, ("[%s] %s"):format(modname, message))
-end
+smartshop = {
+	redo = true,
+	version = os.time({year = 2022, month = 2, day = 28}),
+	modname = modname,
+	modpath = modpath,
 
-smartshop.player_pos = {}
-smartshop.add_storage = {}  -- used for linking shops to external storage
+	log = function(level, messagefmt, ...)
+		return minetest.log(level, ("[%s] %s"):format(modname, messagefmt:format(...)))
+	end,
 
-dofile(smartshop.modpath .. "/settings.lua")
-dofile(smartshop.modpath .. "/util.lua")
+	has = {
+		currency = minetest.get_modpath("currency"),
+		mesecons = minetest.get_modpath("mesecons"),
+		mesecons_mvps = minetest.get_modpath("mesecons_mvps"),
+		tubelib = minetest.get_modpath("tubelib"),
+	},
 
-dofile(smartshop.modpath .. "/metadata.lua")
+	dofile = function(...)
+		dofile(table.concat({modpath, ...}, "/") .. ".lua")
+	end,
+}
 
--- interop that affects the API
-dofile(smartshop.modpath .. "/interop/currency.lua")
-dofile(smartshop.modpath .. "/interop/mesecons.lua")
+smartshop.dofile("settings")
+smartshop.dofile("util")
+smartshop.dofile("api", "init")
+smartshop.dofile("nodes", "init")
 
-dofile(smartshop.modpath .. "/entities.lua")
+smartshop.dofile("refunds")
 
-dofile(smartshop.modpath .. "/shop_node.lua")
-dofile(smartshop.modpath .. "/shop_display.lua")
-dofile(smartshop.modpath .. "/shop_formspec.lua")
-dofile(smartshop.modpath .. "/shop_color.lua")
-
-dofile(smartshop.modpath .. "/storage_node.lua")
-dofile(smartshop.modpath .. "/storage_formspec.lua")
-
-dofile(smartshop.modpath .. "/crafting.lua")
-
--- interop that doesn't affect the API
-dofile(smartshop.modpath .. "/interop/pipeworks.lua")
-dofile(smartshop.modpath .. "/interop/tubelib.lua")
-
-dofile(smartshop.modpath .. "/refunds.lua")
+smartshop.dofile("crafting")
 
 
-minetest.register_on_player_receive_fields(function(player, form, pressed)
-    if form == "smartshop.shop_showform" then
-        smartshop.shop_receive_fields(player, pressed)
-    elseif form == "smartshop.wifi_showform" then
-        smartshop.wifi_receive_fields(player, pressed)
-    end
-end)
+--------------------------------
+smartshop.dofile = nil  -- no need to export this, not sure whether it's dangerous
