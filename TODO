@@ -1,0 +1,2 @@
+* redo how storage is linked - punch node instead of right-click
+* remove dependency on default

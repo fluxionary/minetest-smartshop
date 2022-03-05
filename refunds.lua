@@ -12,17 +12,16 @@ breaks the node, before the LBM has been run.
 
 local function try_refund(shop)
 	local owner = shop:get_owner()
-	local inv = shop:get_inventory()
 
 	local unrefunded = {}
 
 	for _, itemstring in ipairs(shop:get_refund()) do
 		local itemstack = ItemStack(itemstring)
-		if inv:room_for_item("main", itemstack) then
+		if shop:room_for_item("main", itemstack) then
 			smartshop.log("action", "refunding %s to %s's shop at %s",
 				itemstring, owner, minetest.pos_to_string(shop.pos, 0)
 			)
-			inv:add_item("main", itemstack)
+			shop:add_item("main", itemstack)
 		else
 			table.insert(unrefunded, itemstack:to_string())
 		end
@@ -32,7 +31,7 @@ local function try_refund(shop)
 end
 
 local function generate_unrefunded(shop)
-	local inv = shop:get_inventory()
+	local inv = shop.inv
 
 	local unrefunded = {}
 

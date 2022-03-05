@@ -1,5 +1,6 @@
 local modname = minetest.get_current_modname()
 local modpath = minetest.get_modpath(modname)
+local S = minetest.get_translator(modname)
 
 smartshop = {
 	redo = true,
@@ -7,8 +8,14 @@ smartshop = {
 	modname = modname,
 	modpath = modpath,
 
+	S = S,
+
 	log = function(level, messagefmt, ...)
 		return minetest.log(level, ("[%s] %s"):format(modname, messagefmt:format(...)))
+	end,
+
+	chat_send_player = function(player, message, ...)
+		minetest.chat_send_player(player, ("[%s] %s"):format(modname, S(message, ...)))
 	end,
 
 	has = {

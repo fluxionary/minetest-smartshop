@@ -1,7 +1,11 @@
+local S = smartshop.S
+local deepcopy = smartshop.util.deepcopy
 local nodes = smartshop.nodes
 
+smartshop.shop_node_names = {}
+
 local smartshop_def = {
-	description = "Smartshop",
+	description = S("Smartshop"),
 	tiles = {"(default_chest_top.png^[colorize:#FFFFFF77)^default_obsidian_glass.png"},
 	groups = {
 		choppy = 2,
@@ -40,25 +44,41 @@ local smartshop_def = {
 	on_metadata_inventory_put = nodes.on_metadata_inventory_put,
 	on_metadata_inventory_take = nodes.on_metadata_inventory_take,
 	can_dig = nodes.can_dig,
+	on_destruct = nodes.on_destruct,
 	on_blast = function() end,  -- explosion-proof
 }
 
-local smartshop_full_def = smartshop.util.deepcopy(smartshop_def)
-smartshop_full_def.drop = "smartshop:shop"
-smartshop_full_def.tiles = {"(default_chest_top.png^[colorize:#FFFFFF77)^(default_obsidian_glass.png^[colorize:#0000FF77)"}
-smartshop_full_def.groups.not_in_creative_inventory = 1
+local function register_variant(name, overrides)
+	local variant_def
+	if overrides then
+		variant_def = deepcopy(smartshop_def)
+		for key, value in pairs(overrides) do
+			variant_def[key] = value
+		end
+		variant_def.drop = "smartshop:shop"
+		variant_def.groups.not_in_creative_inventory = 1
+	else
+		variant_def = smartshop_def
+	end
 
-local smartshop_empty_def = smartshop.util.deepcopy(smartshop_full_def)
-smartshop_empty_def.tiles = {"(default_chest_top.png^[colorize:#FFFFFF77)^(default_obsidian_glass.png^[colorize:#FF000077)"}
+	minetest.register_node(name, variant_def)
+	table.insert(smartshop.shop_node_names, name)
+end
 
-local smartshop_used_def = smartshop.util.deepcopy(smartshop_full_def)
-smartshop_used_def.tiles = {"(default_chest_top.png^[colorize:#FFFFFF77)^(default_obsidian_glass.png^[colorize:#00FF0077)"}
+local function make_variant_tiles(color)
+	return {("(default_chest_top.png^[colorize:#FFFFFF77)^(default_obsidian_glass.png^[colorize:%s)"):format(color)}
+end
 
-local smartshop_admin_def = smartshop.util.deepcopy(smartshop_full_def)
-smartshop_admin_def.tiles = {"(default_chest_top.png^[colorize:#FFFFFF77)^(default_obsidian_glass.png^[colorize:#00FFFF77)"}
-
-minetest.register_node("smartshop:shop", smartshop_def)
-minetest.register_node("smartshop:shop_full", smartshop_full_def)
-minetest.register_node("smartshop:shop_empty", smartshop_empty_def)
-minetest.register_node("smartshop:shop_used", smartshop_used_def)
-minetest.register_node("smartshop:shop_admin", smartshop_admin_def)
+register_variant("smartshop:shop")
+register_variant("smartshop:shop_full", {
+	tiles = make_variant_tiles(":#0000FF77")
+})
+register_variant("smartshop:shop_empty", {
+	tiles = make_variant_tiles(":#FF000077")
+})
+register_variant("smartshop:shop_used", {
+	tiles = make_variant_tiles(":#00FF0077")
+})
+register_variant("smartshop:shop_admin", {
+	tiles = make_variant_tiles(":#00FFFF77")
+})

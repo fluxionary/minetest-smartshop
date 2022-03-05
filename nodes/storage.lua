@@ -1,7 +1,12 @@
+local S = smartshop.S
+local deepcopy = smartshop.util.deepcopy
 local nodes = smartshop.nodes
+local api = smartshop.api
 
-minetest.register_node("smartshop:wifistorage", {
-	description = "Smartshop external storage",
+smartshop.storage_node_names = {}
+
+local storage_def = {
+	description = S("Smartshop external storage"),
 	tiles = {"default_chest_top.png^[colorize:#ffffff77^default_obsidian_glass.png"},
 	groups = {
 		choppy = 2,
@@ -35,6 +40,41 @@ minetest.register_node("smartshop:wifistorage", {
 	on_metadata_inventory_put = nodes.on_metadata_inventory_put,
 	on_metadata_inventory_take = nodes.on_metadata_inventory_take,
 	can_dig = nodes.can_dig,
-	on_blast = function()
+	on_blast = function() end,  -- explosion-proof
+	on_punch = function(pos, node, puncher, pointed_thing)
+		local storage = api.get_object(pos)
+		api.try_link_storage(storage, puncher)
 	end,
+}
+
+local function register_variant(name, overrides)
+	local variant_def
+	if overrides then
+		variant_def = deepcopy(storage_def)
+		for key, value in pairs(overrides) do
+			variant_def[key] = value
+		end
+		variant_def.drop = "smartshop:storage"
+		variant_def.groups.not_in_creative_inventory = 1
+	else
+		variant_def = storage_def
+	end
+
+	minetest.register_node(name, variant_def)
+	table.insert(smartshop.storage_node_names, name)
+end
+
+local function make_variant_tiles(color)
+	return {("(default_chest_top.png^[colorize:#FFFFFF77)^(default_obsidian_glass.png^[colorize:%s)"):format(color)}
+end
+
+register_variant("smartshop:storage")
+register_variant("smartshop:storage_full", {
+	tiles = make_variant_tiles(":#0000FF77")
+})
+register_variant("smartshop:storage_empty", {
+	tiles = make_variant_tiles(":#FF000077")
+})
+register_variant("smartshop:storage_used", {
+	tiles = make_variant_tiles(":#00FF0077")
 })

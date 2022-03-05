@@ -1,4 +1,19 @@
+local error_behavior = smartshop.settings.error_behavior
+
 smartshop.util = {}
+
+function smartshop.util.error(messagefmt, ...)
+	local message = messagefmt:format(...)
+
+	if error_behavior == "crash" then
+		error(message)
+
+	elseif error_behavior == "announce" then
+		minetest.chat_send_all(message)
+	end
+
+	smartshop.log("error", message)
+end
 
 function smartshop.util.string_to_pos(pos_as_string)
 	-- can't just use minetest.string_to_pos, for sake of backward compatibility
@@ -15,25 +30,25 @@ function smartshop.util.formspec_pos(pos)
 	return ("%i,%i,%i"):format(pos.x, pos.y, pos.z)
 end
 
-function smartshop.util.player_is_admin(player_name)
-	return minetest.check_player_privs(player_name, {[smartshop.settings.admin_shop_priv] = true})
+function smartshop.util.player_is_admin(player_or_name)
+	return minetest.check_player_privs(player_or_name, {[smartshop.settings.admin_shop_priv] = true})
 end
 
-function smartshop.util.deepcopy(orig, copies)
+function smartshop.util.deepcopy(orig, _memo)
 	-- taken from lua documentation
-	copies = copies or {}
+	_memo = _memo or {}
 	local orig_type = type(orig)
 	local copy
 	if orig_type == "table" then
-		if copies[orig] then
-			copy = copies[orig]
+		if _memo[orig] then
+			copy = _memo[orig]
 		else
 			copy = {}
 			for orig_key, orig_value in next, orig, nil do
-				copy[smartshop.util.deepcopy(orig_key, copies)] = smartshop.util.deepcopy(orig_value, copies)
+				copy[smartshop.util.deepcopy(orig_key, _memo)] = smartshop.util.deepcopy(orig_value, _memo)
 			end
-			copies[orig] = copy
-			setmetatable(copy, smartshop.util.deepcopy(getmetatable(orig), copies))
+			_memo[orig] = copy
+			setmetatable(copy, smartshop.util.deepcopy(getmetatable(orig), _memo))
 		end
 	else
 		-- number, string, boolean, etc
@@ -116,14 +131,15 @@ end
 
 function smartshop.util.round(x)
 	-- approved by kahan
-	if x % 2 ~= 0.5 then
-		return math.floor(x + 0.5)
-	else
+	if x % 2 == 0.5 then
 		return x - 0.5
+	else
+		return math.floor(x + 0.5)
 	end
 end
 
 function smartshop.util.clone_tmp_inventory(inv_name, src_inv, src_list_name)
+	-- TODO are these "default" allow functions required? :\
 	local tmp_inv = minetest.create_detached_inventory(inv_name, {
 		allow_move = function(inv, from_list, from_index, to_list, to_index, count, player)
 			return count
@@ -138,7 +154,7 @@ function smartshop.util.clone_tmp_inventory(inv_name, src_inv, src_list_name)
 
 	for name, _ in pairs(src_inv:get_lists()) do
 		if not tmp_inv:is_empty(name) or tmp_inv:get_size(name) ~= 0 then
-			smartshop.log("error", "attempt to re-use existing temporary inventory %s", inv_name)
+			smartshop.util.error("attempt to re-use existing temporary inventory %s", inv_name)
 			return
 		end
 	end
@@ -158,4 +174,59 @@ end
 
 function smartshop.util.delete_tmp_inventory(inv_name)
 	minetest.remove_detached_inventory(inv_name)
+end
+
+function smartshop.util.check_shop_add_remainder(shop, remainder)
+	if remainder:get_count() == 0 then
+		return false
+	end
+
+	local owner = shop:get_owner()
+	local pos_as_string = shop:get_pos_as_string()
+
+	smartshop.util.error("ERROR: %s's smartshop @ %s lost %s while adding", owner, pos_as_string, remainder:to_string())
+
+	return true
+end
+function smartshop.util.check_shop_remove_remainder(shop, remainder)
+	if remainder:get_count() == 0 then
+		return false
+	end
+
+	local owner = shop:get_owner()
+	local pos_as_string = shop:get_pos_as_string()
+
+	smartshop.util.error("ERROR: %s's smartshop @ %s lost %s while removing", owner, pos_as_string, remainder:to_string())
+
+	return true
+end
+
+function smartshop.util.check_player_add_remainder(player, shop, remainder)
+	if remainder:get_count() == 0 then
+		return false
+	end
+
+	local player_name = player:get_player_name()
+	local owner = shop:get_owner()
+	local pos_as_string = shop:get_pos_as_string()
+
+	smartshop.util.error("ERROR: %s lost %s on add using %s's smartshop @ %s",
+		player_name, remainder:to_string(), owner, pos_as_string)
+
+	return true
+end
+
+function smartshop.util.check_player_remove_remainder(player, shop, remainder)
+	if remainder:get_count() == 0 then
+		return false
+	end
+
+	local player_name = player:get_player_name()
+	local owner = shop:get_owner()
+	local pos_as_string = shop:get_pos_as_string()
+
+	smartshop.util.error("ERROR: %s lost %s on remove using %s's smartshop @ %s",
+		player_name, remainder:to_string(), owner, pos_as_string)
+
+	return true
 end

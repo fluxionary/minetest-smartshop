@@ -3,13 +3,13 @@ local get_object = smartshop.api.get_object
 smartshop.nodes = {
 	tube_can_insert = function(pos, node, stack, direction)
 		local obj = get_object(pos)
-		local inv = obj:get_inventory()
+		local inv = obj.inv
 		return inv:room_for_item("main", stack)
 	end,
 
     tube_insert = function(pos, node, stack, direction)
 		local obj = get_object(pos)
-		local inv = obj:get_inventory()
+		local inv = obj.inv
 		local added = inv:add_item("main", stack)
 
 	    obj:update_appearance()
@@ -26,12 +26,11 @@ smartshop.nodes = {
 
 	on_rightclick = function(pos, node, player, itemstack, pointed_thing)
 		local obj = get_object(pos)
-		obj:show_formspec(player)
+		obj:on_rightclick(node, player, itemstack, pointed_thing)
 	end,
 
 	allow_metadata_inventory_put = function(pos, listname, index, stack, player)
 		local obj = get_object(pos)
-
 		return obj:allow_metadata_inventory_put(listname, index, stack, player)
 	end,
 
@@ -58,6 +57,11 @@ smartshop.nodes = {
 	can_dig = function(pos, player)
 		local obj = get_object(pos)
 		return obj:can_dig(player)
+	end,
+
+	on_destruct = function(pos)
+		local obj = get_object(pos)
+		return obj:on_destruct()
 	end,
 }
 

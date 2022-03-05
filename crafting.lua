@@ -8,7 +8,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-	output = "smartshop:wifistorage",
+	output = "smartshop:storage",
 	recipe = {
 		{ "default:mese_crystal_fragment", "default:chest_locked", "default:mese_crystal_fragment" },
 		{ "default:mese_crystal_fragment", "default:chest_locked", "default:mese_crystal_fragment" },
