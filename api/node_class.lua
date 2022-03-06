@@ -52,12 +52,44 @@ function node_class:is_owner(player)
 	end
 end
 
-function node_class:set_infotext(format, ...)
-	self:set_string("infotext", format:format(...))
+function node_class:set_infotext(infotext)
+	self:set_string("infotext", infotext)
 end
 
 function node_class:get_infotext()
 	return self.meta:get_string("infotext")
+end
+
+--------------------
+
+function node_class:get_count(stack, match_meta)
+	if stack:is_empty() then
+		return 0
+	end
+	local inv = self.inv
+	local total = 0
+	if match_meta then
+		local singleton = ItemStack(stack)
+		singleton:set_count(1)
+		local singleton_string = singleton:to_string()
+		for i = 1, inv:get_size("main") do
+			local si = inv:get_stack("main", i)
+			local count = si:get_count()
+			si:set_count(1)
+			if singleton_string == si:to_string() then
+				total = total + count
+			end
+		end
+	else
+		local stack_name = stack:get_name()
+		for i = 1, inv:get_size("main") do
+			local si = inv:get_stack("main", i)
+			if stack_name == si:get_name() then
+				total = total + si:get_count()
+			end
+		end
+	end
+	return math.floor(total / stack:get_count())
 end
 
 function node_class:room_for_item(stack)
@@ -159,10 +191,7 @@ end
 --------------------
 
 function node_class:allow_metadata_inventory_put(listname, index, stack, player)
-	if not self:can_access(player) then
-		return 0
-
-	elseif stack:get_wear() ~= 0 then
+	if not self:can_access(player) or stack:get_wear() ~= 0 or not stack:is_known() then
 		return 0
 
 	else

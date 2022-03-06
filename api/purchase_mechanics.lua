@@ -18,21 +18,22 @@ function api.register_purchase_mechanic(def)
 end
 
 function api.try_purchase(player, shop, n)
+	local player_inv = api.get_player_inv(player)
+
 	for _, def in ipairs(api.registered_purchase_mechanics) do
-		if def.allow_purchase(player, shop, n) then
-			def.do_purchase(player, shop, n)
+		if def.allow_purchase(player_inv, shop, n) then
+			def.do_purchase(player_inv, shop, n)
 			return true
 		end
 	end
 
-	local reason = api.get_purchase_fail_reason(player, shop, n)
+	local reason = api.get_purchase_fail_reason(player_inv, shop, n)
 	smartshop.chat_send_player(player, reason)
 
 	return false
 end
 
-function api.get_purchase_fail_reason(player, shop, n)
-	local player_inv = api.get_player_inv_class(player)
+function api.get_purchase_fail_reason(player_inv, shop, n)
 	local pay_stack = shop:get_pay_stack(n)
 	local give_stack = shop:get_give_stack(n)
 
@@ -51,8 +52,7 @@ end
 
 api.register_purchase_mechanic({
 	name = "smartshop:basic_purchase",
-	allow_purchase = function(player, shop, n)
-		local player_inv = player:get_inventory()
+	allow_purchase = function(player_inv, shop, n)
 		local pay_stack = shop:get_pay_stack(n)
 		local give_stack = shop:get_give_stack(n)
 
@@ -63,8 +63,7 @@ api.register_purchase_mechanic({
 			player_inv:room_for_item(give_stack)
 		)
 	end,
-	do_purchase = function(player, shop, n)
-		local player_inv = player:get_inventory()
+	do_purchase = function(player_inv, shop, n)
 		local pay_stack = shop:get_pay_stack(n)
 		local give_stack = shop:get_give_stack(n)
 

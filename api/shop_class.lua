@@ -25,7 +25,7 @@ function shop_class:initialize_metadata(player)
 	local player_name = player:get_player_name()
 	local is_admin = player_is_admin(player_name)
 
-	self:set_infotext("Shop by: %s", player_name)
+	self:set_infotext(S("Shop by: @1", player_name))
 	self:set_admin(is_admin)
 	self:set_unlimited(is_admin)
 	self:set_upgraded()
@@ -176,15 +176,15 @@ end
 
 --------------------
 
-function shop_class:get_pay_stack(n)
+function shop_class:get_pay_stack(i)
 	local inv = self.inv
-	local listname = ("pay%i"):format(n)
+	local listname = ("pay%i"):format(i)
 	return inv:get_stack(listname, 1)
 end
 
-function shop_class:get_give_stack(n)
+function shop_class:get_give_stack(i)
 	local inv = self.inv
-	local listname = ("give%i"):format(n)
+	local listname = ("give%i"):format(i)
 	return inv:get_stack(listname, 1)
 end
 
@@ -201,6 +201,48 @@ function shop_class:link_storage(storage, storage_type)
 end
 
 --------------------
+
+function shop_class:get_count(stack)
+	local match_meta = self:is_strict_meta()
+	return node_class.get_count(self, stack, match_meta)
+end
+
+function shop_class:give_is_valid(i)
+	local stack = self:get_give_stack(i)
+	return not stack:is_empty() and stack:is_known()
+end
+
+function shop_class:can_give_count(i)
+	local stack = self:get_give_stack(i)
+	local count = self:get_count(stack)
+	local refill = self:get_refill()
+	if refill then
+		local match_meta = self:is_strict_meta()
+		count = count + refill:get_count(stack, match_meta)
+	end
+	return count
+end
+
+function shop_class:pay_is_valid(i)
+	local stack = self:get_pay_stack(i)
+	return not stack:is_empty() and stack:is_known()
+end
+
+function shop_class:has_pay_count(i)
+	local stack = self:get_pay_stack(i)
+	local count = self:get_count(stack)
+	local send = self:get_send()
+	if send then
+		local match_meta = self:is_strict_meta()
+		count = count + send:get_count(stack, match_meta)
+	end
+	return count
+end
+
+function shop_class:room_for_pay(i)
+	local stack = self:get_pay_stack(i)
+	return self:room_for_item(stack)
+end
 
 function shop_class:room_for_item(stack)
 	if self:is_unlimited() then
@@ -407,7 +449,176 @@ end
 --------------------
 
 function shop_class:update_appearance()
-	-- TODO
+	shop_class:update_variant()
+	shop_class:update_info()
+	shop_class:update_entities()
+end
+
+function shop_class:get_info_line(i)
+
+	if not self:give_is_valid(i) or not self:pay_is_valid(i) then
+		return
+	end
+
+	local give = self:get_give_stack(i)
+	local def = give:get_definition()
+
+	local description = def.short_description or (def.description or ""):match("^[^\n]*")
+    if not description or description == "" then
+        description = give:get_name()
+    end
+	description = description:gsub("%%", "%%%%")
+
+	if self:is_unlimited() then
+		return ("(inf) %s"):format(description)
+	end
+
+	local give_count = self:can_give_count(i)
+	if give_count == 0 then
+		return
+	end
+	return ("(%i) %s"):format(give_count, description)
+end
+
+function shop_class:update_info()
+	local lines = {}
+	for i = 1, 4 do
+		local line = self:get_info_line(i)
+		if line then
+			table.add(lines, line)
+		end
+	end
+
+	if #lines == 0 then
+		self:set_infotext(S("(Smartshop by @1)\nThis shop is empty.", self:get_owner()))
+	else
+		if self:is_unlimited() then
+			table.insert(lines, 1, S("(Smartshop by @1) Stock is unlimited", self:get_owner()))
+		else
+			table.insert(lines, 1, S("(Smartshop by %s) Purchases left:", self:get_owner()))
+		end
+		self:set_infotext(table.concat(lines, "\n"))
+	end
+end
+
+function shop_class:can_give(i)
+	local give = self:get_give_stack(i)
+
+end
+
+function shop_class:compute_variant()
+	if self:is_unlimited() then
+		return "smartshop:shop_admin"
+	end
+
+	local n_total = 4
+	local n_have_give = 0
+	local n_have_pay = 0
+	local n_have_room_for_pay = 0
+
+	for i = 1, 4 do
+		if not self:pay_is_valid(i) or not self:give_is_valid(i) then
+			n_total = n_total - 1
+		else
+			if self:can_give_count(i) > 0 then
+				n_have_give = n_have_give + 1
+			end
+			if self:has_pay_count(i) > 0 then
+				n_have_pay = n_have_pay + 1
+			end
+			if self:room_for_pay(i) then
+				n_have_room_for_pay = n_have_room_for_pay + 1
+			end
+		end
+	end
+
+	if n_total == 0 then
+		-- unconfigured shop
+		return "smartshop:shop"
+	elseif n_have_room_for_pay ~= n_total then
+		-- something can't be bought because the shop is full`
+		return "smartshop:shop_full"
+	elseif n_have_give ~= n_total then
+		-- something is sold out
+		return "smartshop:shop_empty"
+	elseif n_have_pay > 0 then
+		return "smartshop:shop_used"
+	else
+		-- shop is ready for use
+		return "smartshop:shop"
+	end
+end
+
+function shop_class:update_variant()
+	local to_swap = self:compute_variant()
+
+    local node = minetest.get_node(self.pos)
+    local node_name = node.name
+    if node_name ~= to_swap then
+        minetest.swap_node(self.pos, {
+            name = to_swap,
+            param1 = node.param1,
+            param2 = node.param2
+        })
+    end
+
+	self:update_send_variant(to_swap)
+	self:update_refill_variant(to_swap)
+end
+
+function shop_class:update_refill_variant(to_swap)
+	local refill = self:get_refill()
+	if not refill then return end
+
+	local storage_variant
+	if to_swap == "smartshop:shop_empty" then
+		storage_variant = "smartshop:storage_empty"
+	else
+		storage_variant = "smartshop:storage"
+	end
+
+    local node = minetest.get_node(refill.pos)
+    local node_name = node.name
+    if node_name ~= storage_variant then
+        minetest.swap_node(self.pos, {
+            name = storage_variant,
+            param1 = node.param1,
+            param2 = node.param2
+        })
+    end
+end
+
+function shop_class:update_send_variant(to_swap)
+	local send = self:get_send()
+	if not send then return end
+
+	local storage_variant
+	if to_swap == "smartshop:shop_full" then
+		storage_variant = "smartshop:storage_full"
+	elseif to_swap == "smartshop:shop_used" then
+		storage_variant = "smartshop:storage_used"
+	else
+		storage_variant = "smartshop:storage"
+	end
+
+    local node = minetest.get_node(send.pos)
+    local node_name = node.name
+    if node_name ~= storage_variant then
+        minetest.swap_node(self.pos, {
+            name = storage_variant,
+            param1 = node.param1,
+            param2 = node.param2
+        })
+    end
+end
+
+function shop_class:clear_entities()
+	api.clear_entities(self.pos)
+end
+
+function shop_class:update_entities()
+	self:clear_entities()
+	api.generate_entities(self)
 end
 
 --------------------
