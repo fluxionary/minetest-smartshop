@@ -8,6 +8,7 @@ smartshop.storage_node_names = {}
 local storage_def = {
 	description = S("Smartshop external storage"),
 	tiles = {"default_chest_top.png^[colorize:#ffffff77^default_obsidian_glass.png"},
+	use_texture_alpha = "opaque",
 	groups = {
 		choppy = 2,
 		oddly_breakable_by_hand = 1,
@@ -70,11 +71,11 @@ end
 
 register_variant("smartshop:storage")
 register_variant("smartshop:storage_full", {
-	tiles = make_variant_tiles(":#0000FF77")
+	tiles = make_variant_tiles("#0000FF77")
 })
 register_variant("smartshop:storage_empty", {
-	tiles = make_variant_tiles(":#FF000077")
+	tiles = make_variant_tiles("#FF000077")
 })
 register_variant("smartshop:storage_used", {
-	tiles = make_variant_tiles(":#00FF0077")
+	tiles = make_variant_tiles("#00FF0077")
 })

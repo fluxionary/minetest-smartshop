@@ -67,10 +67,10 @@ api.register_purchase_mechanic({
 		local pay_stack = shop:get_pay_stack(n)
 		local give_stack = shop:get_give_stack(n)
 
-		check_shop_remove_remainder(shop:remove_item(give_stack))
-		check_player_remove_remainder(player_inv:remove_item(pay_stack))
-		check_player_add_remainder(player_inv:add_item(give_stack))
-		check_shop_add_remainder(shop:add_item(pay_stack))
+		check_shop_remove_remainder(shop, shop:remove_item(give_stack), give_stack)
+		check_player_remove_remainder(player_inv, shop, player_inv:remove_item(pay_stack), pay_stack)
+		check_player_add_remainder(player_inv, shop, player_inv:add_item(give_stack))
+		check_shop_add_remainder(shop, shop:add_item(pay_stack))
 	end
 })
 

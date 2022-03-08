@@ -78,3 +78,7 @@ end
 
 smartshop.dofile("nodes", "shop")
 smartshop.dofile("nodes", "storage")
+smartshop.dofile("nodes", "upgrade_legacy")
+
+
+

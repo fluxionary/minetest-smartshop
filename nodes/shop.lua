@@ -7,6 +7,7 @@ smartshop.shop_node_names = {}
 local smartshop_def = {
 	description = S("Smartshop"),
 	tiles = {"(default_chest_top.png^[colorize:#FFFFFF77)^default_obsidian_glass.png"},
+	use_texture_alpha = "opaque",
 	groups = {
 		choppy = 2,
         oddly_breakable_by_hand = 1,
@@ -71,14 +72,14 @@ end
 
 register_variant("smartshop:shop")
 register_variant("smartshop:shop_full", {
-	tiles = make_variant_tiles(":#0000FF77")
+	tiles = make_variant_tiles("#0000FF77")
 })
 register_variant("smartshop:shop_empty", {
-	tiles = make_variant_tiles(":#FF000077")
+	tiles = make_variant_tiles("#FF000077")
 })
 register_variant("smartshop:shop_used", {
-	tiles = make_variant_tiles(":#00FF0077")
+	tiles = make_variant_tiles("#00FF0077")
 })
 register_variant("smartshop:shop_admin", {
-	tiles = make_variant_tiles(":#00FFFF77")
+	tiles = make_variant_tiles("#00FFFF77")
 })

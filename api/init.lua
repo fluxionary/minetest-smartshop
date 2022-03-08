@@ -28,11 +28,13 @@ end
 ]]
 function smartshop.api.get_object(pos)
 	if not pos then return end
+	local obj
 	if smartshop.api.is_shop(pos) then
-		return smartshop.shop_class:new(pos)
+		obj = smartshop.shop_class:new(pos)
 	elseif smartshop.api.is_storage(pos) then
-		return smartshop.storage_class:new(pos)
+		obj = smartshop.storage_class:new(pos)
 	end
+	return obj
 end
 
 smartshop.dofile("api", "node_class")

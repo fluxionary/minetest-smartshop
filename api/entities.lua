@@ -23,7 +23,11 @@ function smartshop.api.clear_entities(pos)
 end
 
 function smartshop.api.generate_entities(shop)
-	
+	-- TODO i should really also have an "update entities" ....
+
+	-- TODO: just try the quad sprite for the moment
+	local obj = smartshop.entities.add_quad_upright_sprite(shop)
+	smartshop.api.record_entity(shop.pos, obj)
 end
 
 local function get_image_from_tile(tile)
@@ -131,4 +135,18 @@ function smartshop.api.get_image(item)
 	end
 
 	return image or "unknown_node.png"
+end
+
+function smartshop.api.get_quad_image(items)
+	local images = {}
+	for i = 1, 4 do
+		local image = smartshop.api.get_image(items[i])
+		if image == "unknown_node.png" then
+			image = "blank.png"
+		end
+		table.insert(images, image)
+	end
+	local image = ("[combine:68x68:1,1=%s\\^[resize\\:32x32:1,36=%s\\^[resize\\:32x32:36,1=%s\\^[resize\\:32x32:36,36=%s\\^[resize\\:32x32"):format(unpack(images))
+	minetest.chat_send_all(image)
+	return image
 end

@@ -1,12 +1,13 @@
 local F = minetest.formspec_escape
 
 local S = smartshop.S
+local class = smartshop.util.class
 local formspec_pos = smartshop.util.formspec_pos
 
 --------------------
 
 local node_class = smartshop.node_class
-local storage_class = node_class:new()
+local storage_class = class(node_class)
 smartshop.storage_class = storage_class
 
 --------------------
@@ -19,7 +20,7 @@ function storage_class:get_title()
 end
 
 function storage_class:set_title(format, ...)
-	self:set_string("title", format:format(...))
+	self.meta:set_string("title", format:format(...))
 	self.meta:mark_as_private("title")
 end
 
@@ -32,7 +33,7 @@ function node_class:set_mesein(value)
 	self.meta:mark_as_private("mesein")
 end
 
-function storage_class:toggle_mesein(meta)
+function storage_class:toggle_mesein()
 	local mesein = self:get_mesein()
 	if mesein == 3 then
 		mesein = 0
@@ -50,8 +51,8 @@ function storage_class:initialize_metadata(player)
 	local player_name = player:get_player_name()
 
 	self:set_mesein(0)
-	self:set_infotext("External storage by: %s", player_name)
-	self:set_title("storage@%s", minetest.pos_to_string(self.pos))
+	self:set_infotext(S("External storage by: @1", player_name))
+	self:set_title("storage@%s", self:get_pos_as_string())
 end
 
 function storage_class:initialize_inventory()

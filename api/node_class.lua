@@ -1,28 +1,33 @@
 local check_player_privs = minetest.check_player_privs
+local get_meta = minetest.get_meta
 local pos_to_string = minetest.pos_to_string
 
-local check_shop_add_remainder = smartshop.util.check_shop_add_remainder
-local check_shop_remove_remainder = smartshop.util.check_shop_remove_remainder
+local class = smartshop.util.class
 local get_formspec_pos = smartshop.util.get_formspec_pos
 
 --------------------
 
-local node_class = {}
+local node_class = class()
 smartshop.node_class = node_class
 
 --------------------
 
-function node_class:new(pos)
-	local meta = minetest.get_meta(pos)
-	local inv = meta:get_inventory()
-	local object = {
-		pos = pos,
-		meta = meta,
-		inv = inv,
-	}
-	setmetatable(object, self)
-	self.__index = self  -- magic for inheritance?
-	return object
+function node_class:__new(pos)
+	self.pos = pos
+	self.meta = get_meta(pos)
+	self.inv = self.meta:get_inventory()
+end
+
+function node_class:get_pos()
+	return self.pos
+end
+
+function node_class:get_meta()
+	return self.meta
+end
+
+function node_class:get_inv()
+	return self.inv
 end
 
 function node_class:get_pos_as_string()
@@ -53,7 +58,7 @@ function node_class:is_owner(player)
 end
 
 function node_class:set_infotext(infotext)
-	self:set_string("infotext", infotext)
+	self.meta:set_string("infotext", infotext)
 end
 
 function node_class:get_infotext()
@@ -97,9 +102,7 @@ function node_class:room_for_item(stack)
 end
 
 function node_class:add_item(stack)
-	local remainder = self.inv:add_item("main", stack)
-	check_shop_add_remainder(self, remainder)
-	return remainder
+	return self.inv:add_item("main", stack)
 end
 
 function node_class:contains_item(stack, match_meta)
@@ -131,8 +134,6 @@ function node_class:remove_item(stack, match_meta)
 	else
 		remainder = inv:remove_item("main", stack)
 	end
-
-	check_shop_remove_remainder(self, remainder)
 
 	return remainder
 end

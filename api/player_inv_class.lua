@@ -1,27 +1,19 @@
 -- this will allow us to more easily extend behavior e.g. interacting directly w/ inventory bags
 
-local check_player_add_remainder = smartshop.util.check_player_add_remainder
-local check_player_remove_remainder = smartshop.util.check_player_remove_remainder
+local class = smartshop.util.class
 
 --------------------
 
 
-local player_inv_class = {}
+local player_inv_class = class()
 smartshop.player_inv_class = player_inv_class
 
 --------------------
 
-function player_inv_class:new(player)
-	local name = player:get_player_name()
-	local inv = player:get_inventory()
-	local object = {
-		player = player,
-		name = name,
-		inv = inv,
-	}
-	setmetatable(object, self)
-	self.__index = self  -- magic for inheritance?
-	return object
+function player_inv_class:__new(player)
+	self.player = player
+	self.name = player:get_player_name()
+	self.inv = player:get_inventory()
 end
 
 function smartshop.api.get_player_inv(player)
@@ -35,9 +27,7 @@ function player_inv_class:room_for_item(stack)
 end
 
 function player_inv_class:add_item(stack)
-	local remainder = self.inv:add_item("main", stack)
-	check_player_add_remainder(remainder)
-	return remainder
+	return self.inv:add_item("main", stack)
 end
 
 function player_inv_class:contains_item(stack, match_meta)
@@ -45,8 +35,6 @@ function player_inv_class:contains_item(stack, match_meta)
 end
 
 function player_inv_class:remove_item(stack)
-	local remainder =  self.inv:remove_item("main", stack)
-	check_player_remove_remainder(remainder)
-	return remainder
+	return self.inv:remove_item("main", stack)
 end
 

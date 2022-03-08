@@ -15,7 +15,13 @@ smartshop = {
 	end,
 
 	chat_send_player = function(player, message, ...)
-		minetest.chat_send_player(player, ("[%s] %s"):format(modname, S(message, ...)))
+		local player_name
+		if type(player) == "userdata" then
+			player_name = player:get_player_name()
+		else
+			player_name = player
+		end
+		minetest.chat_send_player(player_name, ("[%s] %s"):format(modname, S(message, ...)))
 	end,
 
 	has = {
@@ -34,10 +40,13 @@ smartshop.dofile("settings")
 smartshop.dofile("util")
 smartshop.dofile("api", "init")
 smartshop.dofile("nodes", "init")
-
-smartshop.dofile("refunds")
+smartshop.dofile("entities", "init")
+smartshop.dofile("compat", "init")
 
 smartshop.dofile("crafting")
+smartshop.dofile("aliases")
+
+smartshop.dofile("refunds")
 
 
 --------------------------------

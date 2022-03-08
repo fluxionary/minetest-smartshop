@@ -188,45 +188,61 @@ function smartshop.util.check_shop_add_remainder(shop, remainder)
 
 	return true
 end
-function smartshop.util.check_shop_remove_remainder(shop, remainder)
-	if remainder:get_count() == 0 then
+function smartshop.util.check_shop_remove_remainder(shop, remainder, expected)
+	if remainder:get_count() == expected:get_count() then
 		return false
 	end
 
 	local owner = shop:get_owner()
 	local pos_as_string = shop:get_pos_as_string()
 
-	smartshop.util.error("ERROR: %s's smartshop @ %s lost %s while removing", owner, pos_as_string, remainder:to_string())
+	smartshop.util.error("ERROR: %s's smartshop @ %s lost %s of %s while removing",
+		owner, pos_as_string, remainder:to_string(), expected:to_string())
 
 	return true
 end
 
-function smartshop.util.check_player_add_remainder(player, shop, remainder)
+function smartshop.util.check_player_add_remainder(player_inv, shop, remainder)
 	if remainder:get_count() == 0 then
 		return false
 	end
 
-	local player_name = player:get_player_name()
-	local owner = shop:get_owner()
-	local pos_as_string = shop:get_pos_as_string()
+	local player_name = player_inv.name
 
-	smartshop.util.error("ERROR: %s lost %s on add using %s's smartshop @ %s",
-		player_name, remainder:to_string(), owner, pos_as_string)
+	smartshop.util.error("ERROR: %s lost %s on add using %'s shop @ %s",
+		player_name, remainder:to_string(), shop:get_owner(), shop:get_pos_as_string())
 
 	return true
 end
 
-function smartshop.util.check_player_remove_remainder(player, shop, remainder)
-	if remainder:get_count() == 0 then
+function smartshop.util.check_player_remove_remainder(player_inv, shop, remainder, expected)
+	if remainder:get_count() == expected:get_count() then
 		return false
 	end
 
-	local player_name = player:get_player_name()
-	local owner = shop:get_owner()
-	local pos_as_string = shop:get_pos_as_string()
+	local player_name = player_inv.name
 
-	smartshop.util.error("ERROR: %s lost %s on remove using %s's smartshop @ %s",
-		player_name, remainder:to_string(), owner, pos_as_string)
+	smartshop.util.error("ERROR: %s lost %s of %s on remove from %'s shop @ %s",
+		player_name, remainder:to_string(), expected:to_string(), shop:get_owner(), shop:get_pos_as_string())
 
 	return true
+end
+
+function smartshop.util.class(super)
+    local class = {}
+	class.__index = class
+
+	if super then
+		setmetatable(class, {__index = super})
+	end
+
+    function class:new(...)
+        local obj = setmetatable({}, class)
+        if obj.__new then
+            obj:__new(...)
+        end
+        return obj
+    end
+
+    return class
 end

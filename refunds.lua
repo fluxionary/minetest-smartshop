@@ -17,11 +17,11 @@ local function try_refund(shop)
 
 	for _, itemstring in ipairs(shop:get_refund()) do
 		local itemstack = ItemStack(itemstring)
-		if shop:room_for_item("main", itemstack) then
+		if shop:room_for_item(itemstack) then
 			smartshop.log("action", "refunding %s to %s's shop at %s",
 				itemstring, owner, minetest.pos_to_string(shop.pos, 0)
 			)
-			shop:add_item("main", itemstack)
+			shop:add_item(itemstack)
 		else
 			table.insert(unrefunded, itemstack:to_string())
 		end
@@ -61,7 +61,7 @@ if smartshop.settings.enable_refund then
 		},
 		run_at_every_load = true,
 		action = function(pos, node)
-			local shop = smartshop.get_shop(pos)
+			local shop = smartshop.api.get_object(pos)
 
 			-- don't bother refunding admin shops
 			if shop:is_admin() then
