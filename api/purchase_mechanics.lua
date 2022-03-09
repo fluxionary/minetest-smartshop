@@ -38,7 +38,7 @@ function api.get_purchase_fail_reason(player_inv, shop, n)
 	local give_stack = shop:get_give_stack(n)
 
 	if not player_inv:contains_item(pay_stack, true) then
-		return S("You lack sufficient payment")
+		return "You lack sufficient payment"
 	elseif not player_inv:room_for_item(give_stack) then
 		return "Your inventory is full"
 	elseif not shop:contains_item(give_stack, true) then
@@ -67,8 +67,8 @@ api.register_purchase_mechanic({
 		local pay_stack = shop:get_pay_stack(n)
 		local give_stack = shop:get_give_stack(n)
 
-		check_shop_remove_remainder(shop, shop:remove_item(give_stack), give_stack)
-		check_player_remove_remainder(player_inv, shop, player_inv:remove_item(pay_stack), pay_stack)
+		check_shop_remove_remainder(shop, shop:remove_item(give_stack), shop:get_give_stack(n))
+		check_player_remove_remainder(player_inv, shop, player_inv:remove_item(pay_stack), shop:get_pay_stack(n))
 		check_player_add_remainder(player_inv, shop, player_inv:add_item(give_stack))
 		check_shop_add_remainder(shop, shop:add_item(pay_stack))
 	end

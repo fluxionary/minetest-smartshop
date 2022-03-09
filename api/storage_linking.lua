@@ -1,3 +1,7 @@
+local get_us_time = minetest.get_us_time
+
+local api = smartshop.api
+
 local S = smartshop.S
 
 local storage_max_distance = smartshop.settings.storage_max_distance
@@ -7,18 +11,21 @@ local data_by_player_name = {}
 
 local function expire(player_name, shop, storage_type)
 	local data = data_by_player_name[player_name]
+
+	-- make sure we're expiring the correct request
 	if data and data.shop == shop and data.storage_type == storage_type then
 		data_by_player_name[player_name] = nil
 		smartshop.chat_send_player(player_name, "Storage link attempt timed out, please try again.")
 	end
 end
 
-function smartshop.api.start_storage_linking(player, shop, storage_type)
+function api.start_storage_linking(player, shop, storage_type)
 	local player_name = player:get_player_name()
 
 	smartshop.chat_send_player(player_name, "Punch a smartshop storage node to link @1 storage", S(storage_type))
 
 	data_by_player_name[player_name] = {
+		id = get_us_time(),
 		shop = shop,
 		storage_type = storage_type,
 	}
@@ -26,7 +33,7 @@ function smartshop.api.start_storage_linking(player, shop, storage_type)
 	minetest.after(storage_link_time, expire, player_name, shop, storage_type)
 end
 
-function smartshop.api.try_link_storage(storage, player)
+function api.try_link_storage(storage, player)
 	local player_name = player:get_player_name()
 	local data = data_by_player_name[player_name]
 	if not data then return end

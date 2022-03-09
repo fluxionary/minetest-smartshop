@@ -1,6 +1,10 @@
 local F = minetest.formspec_escape
+local after = minetest.after
+local get_node = minetest.get_node
 local parse_json = minetest.parse_json
 local pos_to_string = minetest.pos_to_string
+local show_formspec = minetest.show_formspec
+local swap_node = minetest.swap_node
 local write_json = minetest.write_json
 
 local S = smartshop.S
@@ -337,10 +341,10 @@ function shop_class:show_formspec(player, force_client_view)
 		formspec = self:build_client_formspec()
 	end
 
-	local player_name = player:get_player_name()
 	local formname = ("smartshop:%s"):format(self:get_pos_as_string())
+	local player_name = player:get_player_name()
 
-	minetest.show_formspec(player_name, formname, formspec)
+	show_formspec(player_name, formname, formspec)
 end
 
 function shop_class:build_client_formspec()
@@ -380,7 +384,7 @@ function shop_class:build_owner_formspec()
 
 	local fs_parts = {
 		"size[8,10]",
-		("button_exit[6,0;1.5,1;customer;%s]"):format(S("Customer")),
+		("button[6,0;1.5,1;customer;%s]"):format(S("Customer")),
 		("label[0,0.2;%s]"):format(S("On Sale:")),
 		("label[0,1.2;]"):format(S("Price:")),
 		("list[nodemeta:%s;give1;1,0;1,1;]"):format(fpos),
@@ -563,18 +567,19 @@ end
 function shop_class:update_variant()
 	local to_swap = self:compute_variant()
 
-    local node = minetest.get_node(self.pos)
+    local node = get_node(self.pos)
     local node_name = node.name
     if node_name ~= to_swap then
-        minetest.swap_node(self.pos, {
+        swap_node(self.pos, {
             name = to_swap,
             param1 = node.param1,
             param2 = node.param2
         })
     end
 
-	self:update_send_variant(to_swap)
-	self:update_refill_variant(to_swap)
+	-- this logic is totally broken, disable it for the moment
+	--self:update_send_variant(to_swap)
+	--self:update_refill_variant(to_swap)
 end
 
 function shop_class:update_refill_variant(to_swap)
@@ -588,10 +593,10 @@ function shop_class:update_refill_variant(to_swap)
 		storage_variant = "smartshop:storage"
 	end
 
-    local node = minetest.get_node(refill.pos)
+    local node = get_node(refill.pos)
     local node_name = node.name
     if node_name ~= storage_variant then
-        minetest.swap_node(refill.pos, {
+        swap_node(refill.pos, {
             name = storage_variant,
             param1 = node.param1,
             param2 = node.param2
@@ -612,10 +617,10 @@ function shop_class:update_send_variant(shop_to_swap)
 		storage_variant = "smartshop:storage"
 	end
 
-    local node = minetest.get_node(send.pos)
+    local node = get_node(send.pos)
     local node_name = node.name
     if node_name ~= storage_variant then
-        minetest.swap_node(send.pos, {
+        swap_node(send.pos, {
             name = storage_variant,
             param1 = node.param1,
             param2 = node.param2
@@ -630,7 +635,7 @@ end
 function shop_class:update_entities()
 	-- TODO don't just clear the old entities, most of the time they don't even need to change...
 	self:clear_entities()
-	api.generate_entities(self)
+	api.update_entities(self)
 end
 
 --------------------
@@ -695,20 +700,14 @@ function shop_class:allow_metadata_inventory_move(from_list, from_index, to_list
 	elseif from_list == "main" then
 		local inv = self.inv
 		local stack = inv:get_stack(from_list, from_index)
-		if self:allow_metadata_inventory_put(to_list, to_index, stack, player) == 0 then
-			return 0
-		else
-			return count
-		end
+		stack:set_count(count)
+		return self:allow_metadata_inventory_put(to_list, to_index, stack, player)
 
 	elseif to_list == "main" then
 		local inv = self.inv
 		local stack = inv:get_stack(to_list, to_index)
-		if self:allow_metadata_inventory_take(from_list, from_index, stack, player) == 0 then
-			return 0
-		else
-			return count
-		end
+		stack:set_count(count)
+		return self:allow_metadata_inventory_take(from_list, from_index, stack, player)
 	else
 		return count
 	end

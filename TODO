@@ -1,2 +1,10 @@
-* redo how storage is linked - punch node instead of right-click
+* TESTING
+
+* storage color variant logic
 * remove dependency on default
+* currency changing
+* new features:
+  * shop history
+  * api features:
+    * register callback on purchase
+    * register callback on shop full/empty

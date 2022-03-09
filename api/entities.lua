@@ -1,33 +1,27 @@
 
 local pos_to_string = minetest.pos_to_string
 
+local api = smartshop.api
+
 local debug = false
 local debug_cache = {}
 
 local entities_by_pos = {}
 
-function smartshop.api.record_entity(pos, obj)
+function api.record_entity(pos, obj)
 	local spos = pos_to_string(pos)
-	local entities = entities_by_pos[spos] or {}
-	table.insert(entities, obj)
-	entities_by_pos[spos] = entities
+	local entities_at_pos = entities_by_pos[spos] or {}
+	table.insert(entities_at_pos, obj)
+	entities_by_pos[spos] = entities_at_pos
 end
 
-function smartshop.api.clear_entities(pos)
+function api.clear_entities(pos)
 	local spos = pos_to_string(pos)
-	local entities = entities_by_pos[spos] or {}
-	for _, obj in ipairs(entities) do
+	local entities_at_pos = entities_by_pos[spos] or {}
+	for _, obj in ipairs(entities_at_pos) do
 		obj:remove()
 	end
 	entities_by_pos[spos] = nil
-end
-
-function smartshop.api.generate_entities(shop)
-	-- TODO i should really also have an "update entities" ....
-
-	-- TODO: just try the quad sprite for the moment
-	local obj = smartshop.entities.add_quad_upright_sprite(shop)
-	smartshop.api.record_entity(shop.pos, obj)
 end
 
 local function get_image_from_tile(tile)
@@ -82,7 +76,11 @@ local function get_image_cube(tiles)
 	return "unknown_node.png"
 end
 
-function smartshop.api.get_image(item)
+function api.get_image(item)
+	if not item or item == "" then
+		return "blank.png"
+	end
+
 	local def = minetest.registered_items[item]
 	if not def then
 		return "unknown_node.png"
@@ -127,9 +125,9 @@ function smartshop.api.get_image(item)
 	end
 
 	if (debug or not image or image == "" or image == "unknown_node.png") and not debug_cache[item] then
-		smartshop.log("warning", "[smartshop] definition for %s", item)
+		smartshop.log("warning", "definition for %s", item)
 		for key, value in pairs(def) do
-			smartshop.log("warning", "[smartshop]     %q = %q", key, minetest.serialize(value))
+			smartshop.log("warning", "    %q = %q", key, minetest.serialize(value))
 		end
 		debug_cache[item] = true
 	end
@@ -137,16 +135,88 @@ function smartshop.api.get_image(item)
 	return image or "unknown_node.png"
 end
 
-function smartshop.api.get_quad_image(items)
+function api.get_quad_image(items)
 	local images = {}
 	for i = 1, 4 do
-		local image = smartshop.api.get_image(items[i])
+		local image = api.get_image(items[i])
 		if image == "unknown_node.png" then
 			image = "blank.png"
 		end
 		table.insert(images, image)
 	end
-	local image = ("[combine:68x68:1,1=%s\\^[resize\\:32x32:1,36=%s\\^[resize\\:32x32:36,1=%s\\^[resize\\:32x32:36,36=%s\\^[resize\\:32x32"):format(unpack(images))
-	minetest.chat_send_all(image)
-	return image
+	return (
+		"[combine:68x68" ..
+		":1,1=%s\\^[resize\\:32x32" ..
+		":1,36=%s\\^[resize\\:32x32" ..
+		":36,1=%s\\^[resize\\:32x32" ..
+		":36,36=%s\\^[resize\\:32x32"
+	):format(unpack(images))
+end
+
+function api.is_complicated_drawtype(drawtype)
+	return (
+		drawtype == "fencelike" or
+		drawtype == "raillike" or
+		drawtype == "nodebox" or
+		drawtype == "mesh"
+	)
+end
+
+function api.get_image_type(shop, index)
+	if not shop:can_exchange(index) then
+		return "none"
+	end
+
+	local item_name = shop:get_give_stack(index):get_name()
+
+	local def = minetest.registered_items[item_name]
+	if not def or item_name == "" then
+		return "none"
+	elseif def.inventory_image and def.inventory_image ~= "" then
+		return "sprite"
+	elseif api.is_complicated_drawtype(def.drawtype) then
+		return "wielditem"
+	else
+		return "sprite"
+	end
+end
+
+function api.update_entities(shop)
+	-- TODO this should also update existing entities, not just create new ones.
+	--      there should be no need to call clear_entities before calling this function.
+
+	local empty_count = 0
+	local sprite_count = 0
+	local entity_types = {}
+	for index = 1, 4 do
+		local image_type = api.get_image_type(shop, index)
+		table.insert(entity_types, image_type)
+		if image_type == "none" then
+			empty_count = empty_count + 1
+		elseif image_type == "sprite" then
+			sprite_count = sprite_count + 1
+		end
+	end
+
+	if empty_count == 4 then
+		-- TODO: just remove any entities
+
+	elseif (sprite_count + empty_count) == 4 then
+		local obj = smartshop.entities.add_quad_upright_sprite(shop)
+		if obj then
+			api.record_entity(shop.pos, obj)
+		end
+	else
+		for index, image_type in ipairs(entity_types) do
+			local obj
+			if image_type == "sprite" then
+				obj = smartshop.entities.add_single_sprite(shop, index)
+			elseif image_type == "wielditem" then
+				obj = smartshop.entities.add_single_wielditem(shop, index)
+			end
+			if obj then
+				api.record_entity(shop.pos, obj)
+			end
+		end
+	end
 end

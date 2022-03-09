@@ -110,6 +110,8 @@ function node_class:contains_item(stack, match_meta)
 end
 
 function node_class:remove_item(stack, match_meta)
+	-- TODO i messed this up?
+	error("FIX THIS")
 	local inv = self.inv
 
 	local remainder

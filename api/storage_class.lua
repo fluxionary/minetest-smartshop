@@ -120,5 +120,3 @@ function storage_class:receive_fields(player, fields)
 	end
 end
 
---------------------
-

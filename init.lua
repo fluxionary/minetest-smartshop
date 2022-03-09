@@ -14,6 +14,9 @@ smartshop = {
 		return minetest.log(level, ("[%s] %s"):format(modname, messagefmt:format(...)))
 	end,
 
+	--[[
+		convenience for player/name checking and i18n
+	]]
 	chat_send_player = function(player, message, ...)
 		local player_name
 		if type(player) == "userdata" then
