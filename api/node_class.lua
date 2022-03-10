@@ -4,6 +4,7 @@ local pos_to_string = minetest.pos_to_string
 
 local class = smartshop.util.class
 local get_formspec_pos = smartshop.util.get_formspec_pos
+local remove_stack_with_meta = smartshop.util.remove_stack_with_meta
 
 --------------------
 
@@ -110,34 +111,17 @@ function node_class:contains_item(stack, match_meta)
 end
 
 function node_class:remove_item(stack, match_meta)
-	-- TODO i messed this up?
-	error("FIX THIS")
 	local inv = self.inv
 
-	local remainder
+	local removed
 	if match_meta then
-		local stack_string = stack:to_string()
-
-		local index
-		for i, inv_stack in ipairs(inv:get_list("main")) do
-			if inv_stack:to_string() == stack_string then
-				index = i
-				break
-			end
-		end
-
-		if index then
-			remainder = ItemStack()
-			inv:set_stack("main", index, remainder)
-		else
-			remainder = stack
-		end
+		removed = remove_stack_with_meta(inv, "main", stack)
 
 	else
-		remainder = inv:remove_item("main", stack)
+		removed = inv:remove_item("main", stack)
 	end
 
-	return remainder
+	return removed
 end
 
 --------------------

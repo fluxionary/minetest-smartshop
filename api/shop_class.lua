@@ -35,7 +35,7 @@ function shop_class:initialize_metadata(player)
 	self:set_unlimited(is_admin)
 	self:set_upgraded()
 	self:set_state(0)  -- mesecons?
-	self:set_strict_meta(true)
+	self:set_strict_meta(false)
 end
 
 function shop_class:initialize_inventory()
@@ -269,7 +269,7 @@ function shop_class:room_for_item(stack)
 	end
 
 	local send = self:get_send()
-	return send and send:room_for_item("main", stack)
+	return send and send:room_for_item(stack)
 end
 
 function shop_class:add_item(stack)
@@ -309,7 +309,7 @@ function shop_class:remove_item(stack)
 	local refill = self:get_refill()
 
 	if refill and refill:contains_item(stack, strict_meta) then
-		return refill:remove_item("main", stack, strict_meta)
+		return refill:remove_item(stack, strict_meta)
 	end
 
 	return node_class.remove_item(self, stack, strict_meta)
@@ -430,9 +430,11 @@ function shop_class:build_owner_formspec()
 	return table.concat(fs_parts, "")
 end
 
-local function get_buy_n(pressed)
-    for n = 1, 4 do
-        if pressed["buy" .. n] then return n end
+local function get_buy_index(pressed)
+    for i = 1, 4 do
+        if pressed["buy" .. i] then
+	        return i
+        end
     end
 end
 
@@ -451,9 +453,9 @@ function shop_class:receive_fields(player, fields)
         self:show_formspec(player)
 
     elseif not fields.quit then
-        local n = get_buy_n(fields)
-        if n then
-            api.try_purchase(player, self, n)
+        local i = get_buy_index(fields)
+        if i then
+            api.try_purchase(player, self, i)
         end
     end
 

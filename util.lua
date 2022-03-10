@@ -1,8 +1,9 @@
 local error_behavior = smartshop.settings.error_behavior
 
 smartshop.util = {}
+local util = smartshop.util
 
-function smartshop.util.error(messagefmt, ...)
+function util.error(messagefmt, ...)
 	local message = messagefmt:format(...)
 
 	if error_behavior == "crash" then
@@ -15,7 +16,7 @@ function smartshop.util.error(messagefmt, ...)
 	smartshop.log("error", message)
 end
 
-function smartshop.util.string_to_pos(pos_as_string)
+function util.string_to_pos(pos_as_string)
 	-- can't just use minetest.string_to_pos, for sake of backward compatibility
 	if not pos_as_string or type(pos_as_string) ~= "string" then
 		return nil
@@ -26,15 +27,15 @@ function smartshop.util.string_to_pos(pos_as_string)
 	end
 end
 
-function smartshop.util.formspec_pos(pos)
+function util.formspec_pos(pos)
 	return ("%i,%i,%i"):format(pos.x, pos.y, pos.z)
 end
 
-function smartshop.util.player_is_admin(player_or_name)
+function util.player_is_admin(player_or_name)
 	return minetest.check_player_privs(player_or_name, {[smartshop.settings.admin_shop_priv] = true})
 end
 
-function smartshop.util.deepcopy(orig, _memo)
+function util.deepcopy(orig, _memo)
 	-- taken from lua documentation
 	_memo = _memo or {}
 	local orig_type = type(orig)
@@ -45,10 +46,10 @@ function smartshop.util.deepcopy(orig, _memo)
 		else
 			copy = {}
 			for orig_key, orig_value in next, orig, nil do
-				copy[smartshop.util.deepcopy(orig_key, _memo)] = smartshop.util.deepcopy(orig_value, _memo)
+				copy[util.deepcopy(orig_key, _memo)] = util.deepcopy(orig_value, _memo)
 			end
 			_memo[orig] = copy
-			setmetatable(copy, smartshop.util.deepcopy(getmetatable(orig), _memo))
+			setmetatable(copy, util.deepcopy(getmetatable(orig), _memo))
 		end
 	else
 		-- number, string, boolean, etc
@@ -57,7 +58,7 @@ function smartshop.util.deepcopy(orig, _memo)
 	return copy
 end
 
-function smartshop.util.table_invert(t)
+function util.table_invert(t)
 	local inverted = {}
 	for k, v in pairs(t) do
 		inverted[v] = k
@@ -65,7 +66,7 @@ function smartshop.util.table_invert(t)
 	return inverted
 end
 
-function smartshop.util.table_reversed(t)
+function util.table_reversed(t)
 	local len = #t
 	local reversed = {}
 	for i = len, 1, -1 do
@@ -74,7 +75,7 @@ function smartshop.util.table_reversed(t)
 	return reversed
 end
 
-function smartshop.util.table_contains(t, value)
+function util.table_contains(t, value)
 	for _, v in ipairs(t) do
 		if v == value then
 			return true
@@ -83,28 +84,29 @@ function smartshop.util.table_contains(t, value)
 	return false
 end
 
-function smartshop.util.table_is_empty(t)
+function util.table_is_empty(t)
 	return not next(t)
 end
 
-function smartshop.util.pairs_by_keys(t, f)
-	local a = {}
-	for n in pairs(t) do
-		table.insert(a, n)
+function util.pairs_by_keys(t, sort_func)
+	local sorted_keys = {}
+	for key in pairs(t) do
+		table.insert(sorted_keys, key)
 	end
-	table.sort(a, f)
+	table.sort(sorted_keys, sort_func)
 	local i = 0
 	return function()
 		i = i + 1
-		if a[i] == nil then
+		local current_key = sorted_keys[i]
+		if current_key == nil then
 			return nil
 		else
-			return a[i], t[a[i]]
+			return current_key, t[current_key]
 		end
 	end
 end
 
-function smartshop.util.pairs_by_values(t, f)
+function util.pairs_by_values(t, f)
 	if not f then
 		f = function(a, b)
 			return a < b
@@ -129,7 +131,7 @@ function smartshop.util.pairs_by_values(t, f)
 	end
 end
 
-function smartshop.util.round(x)
+function util.round(x)
 	-- approved by kahan
 	if x % 2 == 0.5 then
 		return x - 0.5
@@ -138,7 +140,7 @@ function smartshop.util.round(x)
 	end
 end
 
-function smartshop.util.clone_tmp_inventory(inv_name, src_inv, src_list_name)
+function util.clone_tmp_inventory(inv_name, src_inv, src_list_name)
 	-- TODO are these "default" allow functions required? :\
 	local tmp_inv = minetest.create_detached_inventory(inv_name, {
 		allow_move = function(inv, from_list, from_index, to_list, to_index, count, player)
@@ -154,7 +156,7 @@ function smartshop.util.clone_tmp_inventory(inv_name, src_inv, src_list_name)
 
 	for name, _ in pairs(src_inv:get_lists()) do
 		if not tmp_inv:is_empty(name) or tmp_inv:get_size(name) ~= 0 then
-			smartshop.util.error("attempt to re-use existing temporary inventory %s", inv_name)
+			util.error("attempt to re-use existing temporary inventory %s", inv_name)
 			return
 		end
 	end
@@ -172,11 +174,11 @@ function smartshop.util.clone_tmp_inventory(inv_name, src_inv, src_list_name)
 	return tmp_inv
 end
 
-function smartshop.util.delete_tmp_inventory(inv_name)
+function util.delete_tmp_inventory(inv_name)
 	minetest.remove_detached_inventory(inv_name)
 end
 
-function smartshop.util.check_shop_add_remainder(shop, remainder)
+function util.check_shop_add_remainder(shop, remainder)
 	if remainder:get_count() == 0 then
 		return false
 	end
@@ -184,11 +186,11 @@ function smartshop.util.check_shop_add_remainder(shop, remainder)
 	local owner = shop:get_owner()
 	local pos_as_string = shop:get_pos_as_string()
 
-	smartshop.util.error("ERROR: %s's smartshop @ %s lost %s while adding", owner, pos_as_string, remainder:to_string())
+	util.error("ERROR: %s's smartshop @ %s lost %s while adding", owner, pos_as_string, remainder:to_string())
 
 	return true
 end
-function smartshop.util.check_shop_remove_remainder(shop, remainder, expected)
+function util.check_shop_remove_remainder(shop, remainder, expected)
 	if remainder:get_count() == expected:get_count() then
 		return false
 	end
@@ -196,39 +198,107 @@ function smartshop.util.check_shop_remove_remainder(shop, remainder, expected)
 	local owner = shop:get_owner()
 	local pos_as_string = shop:get_pos_as_string()
 
-	smartshop.util.error("ERROR: %s's smartshop @ %s lost %s of %s while removing",
+	util.error("ERROR: %s's smartshop @ %s lost %s of %s while removing",
 		owner, pos_as_string, remainder:to_string(), expected:to_string())
 
 	return true
 end
 
-function smartshop.util.check_player_add_remainder(player_inv, shop, remainder)
+function util.check_player_add_remainder(player_inv, shop, remainder)
 	if remainder:get_count() == 0 then
 		return false
 	end
 
 	local player_name = player_inv.name
 
-	smartshop.util.error("ERROR: %s lost %s on add using %'s shop @ %s",
+	util.error("ERROR: %s lost %s on add using %'s shop @ %s",
 		player_name, remainder:to_string(), shop:get_owner(), shop:get_pos_as_string())
 
 	return true
 end
 
-function smartshop.util.check_player_remove_remainder(player_inv, shop, remainder, expected)
+function util.check_player_remove_remainder(player_inv, shop, remainder, expected)
 	if remainder:get_count() == expected:get_count() then
 		return false
 	end
 
 	local player_name = player_inv.name
 
-	smartshop.util.error("ERROR: %s lost %s of %s on remove from %'s shop @ %s",
+	util.error("ERROR: %s lost %s of %s on remove from %'s shop @ %s",
 		player_name, remainder:to_string(), expected:to_string(), shop:get_owner(), shop:get_pos_as_string())
 
 	return true
 end
 
-function smartshop.util.class(super)
+function util.table_size(t)
+	local size = 0
+	for _ in pairs(t) do
+		size = size + 1
+	end
+	return size
+end
+
+local table_size = util.table_size
+
+function util.equals(a, b)
+	local t = type(a)
+	if t ~= type(b) then
+		return false
+	end
+	if t ~= "table" then
+		return a == b
+	else
+		local size_a = 0
+		for key, value in pairs(a) do
+			if not util.equals(value, b[key]) then
+				return false
+			end
+			size_a = size_a + 1
+		end
+		return size_a == table_size(b)
+	end
+end
+
+local equals = util.equals
+
+function util.remove_stack_with_meta(inv, list_name, stack)
+	if not stack.get_name then
+		error(("stack is WRONG: %s(%s)"):format(type(stack), minetest.serialize(stack)))
+	end
+
+	local stack_name = stack:get_name()
+	local stack_count = stack:get_count()
+	local stack_wear = stack:get_wear()
+	local stack_meta = stack:get_meta():to_table()
+	local list_table = inv:get_list(list_name)
+
+	for _, i_stack in ipairs(list_table) do
+		local i_name = i_stack:get_name()
+		local i_count = i_stack:get_count()
+		local i_wear = i_stack:get_wear()
+		local i_meta = i_stack:get_meta():to_table()
+		if stack_name == i_name and stack_wear == i_wear and equals(stack_meta, i_meta) then
+			if i_count >= stack_count then
+				i_count = i_count - stack_count
+				stack_count = 0
+				i_stack:set_count(i_count)
+				break
+			else
+				stack_count = stack_count - i_count
+				i_stack:clear(0)
+			end
+		end
+	end
+
+	inv:set_list(list_name, list_table)
+
+	-- returns the items that were actually removed
+	local removed = ItemStack(stack)
+	removed:set_count(stack:get_count() - stack_count)
+	return removed
+end
+
+function util.class(super)
     local class = {}
 	class.__index = class
 
