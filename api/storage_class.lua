@@ -1,8 +1,5 @@
-local F = minetest.formspec_escape
-
 local S = smartshop.S
 local class = smartshop.util.class
-local formspec_pos = smartshop.util.formspec_pos
 
 --------------------
 
@@ -64,46 +61,13 @@ end
 
 --------------------
 
-local mesein_descriptions = {
-	S("Don't send"),
-	S("Incoming"),
-	S("Outgoing"),
-	S("Both"),
-}
-
-function storage_class:build_formspec()
-	local fpos = formspec_pos(self.pos)
-	local title = F(self:get_title())
-
-	local fs_parts = {
-		"size[12,9]",
-		("field[0.3,5.3;2,1;title;;%s]"):format(title),
-		"field_close_on_enter[title;false]",
-		("tooltip[title;%s]"):format(S("Used with connected smartshops")),
-		("button_exit[0,6;2,1;save;%s]"):format(S("Save")),
-		("list[nodemeta:%s;main;0,0;12,5;]"):format(fpos),
-		"list[current_player;main;2,5;8,4;]",
-		("listring[nodemeta:%s;main]"):format(fpos),
-		"listring[current_player;main]",
-	}
-
-	if smartshop.has.mesecons then
-		local mesein = self:get_mesein()
-		local description = mesein_descriptions[mesein + 1]
-		table.insert(fs_parts, ("button[0,7;2,1;mesesin;%s]"):format(description))
-		table.insert(fs_parts, ("tooltip[mesesin;%s]"):format(S("When to send a mesecons signal")))
-	end
-
-	return table.concat(fs_parts, "")
-end
-
 function storage_class:show_formspec(player)
 	if not self:can_access(player) then
 		return
 	end
 
 	local player_name = player:get_player_name()
-	local formspec = self:build_formspec()
+	local formspec = api.build_storage_formspec(self)
 	local formname = ("smartshop:%s"):format(self:get_pos_as_string())
 
 	minetest.show_formspec(player_name, formname, formspec)

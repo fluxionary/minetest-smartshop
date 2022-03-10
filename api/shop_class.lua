@@ -1,5 +1,3 @@
-local F = minetest.formspec_escape
-local after = minetest.after
 local get_node = minetest.get_node
 local parse_json = minetest.parse_json
 local pos_to_string = minetest.pos_to_string
@@ -9,7 +7,6 @@ local write_json = minetest.write_json
 
 local S = smartshop.S
 local class = smartshop.util.class
-local formspec_pos = smartshop.util.formspec_pos
 local player_is_admin = smartshop.util.player_is_admin
 local string_to_pos = smartshop.util.string_to_pos
 local table_is_empty = smartshop.util.table_is_empty
@@ -336,98 +333,15 @@ end
 function shop_class:show_formspec(player, force_client_view)
 	local formspec
 	if self:is_owner(player) and not force_client_view then
-		formspec = self:build_owner_formspec(player)
+		formspec = api.build_owner_formspec(self)
 	else
-		formspec = self:build_client_formspec()
+		formspec = api.build_client_formspec(self)
 	end
 
 	local formname = ("smartshop:%s"):format(self:get_pos_as_string())
 	local player_name = player:get_player_name()
 
 	show_formspec(player_name, formname, formspec)
-end
-
-function shop_class:build_client_formspec()
-	local fpos = formspec_pos(self.pos)
-	local inv = self.inv
-	local pay1 = inv:get_stack("pay1", 1)
-	local pay2 = inv:get_stack("pay2", 1)
-	local pay3 = inv:get_stack("pay3", 1)
-	local pay4 = inv:get_stack("pay4", 1)
-
-	local fs_parts = {
-		"size[8,6]",
-		"list[current_player;main;0,2.2;8,4;]",
-		("label[0,0.2;%s]"):format(S("On Sale:")),
-		("label[0,1.2;]"):format(S("Price:")),
-		("list[nodemeta:%s;give1;2,0;1,1;]"):format(fpos),
-		-- TODO why `\n\n\b\b\b\b\b`
-		("item_image_button[2,1;1,1;%s;buy1;\n\n\b\b\b\b\b%i]"):format(pay1:get_name(), pay1:get_count()),
-		("list[nodemeta:%s;give2;3,0;1,1;]"):format(fpos),
-		("item_image_button[3,1;1,1;%s;buy2;\n\n\b\b\b\b\b%i]"):format(pay2:get_name(), pay2:get_count()),
-		("list[nodemeta:%s;give3;4,0;1,1;]"):format(fpos),
-		("item_image_button[4,1;1,1;%s;buy3;\n\n\b\b\b\b\b%i]"):format(pay3:get_name(), pay3:get_count()),
-		("list[nodemeta:%s;give4;5,0;1,1;]"):format(fpos),
-		("item_image_button[5,1;1,1;%s;buy4;\n\n\b\b\b\b\b%i]"):format(pay4:get_name(), pay4:get_count()),
-	}
-
-	return table.concat(fs_parts, "")
-end
-
-function shop_class:build_owner_formspec()
-	local fpos = formspec_pos(self.pos)
-	local send = self:get_send()
-	local refill = self:get_refill()
-
-	local is_unlimited = self:is_unlimited()
-	local owner = self:get_owner()
-
-	local fs_parts = {
-		"size[8,10]",
-		("button[6,0;1.5,1;customer;%s]"):format(S("Customer")),
-		("label[0,0.2;%s]"):format(S("On Sale:")),
-		("label[0,1.2;]"):format(S("Price:")),
-		("list[nodemeta:%s;give1;1,0;1,1;]"):format(fpos),
-		("list[nodemeta:%s;pay1;1,1;1,1;]"):format(fpos),
-		("list[nodemeta:%s;give2;2,0;1,1;]"):format(fpos),
-		("list[nodemeta:%s;pay2;2,1;1,1;]"):format(fpos),
-		("list[nodemeta:%s;give3;3,0;1,1;]"):format(fpos),
-		("list[nodemeta:%s;pay3;3,1;1,1;]"):format(fpos),
-		("list[nodemeta:%s;give4;4,0;1,1;]"):format(fpos),
-		("list[nodemeta:%s;pay4;4,1;1,1;]"):format(fpos),
-		("list[nodemeta:%s;main;0,2;8,4;]"):format(fpos),
-		"list[current_player;main;0,6.2;8,4;]",
-		("listring[nodemeta:%s;main]"):format(fpos),
-		"listring[current_player;main]"
-	}
-
-	if is_unlimited then
-		table.insert(fs_parts, ("label[0.5,-0.4;%s]"):format(S("Your stock is unlimited")))
-	end
-	if player_is_admin(owner) then
-		table.insert(fs_parts, ("button[6,1;2.2,1;toggle_unlimited;%s]"):format(S("Toggle limit")))
-	end
-
-	if not is_unlimited then
-		table.insert(fs_parts, ("button_exit[5,0;1,1;tsend;%s]"):format(S("Send")))
-		table.insert(fs_parts, ("button_exit[5,1;1,1;trefill;%s]"):format(S("Refill")))
-
-		if send then
-			local title = F(send:get_title())
-			table.insert(fs_parts, ("tooltip[tsend;%s]"):format(S("Payments sent to @1", title)))
-		else
-			table.insert(fs_parts, ("tooltip[tsend;%s]"):format(S("Click to set send storage")))
-		end
-
-		if refill then
-			local title = F(refill:get_title())
-			table.insert(fs_parts, ("tooltip[trefill;%s]"):format(S("Automatically refilled from @1", title)))
-		else
-			table.insert(fs_parts, ("tooltip[trefill;%s]"):format(S("Click to set refill storage")))
-		end
-	end
-
-	return table.concat(fs_parts, "")
 end
 
 local function get_buy_index(pressed)

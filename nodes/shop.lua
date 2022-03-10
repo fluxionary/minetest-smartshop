@@ -72,7 +72,7 @@ end
 
 register_variant("smartshop:shop")
 register_variant("smartshop:shop_full", {
-	tiles = make_variant_tiles("#0000FF77")
+	tiles = make_variant_tiles("#80008077")
 })
 register_variant("smartshop:shop_empty", {
 	tiles = make_variant_tiles("#FF000077")
