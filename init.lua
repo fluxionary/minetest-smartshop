@@ -29,6 +29,7 @@ smartshop = {
 
 	has = {
 		currency = minetest.get_modpath("currency"),
+		default = minetest.get_modpath("default"),
 		mesecons = minetest.get_modpath("mesecons"),
 		mesecons_mvps = minetest.get_modpath("mesecons_mvps"),
 		tubelib = minetest.get_modpath("tubelib"),
@@ -46,10 +47,10 @@ smartshop.dofile("nodes", "init")
 smartshop.dofile("entities", "init")
 smartshop.dofile("compat", "init")
 
+smartshop.dofile("refunds")
+
 smartshop.dofile("crafting")
 smartshop.dofile("aliases")
-
-smartshop.dofile("refunds")
 
 
 --------------------------------

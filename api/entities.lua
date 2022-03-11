@@ -183,7 +183,8 @@ end
 
 function api.update_entities(shop)
 	-- TODO this should also update existing entities, not just create new ones.
-	--      there should be no need to call clear_entities before calling this function.
+	--      there should be no need to call clear_entities
+	shop:clear_entities()
 
 	local empty_count = 0
 	local sprite_count = 0

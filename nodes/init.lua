@@ -1,23 +1,8 @@
 local get_object = smartshop.api.get_object
 
 smartshop.nodes = {
-	tube_can_insert = function(pos, node, stack, direction)
-		local obj = get_object(pos)
-		local inv = obj.inv
-		return inv:room_for_item("main", stack)
-	end,
 
-    tube_insert = function(pos, node, stack, direction)
-		local obj = get_object(pos)
-		local inv = obj.inv
-		local added = inv:add_item("main", stack)
-
-	    obj:update_appearance()
-
-	    return added
-	end,
-
-	after_place_node = function(pos, placer)
+	after_place_node = function(pos, placer, itemstack)
 		local obj = get_object(pos)
 		obj:initialize_metadata(placer)
 		obj:initialize_inventory()
@@ -64,17 +49,6 @@ smartshop.nodes = {
 		return obj:on_destruct()
 	end,
 }
-
-if smartshop.has.mesecon then
-	function smartshop.nodes.on_timer(pos, elapsed)
-		mesecon.receptor_off(pos)
-		return false
-	end
-else
-	function smartshop.nodes.on_timer()
-		return false
-	end
-end
 
 smartshop.dofile("nodes", "shop")
 smartshop.dofile("nodes", "storage")

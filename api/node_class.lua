@@ -2,8 +2,11 @@ local check_player_privs = minetest.check_player_privs
 local get_meta = minetest.get_meta
 local pos_to_string = minetest.pos_to_string
 
+local api = smartshop.api
+
 local class = smartshop.util.class
 local get_formspec_pos = smartshop.util.get_formspec_pos
+local get_stack_key = smartshop.util.get_stack_key
 local remove_stack_with_meta = smartshop.util.remove_stack_with_meta
 
 --------------------
@@ -68,34 +71,48 @@ end
 
 --------------------
 
+function node_class:is_shop()
+	return api.is_shop(self.pos)
+end
+
+function node_class:is_storage()
+	return api.is_storage(self.pos)
+end
+
+--------------------
+
 function node_class:get_count(stack, match_meta)
+	if type(stack) == "string" then
+		stack = ItemStack(stack)
+	end
 	if stack:is_empty() then
 		return 0
 	end
 	local inv = self.inv
 	local total = 0
-	if match_meta then
-		local singleton = ItemStack(stack)
-		singleton:set_count(1)
-		local singleton_string = singleton:to_string()
-		for i = 1, inv:get_size("main") do
-			local si = inv:get_stack("main", i)
-			local count = si:get_count()
-			si:set_count(1)
-			if singleton_string == si:to_string() then
-				total = total + count
-			end
-		end
-	else
-		local stack_name = stack:get_name()
-		for i = 1, inv:get_size("main") do
-			local si = inv:get_stack("main", i)
-			if stack_name == si:get_name() then
-				total = total + si:get_count()
-			end
+
+	local key = get_stack_key(stack, match_meta)
+	for _, inv_stack in inv:get_list("main") do
+		if key == get_stack_key(inv_stack, match_meta) then
+			total = total + inv_stack:get_count()
 		end
 	end
+
 	return math.floor(total / stack:get_count())
+end
+
+function node_class:get_all_counts(match_meta)
+	local inv = self.inv
+	local all_counts = {}
+
+	for _, stack in inv:get_list("main") do
+		local key = get_stack_key(stack, match_meta)
+		local count = all_counts[key] or 0
+		count = count + stack:get_count()
+		all_counts[key] = count
+	end
+
+	return all_counts()
 end
 
 function node_class:room_for_item(stack)

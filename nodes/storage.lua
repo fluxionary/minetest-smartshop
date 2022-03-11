@@ -7,32 +7,15 @@ smartshop.storage_node_names = {}
 
 local storage_def = {
 	description = S("Smartshop external storage"),
-	tiles = {"default_chest_top.png^[colorize:#ffffff77^default_obsidian_glass.png"},
+	tiles = {"smartshop_face.png^[colorize:#ffffff77^smartshop_border.png"},
 	use_texture_alpha = "opaque",
 	groups = {
 		choppy = 2,
 		oddly_breakable_by_hand = 1,
-		tubedevice = 1,
-		tubedevice_receiver = 1,
-		mesecon = 2
 	},
 	paramtype = "light",
 	sunlight_propagates = true,
 	light_source = 10,
-	on_timer = nodes.on_timer,
-	tube = {
-		insert_object = nodes.tube_insert,
-		can_insert = nodes.tube_can_insert,
-		input_inventory = "main",
-		connect_sides = {
-			left = 1,
-			right = 1,
-			front = 1,
-			back = 1,
-			top = 1,
-			bottom = 1
-		}
-	},
 	after_place_node = nodes.after_place_node,
 	on_rightclick = nodes.on_rightclick,
 	allow_metadata_inventory_put = nodes.allow_metadata_inventory_put,
@@ -66,7 +49,7 @@ local function register_variant(name, overrides)
 end
 
 local function make_variant_tiles(color)
-	return {("(default_chest_top.png^[colorize:#FFFFFF77)^(default_obsidian_glass.png^[colorize:%s)"):format(color)}
+	return {("(smartshop_face.png^[colorize:#FFFFFF77)^(smartshop_border.png^[colorize:%s)"):format(color)}
 end
 
 register_variant("smartshop:storage")

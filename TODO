@@ -1,26 +1,17 @@
 * TESTING
 
-* toggle for strict metadata (bug #24)
-* logic for updating color of storage nodes
-* remove dependency on default
 * re-implement currency changing
+* logic for updating color of storage nodes
+* update existing entities, not just create new ones.
 * luacheck
 * automated testing
-* new features:
-  * see listed bugz, below
-  * api features:
-    * register callback on purchase
-    * register callback on shop full/empty
+
 * listed bugz
   * NaN checks when working w/ lurkcoin #3
   * Shops don't always indicate they have been "used" properly #6
-    Suppose a shop sells two items, for 2 different denominations of currency. If item 1 has not been bought, and item 2
-    has sold out, the shop will appear to be unused. I possibly fixed this w/ a re-ordering of a couple of conditionals
-    in the shop colouring logic, but I haven't tested.
     * possibly fixed? need to test
   * Some items appear as unknown nodes in shops. #7
     E.g. the barrel cacti from desert life
-    note: i think i've fixed this; show wielditem entity for nodebox/mesh drawtypes
     * possibly fixed? need to test
   * if an item is in multiple slots in a smartshop, only show one entity icon for it #11
     * this should only be relevant when you can't show all 4 slots in a single entity
@@ -30,3 +21,4 @@
     based on the next animal to sell.
   * Add a help button #16
   * allow shared shops #23
+  * toggle for strict metadata (bug #24)

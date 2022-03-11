@@ -9,11 +9,11 @@ local storage_link_time = smartshop.settings.storage_link_time
 
 local data_by_player_name = {}
 
-local function expire(player_name, shop, storage_type)
+local function expire(player_name, id, shop, storage_type)
 	local data = data_by_player_name[player_name]
 
 	-- make sure we're expiring the correct request
-	if data and data.shop == shop and data.storage_type == storage_type then
+	if data and data.id == id and data.shop == shop and data.storage_type == storage_type then
 		data_by_player_name[player_name] = nil
 		smartshop.chat_send_player(player_name, "Storage link attempt timed out, please try again.")
 	end
@@ -24,13 +24,14 @@ function api.start_storage_linking(player, shop, storage_type)
 
 	smartshop.chat_send_player(player_name, "Punch a smartshop storage node to link @1 storage", S(storage_type))
 
+	local id = get_us_time()
 	data_by_player_name[player_name] = {
-		id = get_us_time(),
+		id = id,
 		shop = shop,
 		storage_type = storage_type,
 	}
 
-	minetest.after(storage_link_time, expire, player_name, shop, storage_type)
+	minetest.after(storage_link_time, expire, player_name, id, shop, storage_type)
 end
 
 function api.try_link_storage(storage, player)

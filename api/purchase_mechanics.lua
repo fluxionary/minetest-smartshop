@@ -1,5 +1,3 @@
-local S = smartshop.S
-
 local api = smartshop.api
 
 local check_shop_add = smartshop.util.check_shop_add_remainder
@@ -8,6 +6,9 @@ local check_player_add = smartshop.util.check_player_add_remainder
 local check_player_removed = smartshop.util.check_player_remove_remainder
 
 api.registered_purchase_mechanics = {}
+api.registered_on_purchases = {}
+api.registered_on_shop_fulls = {}
+api.registered_on_shop_emptys = {}
 
 --[[
 	TODO: mechanic definition isn't set in stone currently, see below
@@ -17,18 +18,55 @@ function api.register_purchase_mechanic(def)
 	table.insert(api.registered_purchase_mechanics, def)
 end
 
+function api.register_on_purchase(callback)
+	table.insert(api.registered_on_purchases, callback)
+end
+
+function api.on_purchase(player, shop, i)
+	for _, callback in ipairs(api.registered_on_purchases) do
+		callback(player, shop, i)
+	end
+end
+
+function api.register_on_shop_full(callback)
+	table.insert(api.registered_on_shop_fulls, callback)
+end
+
+function api.on_shop_full(player, shop, i)
+	for _, callback in ipairs(api.registered_on_shop_fulls) do
+		callback(player, shop, i)
+	end
+end
+
+function api.register_on_shop_empty(callback)
+	table.insert(api.registered_on_shop_emptys, callback)
+end
+
+function api.on_shop_empty(player, shop, i)
+	for _, callback in ipairs(api.registered_on_shop_emptys) do
+		callback(player, shop, i)
+	end
+end
+
 function api.try_purchase(player, shop, i)
 	local player_inv = api.get_player_inv(player)
 
 	for _, def in ipairs(api.registered_purchase_mechanics) do
 		if def.allow_purchase(player_inv, shop, i) then
 			def.do_purchase(player_inv, shop, i)
+			api.on_purchase(player, shop, i)
 			return true
 		end
 	end
 
 	local reason = api.get_purchase_fail_reason(player_inv, shop, i)
 	smartshop.chat_send_player(player, ("Cannot exchange: %s"):format(reason))
+
+	if reason == "Shop is sold out" then
+		api.on_shop_empty(player, shop, i)
+	elseif reason == "Shop is full" then
+		api.on_shop_full(player, shop, i)
+	end
 
 	return false
 end

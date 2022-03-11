@@ -6,15 +6,7 @@ local S = smartshop.S
 local api = smartshop.api
 
 local formspec_pos = smartshop.util.formspec_pos
-
---------------------
-
-local mesein_descriptions = {
-	S("Don't send"),
-	S("Incoming"),
-	S("Outgoing"),
-	S("Both"),
-}
+local player_is_admin = smartshop.util.player_is_admin
 
 --------------------
 
@@ -90,27 +82,30 @@ end
 
 function api.build_client_formspec(shop)
 	local fpos = formspec_pos(shop.pos)
-	local inv = shop.inv
-	local pay1 = inv:get_stack("pay1", 1)
-	local pay2 = inv:get_stack("pay2", 1)
-	local pay3 = inv:get_stack("pay3", 1)
-	local pay4 = inv:get_stack("pay4", 1)
 
 	local fs_parts = {
 		"size[8,6]",
 		"list[current_player;main;0,2.2;8,4;]",
 		("label[0,0.2;%s]"):format(S("On Sale:")),
 		("label[0,1.2;]"):format(S("Price:")),
-		("list[nodemeta:%s;give1;2,0;1,1;]"):format(fpos),
-		-- TODO why `\n\n\b\b\b\b\b`
-		("item_image_button[2,1;1,1;%s;buy1;\n\n\b\b\b\b\b%i]"):format(pay1:get_name(), pay1:get_count()),
-		("list[nodemeta:%s;give2;3,0;1,1;]"):format(fpos),
-		("item_image_button[3,1;1,1;%s;buy2;\n\n\b\b\b\b\b%i]"):format(pay2:get_name(), pay2:get_count()),
-		("list[nodemeta:%s;give3;4,0;1,1;]"):format(fpos),
-		("item_image_button[4,1;1,1;%s;buy3;\n\n\b\b\b\b\b%i]"):format(pay3:get_name(), pay3:get_count()),
-		("list[nodemeta:%s;give4;5,0;1,1;]"):format(fpos),
-		("item_image_button[5,1;1,1;%s;buy4;\n\n\b\b\b\b\b%i]"):format(pay4:get_name(), pay4:get_count()),
 	}
+
+	local function give_i(i)
+		return ("list[nodemeta:%s;give%i;%i,0;1,1;]"):format(fpos, i, i + 1)
+	end
+
+	local function buy_i(i)
+		local pay = shop:get_pay_stack(i)
+		-- TODO why `\n\n\b\b\b\b\b`
+		return ("item_image_button[%i,1;1,1;%s;buy%i;\n\n\b\b\b\b\b%i]"):format(
+			i + 1, pay:get_name(), i, pay:get_count()
+		)
+	end
+
+	for i = 1, 4 do
+		table.insert(fs_parts, give_i(i))
+		table.insert(fs_parts, buy_i(i))
+	end
 
 	return table.concat(fs_parts, "")
 end
@@ -130,13 +125,6 @@ function api.build_storage_formspec(storage)
 		("listring[nodemeta:%s;main]"):format(fpos),
 		"listring[current_player;main]",
 	}
-
-	if smartshop.has.mesecons then
-		local mesein = storage:get_mesein()
-		local description = mesein_descriptions[mesein + 1]
-		table.insert(fs_parts, ("button[0,7;2,1;mesesin;%s]"):format(description))
-		table.insert(fs_parts, ("tooltip[mesesin;%s]"):format(S("When to send a mesecons signal")))
-	end
 
 	return table.concat(fs_parts, "")
 end

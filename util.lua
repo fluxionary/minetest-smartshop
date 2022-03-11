@@ -298,6 +298,16 @@ function util.remove_stack_with_meta(inv, list_name, stack)
 	return removed
 end
 
+function util.get_stack_key(stack, match_meta)
+	if match_meta then
+		local key_stack = ItemStack(stack) -- clone
+		key_stack:set_count(1)
+		return key_stack:to_string()
+	else
+		return stack:get_name()
+	end
+end
+
 function util.class(super)
     local class = {}
 	class.__index = class

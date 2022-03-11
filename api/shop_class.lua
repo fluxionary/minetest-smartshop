@@ -31,7 +31,6 @@ function shop_class:initialize_metadata(player)
 	self:set_admin(is_admin)
 	self:set_unlimited(is_admin)
 	self:set_upgraded()
-	self:set_state(0)  -- mesecons?
 	self:set_strict_meta(false)
 end
 
@@ -163,11 +162,6 @@ function shop_class:has_refund()
 	return self.meta:get("refund")
 end
 
-function shop_class:set_state(value)
-	self.meta:set_int("state", value)
-	self.meta:mark_as_private("state")
-end
-
 function shop_class:set_strict_meta(value)
 	self.meta:set_int("strict_meta", value and 1 or 0)
 	self.meta:mark_as_private("strict_meta")
@@ -205,30 +199,64 @@ end
 
 --------------------
 
-function shop_class:get_count(stack)
+function shop_class:get_count(stack, kind)
 	local match_meta = self:is_strict_meta()
-	return node_class.get_count(self, stack, match_meta)
+	local count = node_class.get_count(self, stack, match_meta)
+
+	if kind == "give" then
+		local refill = self:get_refill()
+		if refill then
+			count = count + refill:get_count(stack, match_meta)
+		end
+
+	elseif kind == "pay" then
+		local send = self:get_send()
+		if send then
+			count = count + send:get_count(stack, match_meta)
+		end
+
+	end
+
+	return count
+end
+
+function shop_class:get_all_counts(kind)
+	local match_meta = self:is_strict_meta()
+	local all_counts = node_class.get_all_counts(self, match_meta)
+
+	if kind == "give" then
+		local refill = self:get_refill()
+		if refill then
+			for key, value in pairs(refill:get_all_counts(match_meta)) do
+				all_counts[key] = (all_counts[key] or 0) + value
+			end
+		end
+
+	elseif kind == "pay" then
+		local send = self:get_send()
+		if send then
+			for key, value in pairs(send:get_all_counts(match_meta)) do
+				all_counts[key] = (all_counts[key] or 0) + value
+			end
+		end
+	end
+
+	return all_counts
 end
 
 function shop_class:give_is_valid(i)
 	local stack = self:get_give_stack(i)
-	return not stack:is_empty() and stack:is_known()
+	return stack:is_known() and not stack:is_empty()
 end
 
 function shop_class:can_give_count(i)
 	local stack = self:get_give_stack(i)
-	local count = self:get_count(stack)
-	local refill = self:get_refill()
-	if refill then
-		local match_meta = self:is_strict_meta()
-		count = count + refill:get_count(stack, match_meta)
-	end
-	return count
+	return self:get_count(stack, "give")
 end
 
 function shop_class:pay_is_valid(i)
 	local stack = self:get_pay_stack(i)
-	return not stack:is_empty() and stack:is_known()
+	return stack:is_known() and not stack:is_empty()
 end
 
 function shop_class:has_pay(i)
@@ -238,13 +266,7 @@ end
 
 function shop_class:has_pay_count(i)
 	local stack = self:get_pay_stack(i)
-	local count = self:get_count(stack)
-	local send = self:get_send()
-	if send then
-		local match_meta = self:is_strict_meta()
-		count = count + send:get_count(stack, match_meta)
-	end
-	return count
+	return self:get_count(stack, "pay")
 end
 
 function shop_class:room_for_pay(i)
@@ -253,7 +275,12 @@ function shop_class:room_for_pay(i)
 end
 
 function shop_class:can_exchange(i)
-	return self:give_is_valid(i) and self:pay_is_valid(i) and self:can_give(i) and self:room_for_pay(i)
+	return (
+		self:give_is_valid(i) and
+		self:pay_is_valid(i) and
+		self:can_give(i) and
+		self:room_for_pay(i)
+	)
 end
 
 function shop_class:room_for_item(stack)
@@ -469,11 +496,11 @@ function shop_class:compute_variant()
 	elseif n_have_room_for_pay ~= n_total then
 		-- something can't be bought because the shop is full`
 		return "smartshop:shop_full"
+	elseif n_have_pay > 0 then
+		return "smartshop:shop_used"
 	elseif n_have_give ~= n_total then
 		-- something is sold out
 		return "smartshop:shop_empty"
-	elseif n_have_pay > 0 then
-		return "smartshop:shop_used"
 	else
 		-- shop is ready for use
 		return "smartshop:shop"
@@ -549,8 +576,6 @@ function shop_class:clear_entities()
 end
 
 function shop_class:update_entities()
-	-- TODO don't just clear the old entities, most of the time they don't even need to change...
-	self:clear_entities()
 	api.update_entities(self)
 end
 
