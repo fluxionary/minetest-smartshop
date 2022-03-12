@@ -3,6 +3,7 @@
 * re-implement currency changing
 * logic for updating color of storage nodes
 * update existing entities, not just create new ones.
+* don't show invalid exchanges in the customer view
 * luacheck
 * automated testing
 

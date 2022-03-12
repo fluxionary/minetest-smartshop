@@ -77,11 +77,11 @@ function api.get_purchase_fail_reason(player_inv, shop, i)
 
 	if not player_inv:contains_item(pay_stack) then
 		return "You lack appropriate payment"
-	elseif not shop:contains_item(give_stack) then
+	elseif not shop:contains_item(give_stack, "give") then
 		return "Shop is sold out"
 	elseif not player_inv:room_for_item(give_stack) then
 		return "No room in your inventory"
-	elseif not shop:room_for_item(pay_stack) then
+	elseif not shop:room_for_item(pay_stack, "pay") then
 		return "Shop is full"
 	end
 
@@ -95,8 +95,8 @@ api.register_purchase_mechanic({
 		local give_stack = shop:get_give_stack(i)
 
 		return (
-			shop:contains_item(give_stack) and
-			shop:room_for_item(pay_stack) and
+			shop:contains_item(give_stack, "give") and
+			shop:room_for_item(pay_stack, "pay") and
 			player_inv:contains_item(pay_stack) and
 			player_inv:room_for_item(give_stack)
 		)
@@ -105,10 +105,10 @@ api.register_purchase_mechanic({
 		local pay_stack = shop:get_pay_stack(i)
 		local give_stack = shop:get_give_stack(i)
 
-		local shop_removed = shop:remove_item(give_stack)
+		local shop_removed = shop:remove_item(give_stack, "give")
 		local player_removed = player_inv:remove_item(pay_stack)
 		local player_remaining = player_inv:add_item(give_stack)
-		local shop_remaining = shop:add_item(pay_stack)
+		local shop_remaining = shop:add_item(pay_stack, "pay")
 
 		check_shop_removed(shop, shop_removed, give_stack)
 		check_player_removed(player_inv, shop, player_removed, pay_stack)

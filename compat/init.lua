@@ -1,7 +1,7 @@
--- TODO not finished
---if smartshop.has.currency then
---	smartshop.dofile("compat", "currency")
---end
+
+if smartshop.has.currency then
+	smartshop.dofile("compat", "currency")
+end
 
 if smartshop.has.mesecons then
 	smartshop.dofile("compat", "mesecons")

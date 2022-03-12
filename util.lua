@@ -1,3 +1,5 @@
+local create_detached_inventory = minetest.create_detached_inventory
+
 local error_behavior = smartshop.settings.error_behavior
 
 smartshop.util = {}
@@ -106,9 +108,9 @@ function util.pairs_by_keys(t, sort_func)
 	end
 end
 
-function util.pairs_by_values(t, f)
-	if not f then
-		f = function(a, b)
+function util.pairs_by_values(t, sort_function)
+	if not sort_function then
+		sort_function = function(a, b)
 			return a < b
 		end
 	end
@@ -117,7 +119,7 @@ function util.pairs_by_values(t, f)
 		table.insert(s, {k, v})
 	end
 	table.sort(s, function(a, b)
-		return f(a[2], b[2])
+		return sort_function(a[2], b[2])
 	end)
 	local i = 0
 	return function()
@@ -140,44 +142,6 @@ function util.round(x)
 	end
 end
 
-function util.clone_tmp_inventory(inv_name, src_inv, src_list_name)
-	-- TODO are these "default" allow functions required? :\
-	local tmp_inv = minetest.create_detached_inventory(inv_name, {
-		allow_move = function(inv, from_list, from_index, to_list, to_index, count, player)
-			return count
-		end,
-		allow_put = function(inv, listname, index, stack, player)
-			return stack:get_size()
-		end,
-		allow_take = function(inv, listname, index, stack, player)
-			return stack:get_size()
-		end,
-	})
-
-	for name, _ in pairs(src_inv:get_lists()) do
-		if not tmp_inv:is_empty(name) or tmp_inv:get_size(name) ~= 0 then
-			util.error("attempt to re-use existing temporary inventory %s", inv_name)
-			return
-		end
-	end
-
-	if src_list_name then
-		tmp_inv:set_size(src_list_name, src_inv:get_size(src_list_name))
-		tmp_inv:set_list(src_list_name, src_inv:get_list(src_list_name))
-	else
-		for name, list in pairs(src_inv:get_lists()) do
-			tmp_inv:set_size(name, src_inv:get_size(name))
-			tmp_inv:set_list(name, list)
-		end
-	end
-
-	return tmp_inv
-end
-
-function util.delete_tmp_inventory(inv_name)
-	minetest.remove_detached_inventory(inv_name)
-end
-
 function util.check_shop_add_remainder(shop, remainder)
 	if remainder:get_count() == 0 then
 		return false
@@ -190,6 +154,7 @@ function util.check_shop_add_remainder(shop, remainder)
 
 	return true
 end
+
 function util.check_shop_remove_remainder(shop, remainder, expected)
 	if remainder:get_count() == expected:get_count() then
 		return false
@@ -262,10 +227,6 @@ end
 local equals = util.equals
 
 function util.remove_stack_with_meta(inv, list_name, stack)
-	if not stack.get_name then
-		error(("stack is WRONG: %s(%s)"):format(type(stack), minetest.serialize(stack)))
-	end
-
 	local stack_name = stack:get_name()
 	local stack_count = stack:get_count()
 	local stack_wear = stack:get_wear()
@@ -306,6 +267,24 @@ function util.get_stack_key(stack, match_meta)
 	else
 		return stack:get_name()
 	end
+end
+
+function util.clone_tmp_inventory(inv_name, src_inv)
+	local tmp_inv = create_detached_inventory(inv_name, {})
+
+	for name, _ in pairs(src_inv:get_lists()) do
+		if not tmp_inv:is_empty(name) or tmp_inv:get_size(name) ~= 0 then
+			util.error("attempt to re-use existing temporary inventory %s", inv_name)
+			return
+		end
+	end
+
+	for name, list in pairs(src_inv:get_lists()) do
+		tmp_inv:set_size(name, src_inv:get_size(name))
+		tmp_inv:set_list(name, list)
+	end
+
+	return tmp_inv
 end
 
 function util.class(super)

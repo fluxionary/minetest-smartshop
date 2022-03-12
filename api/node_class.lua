@@ -6,12 +6,11 @@ local api = smartshop.api
 
 local class = smartshop.util.class
 local get_formspec_pos = smartshop.util.get_formspec_pos
-local get_stack_key = smartshop.util.get_stack_key
-local remove_stack_with_meta = smartshop.util.remove_stack_with_meta
 
 --------------------
 
-local node_class = class()
+local inv_class = smartshop.inv_class
+local node_class = class(inv_class)
 smartshop.node_class = node_class
 
 --------------------
@@ -19,19 +18,7 @@ smartshop.node_class = node_class
 function node_class:__new(pos)
 	self.pos = pos
 	self.meta = get_meta(pos)
-	self.inv = self.meta:get_inventory()
-end
-
-function node_class:get_pos()
-	return self.pos
-end
-
-function node_class:get_meta()
-	return self.meta
-end
-
-function node_class:get_inv()
-	return self.inv
+	inv_class.__new(self, self.meta:get_inventory())
 end
 
 function node_class:get_pos_as_string()
@@ -81,75 +68,9 @@ end
 
 --------------------
 
-function node_class:get_count(stack, match_meta)
-	if type(stack) == "string" then
-		stack = ItemStack(stack)
-	end
-	if stack:is_empty() then
-		return 0
-	end
-	local inv = self.inv
-	local total = 0
-
-	local key = get_stack_key(stack, match_meta)
-	for _, inv_stack in inv:get_list("main") do
-		if key == get_stack_key(inv_stack, match_meta) then
-			total = total + inv_stack:get_count()
-		end
-	end
-
-	return math.floor(total / stack:get_count())
-end
-
-function node_class:get_all_counts(match_meta)
-	local inv = self.inv
-	local all_counts = {}
-
-	for _, stack in inv:get_list("main") do
-		local key = get_stack_key(stack, match_meta)
-		local count = all_counts[key] or 0
-		count = count + stack:get_count()
-		all_counts[key] = count
-	end
-
-	return all_counts()
-end
-
-function node_class:room_for_item(stack)
-	return self.inv:room_for_item("main", stack)
-end
-
-function node_class:add_item(stack)
-	return self.inv:add_item("main", stack)
-end
-
-function node_class:contains_item(stack, match_meta)
-	return self.inv:contains_item("main", stack, match_meta)
-end
-
-function node_class:remove_item(stack, match_meta)
-	local inv = self.inv
-
-	local removed
-	if match_meta then
-		removed = remove_stack_with_meta(inv, "main", stack)
-
-	else
-		removed = inv:remove_item("main", stack)
-	end
-
-	return removed
-end
-
---------------------
-
 function node_class:initialize_metadata(owner)
 	local player_name = owner:get_player_name()
 	self:set_owner(player_name)
-end
-
-function node_class:initialize_inventory()
-	-- noop
 end
 
 --------------------
@@ -188,8 +109,7 @@ function node_class:can_access(player)
 end
 
 function node_class:can_dig(player)
-	local inv = self.inv
-	return inv:is_empty("main") and self:can_access(player)
+	return self.inv:is_empty("main") and self:can_access(player)
 end
 
 --------------------

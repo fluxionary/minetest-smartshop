@@ -3,7 +3,7 @@ local check_shop_add = smartshop.util.check_shop_add_remainder
 local check_shop_removed = smartshop.util.check_shop_remove_remainder
 local check_player_add = smartshop.util.check_player_add_remainder
 local check_player_removed = smartshop.util.check_player_remove_remainder
-local get_stack_key = smartshop.util.get_stack_key
+local pairs_by_value = smartshop.util.pairs_by_value
 
 smartshop.currency = {}
 local currency = smartshop.currency
@@ -41,18 +41,28 @@ local known_currency = {
 }
 
 currency.available_currency = {}
-for name, amount in pairs(known_currency) do
+for name, value in pairs(known_currency) do
     if minetest.registered_items[name] then
-        currency.available_currency[name] = amount
-        smartshop.log("action", "available currency: %s=%q", name, tostring(amount))
+        currency.available_currency[name] = value
+        smartshop.log("action", "available currency: %s=%q", name, tostring(value))
     end
+end
+
+local decreasing_values = {}
+for name, value in pairs_by_value(currency.available_currency, function(a, b) return b < a end) do
+	table.insert(decreasing_values, {name, value})
+end
+
+local stack_sizes = {}
+for name, _ in pairs(currency.available_currency) do
+	stack_sizes[name] = ItemStack(name):get_stack_max()
 end
 
 local function sum_stack(stack)
     local name = stack:get_name()
     local count = stack:get_count()
-    local amount = currency.available_currency[name] or 0
-    return amount * count
+    local value = currency.available_currency[name] or 0
+    return value * count
 end
 
 local function sum_inv(inv, kind)
@@ -76,57 +86,168 @@ local function is_currency(stack)
     return smartshop.available_currency[name]
 end
 
-local function sort_increasing(a, b)
+local function sort_currency_counts(a, b)
     return smartshop.available_currency[a[1]] < smartshop.available_currency[b[1]]
 end
 
-local function sort_decreasing(a, b)
-    return smartshop.available_currency[b[1]] < smartshop.available_currency[a[1]]
-end
-
 function currency.room_for_item(inv, stack, kind)
-	return inv:room_for_item(stack)
+	return inv:room_for_item(stack, kind)
 end
 
 function currency.add_item(inv, stack, kind)
-	return inv:add_item(stack)
+	return inv:add_item(stack, kind)
+end
+
+local function get_change_stacks(value)
+	for _, currency_value in ipairs(decreasing_values) do
+		local name, c_value = unpack(currency_value)
+		if value % c_value == 0 then
+			local change_stacks = {}
+			local count_required = value / c_value
+			local stack_max = stack_sizes[name]
+
+			if stack_max < count_required then
+				local num_full_stacks = math.floor(count_required / stack_max)
+				local remainder = count_required % stack_max
+				for _ = 1, num_full_stacks do
+					local change_stack = ItemStack(name)
+					change_stack:set_count(stack_max)
+					table.insert(change_stack)
+				end
+				local change_stack = ItemStack(name)
+				change_stack:set_count(remainder)
+				table.insert(change_stack)
+			else
+				local change_stack = ItemStack(name)
+				change_stack:set_count()
+				table.insert(change_stacks, change_stack)
+			end
+
+			return change_stacks
+		end
+	end
 end
 
 function currency.contains_item(inv, stack, kind)
-	--local stack_amount = sum_stack(stack)
-	--local inv_amount = sum_inv(inv, kind)
-	--return inv_amount >= stack_amount
-	-- TODO whoops forgot to account for change
-	error("whoops forgot to account for change")
+	local tmp_inv = inv:get_tmp_inv()
+	local removed = currency.remove_item(tmp_inv, stack, kind)
+	local contains_item = removed:to_string() == stack:to_string()
+	inv:destroy_tmp_inv(tmp_inv)
+	return contains_item
 end
 
-function currency.remove_item(inv, stack, kind)
-	-- do the simple thing if possible
-	if inv:contains_item(stack) then
-		return inv:remove_item(stack)
-	end
-	-- here be dragons
-	local owed_amount = sum_stack(stack)
-	local paid_amount = 0
-
-	local key_stack = ItemStack(get_stack_key(stack, true))
-	if inv:contains_item(key_stack) then
-		local removed = inv:remove_item(stack)
-		local removed_amount = sum_stack(removed)
-		paid_amount = paid_amount + removed_amount
-		owed_amount = owed_amount - removed_amount
-	end
-
-	local all_counts = inv:get_all_counts(kind)
+local function get_currency_counts(inv, kind)
 	local currency_counts = {}
+	local all_counts = inv:get_all_counts(kind)
 	for item, count in pairs(all_counts) do
 		if is_currency(item) then
 			table.insert(currency_counts, {item, count})
 		end
 	end
-	table.sort(currency_counts, sort_decreasing)
+	table.sort(currency_counts, sort_currency_counts)
+	return currency_counts
+end
 
-	error("not finished")
+local function remove_small_bills(inv, kind, currency_counts, owed_value, removed_items)
+	-- remove small bills
+	local name_to_break  -- name of bill to break, if value is left over
+	for _, currency_count in ipairs(currency_counts) do
+		local name, count = unpack(currency_count)
+		local value = currency.available_currency[name]
+		local count_to_remove = math.min(count, math.floor(owed_value / value))
+		if count_to_remove == 0 then
+			name_to_break = name
+			break
+		end
+
+		local stack_to_remove = ItemStack(name)
+		stack_to_remove:set_count(count_to_remove)
+		table.insert(removed_items, inv:remove_item(stack_to_remove, kind))
+		owed_value = owed_value - (count_to_remove * value)
+	end
+
+	return name_to_break, owed_value
+end
+
+local function try_to_change(inv, kind, name_to_break, owed_value, removed_items)
+	local stack_to_break = ItemStack(name_to_break)
+
+	table.insert(removed_items, inv:remove_item(stack_to_break, kind))
+	local value = currency.available_currency[name_to_break]
+
+	local change_stacks = get_change_stacks(value - owed_value)
+	if not change_stacks then
+		return true
+	end
+
+	-- try adding the change to the inventory
+	local num_stacks_processed = 0
+	for _, change_stack in ipairs(change_stacks) do
+		local remainder = inv:add_item(change_stack, kind)
+
+		if not remainder:is_empty() then
+			-- failed to fit full change stack, we've got to undo inventory changes now
+			local partial_change_stack = ItemStack(change_stack:get_name())
+			partial_change_stack:set_count(change_stack:get_count() - remainder:get_count())
+			inv:remove_item(partial_change_stack, kind)
+			break
+		end
+
+		num_stacks_processed = num_stacks_processed + 1
+	end
+
+	if num_stacks_processed ~= #change_stacks then
+		-- changing failed, remove any change that was already added
+		for i = 1, num_stacks_processed do
+			inv:remove_item(change_stacks[i], kind)
+		end
+
+		return true
+	end
+
+	return false
+end
+
+function currency.remove_item(inv, stack, kind)
+	-- do the simple thing if possible
+	if inv:contains_item(stack, kind) then
+		return inv:remove_item(stack, kind)
+	end
+	-- here be dragons
+	local owed_value = sum_stack(stack)
+	local removed_items = {}
+
+	-- remove any relevant denominations
+	do
+		local removed = inv:remove_item(stack, kind)
+		local removed_value = sum_stack(removed)
+		owed_value = owed_value - removed_value
+		if not removed:is_empty() then
+			table.insert(removed_items, removed)
+		end
+	end
+
+	-- see what's in the player's inventory
+	local currency_counts = get_currency_counts(inv, kind)
+
+	local name_to_break
+	name_to_break, owed_value = remove_small_bills(inv, kind, currency_counts, owed_value, removed_items)
+
+	local change_failed = false
+	if owed_value > 0 then
+		-- break the next largest bill
+
+		change_failed = try_to_change(inv, kind, name_to_break, owed_value, removed_items)
+	end
+
+	-- if we failed, put stuff back
+	if change_failed then
+		for _, removed_item in ipairs(removed_items) do
+			inv:add_item(removed_item, kind)
+		end
+		return ItemStack()
+	end
+
 	return ItemStack(stack)
 end
 
@@ -148,16 +269,16 @@ api.register_purchase_mechanic({
 			shop_room_for_item = currency.room_for_item(shop, pay_stack, "pay")
 			player_contains_item = currency.contains_item(player_inv, pay_stack, "pay")
 		else
-			shop_room_for_item = shop:room_for_item(pay_stack)
-			player_contains_item = player_inv:contains_item(pay_stack)
+			shop_room_for_item = shop:room_for_item(pay_stack, "pay")
+			player_contains_item = player_inv:contains_item(pay_stack, "pay")
 		end
 
 		if is_currency(give_stack) then
 			shop_contains_item = currency.contains_item(shop, give_stack, "give")
 			player_room_for_item = currency.room_for_item(player_inv, give_stack, "give")
 		else
-			shop_contains_item = shop:contains_item(give_stack)
-			player_room_for_item = player_inv:room_for_item(give_stack)
+			shop_contains_item = shop:contains_item(give_stack, "give")
+			player_room_for_item = player_inv:room_for_item(give_stack, "give")
 		end
 
 		return (
@@ -182,16 +303,16 @@ api.register_purchase_mechanic({
 			player_removed = currency.remove_item(player_inv, pay_stack, "pay")
 			shop_remaining = currency.add_item(shop, pay_stack, "pay")
 		else
-			player_removed = player_inv:remove_item(pay_stack)
-			shop_remaining = shop:add_item(pay_stack)
+			player_removed = player_inv:remove_item(pay_stack, "pay")
+			shop_remaining = shop:add_item(pay_stack, "pay")
 		end
 
 		if is_currency(give_stack) then
 			shop_removed = currency.remove_item(shop, give_stack, "give")
 			player_remaining = currency.add_item(player_inv, give_stack, "give")
 		else
-			shop_removed = shop:remove_item(give_stack)
-			player_remaining = player_inv:add_item(give_stack)
+			shop_removed = shop:remove_item(give_stack, "give")
+			player_remaining = player_inv:add_item(give_stack, "give")
 		end
 
 		check_shop_removed(shop, shop_removed, give_stack)

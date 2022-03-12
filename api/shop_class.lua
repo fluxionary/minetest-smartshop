@@ -261,7 +261,7 @@ end
 
 function shop_class:has_pay(i)
 	local stack = self:get_pay_stack(i)
-	return self:contains_item(stack)
+	return self:contains_item(stack, "pay")
 end
 
 function shop_class:has_pay_count(i)
@@ -271,7 +271,7 @@ end
 
 function shop_class:room_for_pay(i)
 	local stack = self:get_pay_stack(i)
-	return self:room_for_item(stack)
+	return self:room_for_item(stack, "pay")
 end
 
 function shop_class:can_exchange(i)
@@ -283,7 +283,7 @@ function shop_class:can_exchange(i)
 	)
 end
 
-function shop_class:room_for_item(stack)
+function shop_class:room_for_item(stack, kind)
 	if self:is_unlimited() then
 		return true
 	end
@@ -292,24 +292,38 @@ function shop_class:room_for_item(stack)
 		return true
 	end
 
-	local send = self:get_send()
-	return send and send:room_for_item(stack)
+	if kind == "give" then
+		local refill = self:get_refill()
+		return refill and refill:room_for_item(stack)
+
+	elseif kind == "pay" then
+		local send = self:get_send()
+		return send and send:room_for_item(stack)
+	end
 end
 
-function shop_class:add_item(stack)
+function shop_class:add_item(stack, kind)
 	if self:is_unlimited() then
 		return ItemStack()
 	end
 
-	local send = self:get_send()
-	if send and send:room_for_item(stack) then
-		return send:add_item(stack)
+	if kind == "give" then
+		local refill = self:get_refill()
+		if refill and refill:room_for_item(stack) then
+			return refill:add_item(stack)
+		end
+
+	elseif kind == "pay" then
+		local send = self:get_send()
+		if send and send:room_for_item(stack) then
+			return send:add_item(stack)
+		end
 	end
 
 	return node_class.add_item(self, stack)
 end
 
-function shop_class:contains_item(stack)
+function shop_class:contains_item(stack, kind)
 	if self:is_unlimited() then
 		return true
 	end
@@ -320,20 +334,34 @@ function shop_class:contains_item(stack)
 		return true
 	end
 
-	local refill = self:get_refill()
-	return refill and refill:contains_item(stack, match_meta)
+	if kind == "give" then
+		local refill = self:get_refill()
+		return refill and refill:contains_item(stack, match_meta)
+
+	elseif kind == "pay" then
+		local send = self:get_send()
+		return send and send:contains_item(stack, match_meta)
+	end
 end
 
-function shop_class:remove_item(stack)
+function shop_class:remove_item(stack, kind)
 	if self:is_unlimited() then
 		return stack
 	end
 
 	local strict_meta = self:is_strict_meta()
-	local refill = self:get_refill()
 
-	if refill and refill:contains_item(stack, strict_meta) then
-		return refill:remove_item(stack, strict_meta)
+	if kind == "give" then
+		local refill = self:get_refill()
+		if refill and refill:contains_item(stack, strict_meta) then
+			return refill:remove_item(stack, strict_meta)
+		end
+
+	elseif kind == "pay" then
+		local send = self:get_send()
+		if send and send:contains_item(stack, strict_meta) then
+			return send:remove_item(stack, strict_meta)
+		end
 	end
 
 	return node_class.remove_item(self, stack, strict_meta)
@@ -461,7 +489,7 @@ end
 
 function shop_class:can_give(i)
 	local give = self:get_give_stack(i)
-	return self:contains_item(give)
+	return self:contains_item(give, "give")
 end
 
 function shop_class:compute_variant()
@@ -664,4 +692,10 @@ function shop_class:on_metadata_inventory_take(listname, index, stack, player)
 	if listname == "main" then
 		node_class.on_metadata_inventory_take(self, listname, index, stack, player)
 	end
+end
+
+--------------------
+
+function inv_class:get_tmp_inv()
+	return smartshop.tmp_shop_inv_class:new(self)
 end
