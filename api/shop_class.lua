@@ -73,8 +73,7 @@ function shop_class:toggle_unlimited()
 end
 
 function shop_class:is_unlimited()
-	local meta = self:get_meta()
-	return meta:get_int("unlimited") == 1
+	return self.meta:get_int("unlimited") == 1
 end
 
 function shop_class:set_send_pos(send_pos)
@@ -696,6 +695,6 @@ end
 
 --------------------
 
-function inv_class:get_tmp_inv()
+function shop_class:get_tmp_inv()
 	return smartshop.tmp_shop_inv_class:new(self)
 end

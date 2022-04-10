@@ -1,5 +1,20 @@
 smartshop.api = {}
 
+smartshop.dofile("api", "inv_class")
+smartshop.dofile("api", "node_class")
+smartshop.dofile("api", "shop_class")
+smartshop.dofile("api", "storage_class")
+smartshop.dofile("api", "player_inv_class")
+smartshop.dofile("api", "tmp_inv_class")
+smartshop.dofile("api", "tmp_shop_inv_class")
+
+smartshop.dofile("api", "formspec")
+
+smartshop.dofile("api", "purchase_mechanics")
+smartshop.dofile("api", "storage_linking")
+
+smartshop.dofile("api", "entities")
+
 function smartshop.api.is_shop(pos)
 	if not pos then return end
 	local node_name = minetest.get_node(pos).name
@@ -36,15 +51,3 @@ function smartshop.api.get_object(pos)
 	end
 	return obj
 end
-
-smartshop.dofile("api", "node_class")
-smartshop.dofile("api", "shop_class")
-smartshop.dofile("api", "storage_class")
-smartshop.dofile("api", "player_inv_class")
-
-smartshop.dofile("api", "formspec")
-
-smartshop.dofile("api", "purchase_mechanics")
-smartshop.dofile("api", "storage_linking")
-
-smartshop.dofile("api", "entities")

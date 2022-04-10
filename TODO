@@ -1,11 +1,14 @@
 * TESTING
 
-* re-implement currency changing
 * logic for updating color of storage nodes
 * update existing entities, not just create new ones.
 * don't show invalid exchanges in the customer view
 * luacheck
 * automated testing
+
+* needed features:
+ * toggle for allowing empty buy/give lines
+ * hide sold out items in the customer view
 
 * listed bugz
   * NaN checks when working w/ lurkcoin #3
