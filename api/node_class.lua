@@ -5,7 +5,7 @@ local pos_to_string = minetest.pos_to_string
 local api = smartshop.api
 
 local class = smartshop.util.class
-local get_formspec_pos = smartshop.util.get_formspec_pos
+local formspec_pos = smartshop.util.formspec_pos
 
 --------------------
 
@@ -26,7 +26,7 @@ function node_class:get_pos_as_string()
 end
 
 function node_class:get_formspec_pos()
-	return get_formspec_pos(self.pos)
+	return formspec_pos(self.pos)
 end
 
 --------------------

@@ -140,7 +140,7 @@ function shop_class:set_upgraded()
 end
 
 function shop_class:has_upgraded()
-	return self.meta:get("upgraded")
+	return self.meta:get("upgraded") == "true"
 end
 
 function shop_class:set_refund(refund)
@@ -158,7 +158,7 @@ function shop_class:get_refund()
 end
 
 function shop_class:has_refund()
-	return self.meta:get("refund")
+	return not not self.meta:get("refund")
 end
 
 function shop_class:set_strict_meta(value)
