@@ -1,9 +1,11 @@
+local api = smartshop.api
+local util = smartshop.util
 
-local check_shop_add = smartshop.util.check_shop_add_remainder
-local check_shop_removed = smartshop.util.check_shop_remove_remainder
-local check_player_add = smartshop.util.check_player_add_remainder
-local check_player_removed = smartshop.util.check_player_remove_remainder
-local pairs_by_value = smartshop.util.pairs_by_value
+local check_shop_add = util.check_shop_add_remainder
+local check_shop_removed = util.check_shop_remove_remainder
+local check_player_add = util.check_player_add_remainder
+local check_player_removed = util.check_player_remove_remainder
+local pairs_by_value = util.pairs_by_value
 
 smartshop.currency = {}
 local currency = smartshop.currency
@@ -63,17 +65,6 @@ local function sum_stack(stack)
     local count = stack:get_count()
     local value = currency.available_currency[name] or 0
     return value * count
-end
-
-local function sum_inv(inv, kind)
-	local total = 0
-
-	for item, value in pairs(currency.available_currency) do
-		local count = inv:get_count(item, kind)
-		total = total + (count * value)
-	end
-
-    return total
 end
 
 local function is_currency(stack)

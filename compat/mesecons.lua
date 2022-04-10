@@ -1,3 +1,4 @@
+-- luacheck: globals mesecon
 
 local S = smartshop.S
 

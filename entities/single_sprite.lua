@@ -12,10 +12,17 @@ local element_dir = smartshop.entities.element_dir
 local entity_offset = smartshop.entities.entity_offset
 
 local element_offset = {
-    { vector.new(0.2, 0.2, -0.2), vector.new(-0.2, 0.2, -0.2), vector.new(0.2, -0.2, -0.2), vector.new(-0.2, -0.2, -0.2) },
-    { vector.new(-0.2, 0.2, 0.2), vector.new(-0.2, 0.2, -0.2), vector.new(-0.2, -0.2, 0.2), vector.new(-0.2, -0.2, -0.2) },
-    { vector.new(-0.2, 0.2, 0.2), vector.new(0.2, 0.2, 0.2), vector.new(-0.2, -0.2, 0.2), vector.new(0.2, -0.2, 0.2) },
-    { vector.new(0.2, 0.2, -0.2), vector.new(0.2, 0.2, 0.2), vector.new(0.2, -0.2, -0.2), vector.new(0.2, -0.2, 0.2) },
+    { vector.new(0.2, 0.2, -0.2), vector.new(-0.2, 0.2, -0.2),
+      vector.new(0.2, -0.2, -0.2), vector.new(-0.2, -0.2, -0.2) },
+
+    { vector.new(-0.2, 0.2, 0.2), vector.new(-0.2, 0.2, -0.2),
+      vector.new(-0.2, -0.2, 0.2), vector.new(-0.2, -0.2, -0.2) },
+
+    { vector.new(-0.2, 0.2, 0.2), vector.new(0.2, 0.2, 0.2),
+      vector.new(-0.2, -0.2, 0.2), vector.new(0.2, -0.2, 0.2) },
+
+    { vector.new(0.2, 0.2, -0.2), vector.new(0.2, 0.2, 0.2),
+      vector.new(0.2, -0.2, -0.2), vector.new(0.2, -0.2, 0.2) },
 }
 
 minetest.register_entity("smartshop:single_sprite", {

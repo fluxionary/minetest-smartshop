@@ -1,4 +1,5 @@
 local S = smartshop.S
+local api = smartshop.api
 local class = smartshop.util.class
 
 --------------------

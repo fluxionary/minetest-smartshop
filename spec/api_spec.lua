@@ -1,3 +1,5 @@
+-- luacheck: globals mineunit fixture world sourcefile Player
+
 require("mineunit")
 
 mineunit("core")

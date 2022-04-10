@@ -35,10 +35,28 @@ local function get_image_from_tile(tile)
 			image_name = tile.name
 		end
 		if image_name then
-			if tile.animation and tile.animation.type == "vertical_frames" and tile.animation.aspect_w and tile.animation.aspect_h then
-				return ("smartshop_animation_mask.png^[resize:%ix%i^[mask:"):format(tile.animation.aspect_w, tile.animation.aspect_h) .. image_name
-			elseif tile.animation and tile.animation.type == "sheet_2d" and tile.animation.frames_w and tile.animation.frames_h then
-				return image_name .. ("^[sheet:%ix%i:0,0"):format(tile.animation.frames_w, tile.animation.frames_h)
+			if (
+				tile.animation and
+				tile.animation.type == "vertical_frames" and
+				tile.animation.aspect_w and
+				tile.animation.aspect_h
+			) then
+				return ("smartshop_animation_mask.png^[resize:%ix%i^[mask:%s"):format(
+					tile.animation.aspect_w,
+					tile.animation.aspect_h,
+					image_name
+				)
+			elseif (
+				tile.animation and
+				tile.animation.type == "sheet_2d" and
+				tile.animation.frames_w and
+				tile.animation.frames_h
+			) then
+				return ("%s^[sheet:%ix%i:0,0"):format(
+					image_name,
+					tile.animation.frames_w,
+					tile.animation.frames_h
+				)
 			else
 				return image_name
 			end
@@ -199,8 +217,10 @@ function api.update_entities(shop)
 		end
 	end
 
+	-- luacheck: push ignore 542
 	if empty_count == 4 then
 		-- TODO: just remove any entities
+		-- luacheck: pop
 
 	elseif (sprite_count + empty_count) == 4 then
 		local obj = smartshop.entities.add_quad_upright_sprite(shop)

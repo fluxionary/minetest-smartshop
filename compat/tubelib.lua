@@ -1,3 +1,5 @@
+-- luacheck: globals tubelib
+
 local deepcopy = smartshop.util.deepcopy
 
 local get_object = smartshop.api.get_object

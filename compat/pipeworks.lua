@@ -1,3 +1,5 @@
+-- luacheck: globals pipeworks
+
 local function pipeworks_override(itemstring)
     local def = minetest.registered_nodes[itemstring]
     local after_place_node = def.after_place_node
