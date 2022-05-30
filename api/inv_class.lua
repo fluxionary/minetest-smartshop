@@ -11,6 +11,9 @@ smartshop.inv_class = inv_class
 --------------------
 
 function inv_class:__new(inv)
+	if type(inv) ~= "userdata" then
+		smartshop.util.error("new inventory unexpectedly %s", dump(inv))
+	end
 	self.inv = inv
 end
 
@@ -33,7 +36,7 @@ function inv_class:get_count(stack, match_meta)
 	local total = 0
 
 	local key = get_stack_key(stack, match_meta)
-	for _, inv_stack in inv:get_list("main") do
+	for _, inv_stack in ipairs(inv:get_list("main")) do
 		if key == get_stack_key(inv_stack, match_meta) then
 			total = total + inv_stack:get_count()
 		end
@@ -46,7 +49,7 @@ function inv_class:get_all_counts(match_meta)
 	local inv = self.inv
 	local all_counts = {}
 
-	for _, stack in inv:get_list("main") do
+	for _, stack in ipairs(inv:get_list("main")) do
 		local key = get_stack_key(stack, match_meta)
 		local count = all_counts[key] or 0
 		count = count + stack:get_count()

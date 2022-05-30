@@ -40,6 +40,15 @@ local known_currency = {
     ["currency:buck_200"]=20000,
     ["currency:buck_500"]=50000,
     ["currency:buck_1000"]=100000,
+
+    -- mineunit tests
+    ["smartshop:currency_1"]=1,
+    ["smartshop:currency_2"]=2,
+    ["smartshop:currency_5"]=5,
+    ["smartshop:currency_10"]=10,
+    ["smartshop:currency_20"]=20,
+    ["smartshop:currency_50"]=50,
+    ["smartshop:currency_100"]=100,
 }
 
 currency.available_currency = {}

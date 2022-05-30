@@ -3,8 +3,9 @@ local modpath = minetest.get_modpath(modname)
 local S = minetest.get_translator(modname)
 
 smartshop = {
-	redo = true,
 	version = os.time({year = 2022, month = 2, day = 28}),
+	fork = "fluxionary",
+
 	modname = modname,
 	modpath = modpath,
 
@@ -36,7 +37,7 @@ smartshop = {
 	},
 
 	dofile = function(...)
-		dofile(table.concat({modpath, ...}, "/") .. ".lua")
+		dofile(table.concat({modpath, ...}, DIR_DELIM) .. ".lua")
 	end,
 }
 
@@ -52,6 +53,9 @@ smartshop.dofile("refunds")
 smartshop.dofile("crafting")
 smartshop.dofile("aliases")
 
+if smartshop.settings.enable_tests then
+	smartshop.dofile("tests", "init")
+end
 
 --------------------------------
 smartshop.dofile = nil  -- no need to export this, not sure whether it's dangerous

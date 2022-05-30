@@ -108,7 +108,7 @@ function util.pairs_by_keys(t, sort_func)
 	end
 end
 
-function util.pairs_by_values(t, sort_function)
+function util.pairs_by_value(t, sort_function)
 	if not sort_function then
 		sort_function = function(a, b)
 			return a < b

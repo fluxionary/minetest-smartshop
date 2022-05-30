@@ -28,7 +28,6 @@ function shop_class:initialize_metadata(player)
 	local is_admin = player_is_admin(player_name)
 
 	self:set_infotext(S("Shop by: @1", player_name))
-	self:set_admin(is_admin)
 	self:set_unlimited(is_admin)
 	self:set_upgraded()
 	self:set_strict_meta(false)
@@ -47,13 +46,8 @@ end
 
 --------------------
 
-function shop_class:set_admin(value)
-	self.meta:set_int("creative", value and 1 or 0)
-	self.meta:mark_as_private("creative")
-end
-
 function shop_class:is_admin()
-	return self.meta:get_int("creative") == 1
+	return player_is_admin(self:get_owner())
 end
 
 function shop_class:set_unlimited(value)
@@ -154,7 +148,7 @@ end
 
 function shop_class:get_refund()
 	local refund = self.meta:get("refund")
-	return refund and parse_json(refund) or {}
+	return (refund and parse_json(refund)) or {}
 end
 
 function shop_class:has_refund()
@@ -375,10 +369,9 @@ end
 --------------------
 
 function shop_class:on_rightclick(node, player, itemstack, pointed_thing)
-	if self:is_owner(player) and self:is_admin() and not player_is_admin(player) then
-		-- if a shop is admin, but the player no longer has admin privs, revert the shop
-		self:set_admin(false)
-		self:set_unlimited((false))
+	if not self:is_admin() then
+		-- if a shop is unlimited, but the owner no longer has admin privs, revert the shop
+		self:set_unlimited(false)
 	end
 
 	node_class.on_rightclick(self, node, player, itemstack, pointed_thing)
@@ -478,9 +471,9 @@ function shop_class:update_info()
 		self:set_infotext(S("(Smartshop by @1)\nThis shop is empty.", owner))
 	else
 		if self:is_unlimited() then
-			table.insert(lines, 1, S("(Smartshop by @1) Stock is unlimited", owner))
+			table.insert(lines, 1, S("(Smartshop by @1)\nStock is unlimited", owner))
 		else
-			table.insert(lines, 1, S("(Smartshop by @1) Purchases left:", owner))
+			table.insert(lines, 1, S("(Smartshop by @1)\nPurchases left:", owner))
 		end
 		self:set_infotext(table.concat(lines, "\n"))
 	end
