@@ -1,0 +1,7 @@
+minetest.register_craftitem("smartshop:currency_1", {})
+minetest.register_craftitem("smartshop:currency_2", {})
+minetest.register_craftitem("smartshop:currency_5", {})
+minetest.register_craftitem("smartshop:currency_10", {})
+minetest.register_craftitem("smartshop:currency_20", {})
+minetest.register_craftitem("smartshop:currency_50", {})
+minetest.register_craftitem("smartshop:currency_100", {})
