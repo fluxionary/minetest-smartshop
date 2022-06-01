@@ -48,8 +48,6 @@ smartshop.dofile("nodes", "init")
 smartshop.dofile("entities", "init")
 smartshop.dofile("compat", "init")
 
-smartshop.dofile("refunds")
-
 smartshop.dofile("crafting")
 smartshop.dofile("aliases")
 

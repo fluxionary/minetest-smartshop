@@ -83,11 +83,11 @@ local function is_currency(stack)
 	else
 		name = stack:get_name()
 	end
-    return smartshop.available_currency[name]
+    return currency.available_currency[name]
 end
 
 local function sort_currency_counts(a, b)
-    return smartshop.available_currency[a[1]] < smartshop.available_currency[b[1]]
+    return currency.available_currency[a[1]] < currency.available_currency[b[1]]
 end
 
 function currency.room_for_item(inv, stack, kind)

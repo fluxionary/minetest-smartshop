@@ -27,5 +27,14 @@ table.insert(smartshop.tests, {
         shop.inv:set_stack("give2", 1, "smartshop:node 5")
         shop.inv:set_stack("pay3", 1, "smartshop:gold 10")
         shop.inv:set_stack("give3", 1, "smartshop:tool")
+
+        shop.inv:add_item("main", "smartshop:node 25")
+        shop:on_metadata_inventory_put("main", 1, ItemStack("smartshop:node 25"), player)
+        shop.inv:add_item("main", "smartshop:tool")
+        shop:on_metadata_inventory_put("main", 1, ItemStack("smartshop:tool"), player)
+        shop:update_appearance()
+
+        state.shop_at = shop_at
+        return state
     end
 })

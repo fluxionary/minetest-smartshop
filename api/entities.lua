@@ -2,6 +2,9 @@
 local pos_to_string = minetest.pos_to_string
 
 local api = smartshop.api
+local util = smartshop.util
+
+local escape_texture = util.escape_texture
 
 local debug = false
 local debug_cache = {}
@@ -160,15 +163,9 @@ function api.get_quad_image(items)
 		if image == "unknown_node.png" then
 			image = "blank.png"
 		end
-		table.insert(images, image)
+		table.insert(images, escape_texture(image .. "^[resize:32x32"))
 	end
-	return (
-		"[combine:68x68" ..
-		":1,1=%s\\^[resize\\:32x32" ..
-		":1,36=%s\\^[resize\\:32x32" ..
-		":36,1=%s\\^[resize\\:32x32" ..
-		":36,36=%s\\^[resize\\:32x32"
-	):format(unpack(images))
+	return ("[combine:68x68:1,1=%s:1,36=%s:36,1=%s:36,36=%s"):format(unpack(images))
 end
 
 function api.is_complicated_drawtype(drawtype)
@@ -227,6 +224,7 @@ function api.update_entities(shop)
 		if obj then
 			api.record_entity(shop.pos, obj)
 		end
+
 	else
 		for index, image_type in ipairs(entity_types) do
 			local obj

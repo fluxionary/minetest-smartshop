@@ -305,3 +305,9 @@ function util.class(super)
 
     return class
 end
+
+-- https://github.com/minetest/minetest/blob/9fc018ded10225589d2559d24a5db739e891fb31/doc/lua_api.txt#L453-L462
+function util.escape_texture(texturestring)
+	local v = texturestring:gsub("%^", "\\^"):gsub(":", "\\:")
+	return v
+end

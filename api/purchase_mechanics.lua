@@ -49,17 +49,15 @@ function api.on_shop_empty(player, shop, i)
 end
 
 function api.try_purchase(player, shop, i)
-	local player_inv = api.get_player_inv(player)
-
 	for _, def in ipairs(api.registered_purchase_mechanics) do
-		if def.allow_purchase(player_inv, shop, i) then
-			def.do_purchase(player_inv, shop, i)
+		if def.allow_purchase(player, shop, i) then
+			def.do_purchase(player, shop, i)
 			api.on_purchase(player, shop, i)
 			return true
 		end
 	end
 
-	local reason = api.get_purchase_fail_reason(player_inv, shop, i)
+	local reason = api.get_purchase_fail_reason(player, shop, i)
 	smartshop.chat_send_player(player, ("Cannot exchange: %s"):format(reason))
 
 	if reason == "Shop is sold out" then
@@ -71,7 +69,8 @@ function api.try_purchase(player, shop, i)
 	return false
 end
 
-function api.get_purchase_fail_reason(player_inv, shop, i)
+function api.get_purchase_fail_reason(player, shop, i)
+	local player_inv = api.get_player_inv(player)
 	local pay_stack = shop:get_pay_stack(i)
 	local give_stack = shop:get_give_stack(i)
 
@@ -90,7 +89,8 @@ end
 
 api.register_purchase_mechanic({
 	name = "smartshop:basic_purchase",
-	allow_purchase = function(player_inv, shop, i)
+	allow_purchase = function(player, shop, i)
+		local player_inv = api.get_player_inv(player)
 		local pay_stack = shop:get_pay_stack(i)
 		local give_stack = shop:get_give_stack(i)
 
@@ -101,7 +101,8 @@ api.register_purchase_mechanic({
 			player_inv:room_for_item(give_stack)
 		)
 	end,
-	do_purchase = function(player_inv, shop, i)
+	do_purchase = function(player, shop, i)
+		local player_inv = api.get_player_inv(player)
 		local pay_stack = shop:get_pay_stack(i)
 		local give_stack = shop:get_give_stack(i)
 

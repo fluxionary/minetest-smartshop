@@ -53,6 +53,7 @@ function smartshop.entities.add_quad_upright_sprite(shop)
 	end
 
 	local texture = api.get_quad_image(items)
+	smartshop.log("info", "quad texture = %s", texture)
 
 	obj:set_yaw(math.pi * (2 - (param2 / 2)))
 	obj:set_properties({textures = {texture}})

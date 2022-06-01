@@ -50,6 +50,25 @@ local function generate_unrefunded(shop)
 	return unrefunded
 end
 
+function smartshop.compat.do_refund(pos)
+	local shop = smartshop.api.get_object(pos)
+
+	-- don't bother refunding admin shops
+	if shop:is_admin() then
+		return
+	end
+
+	if not shop:has_upgraded() then
+		local unrefunded = generate_unrefunded(shop)
+		shop:set_refund(unrefunded)
+		shop:set_upgraded()
+	end
+
+	if shop:has_refund() then
+		try_refund(shop)
+	end
+end
+
 if smartshop.settings.enable_refund then
 	minetest.register_lbm({
 		name = "smartshop:repay_lost_stuff",
@@ -61,22 +80,7 @@ if smartshop.settings.enable_refund then
 		},
 		run_at_every_load = true,
 		action = function(pos, node)
-			local shop = smartshop.api.get_object(pos)
-
-			-- don't bother refunding admin shops
-			if shop:is_admin() then
-				return
-			end
-
-			if not shop:has_upgraded() then
-				local unrefunded = generate_unrefunded(shop)
-				shop:set_refund(unrefunded)
-				shop:set_upgraded()
-			end
-
-			if shop:has_refund() then
-				try_refund(shop)
-			end
+			smartshop.compat.do_refund(pos)
 		end,
 	})
 end

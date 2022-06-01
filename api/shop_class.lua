@@ -364,6 +364,9 @@ end
 
 function shop_class:on_destruct()
 	self:clear_entities()
+	for _, itemstring in ipairs(self:get_refund()) do
+		minetest.add_item(self.pos, itemstring)
+	end
 end
 
 --------------------
@@ -393,7 +396,7 @@ end
 
 local function get_buy_index(pressed)
     for i = 1, 4 do
-        if pressed["buy" .. i] then
+        if pressed["buy" .. i .. "a"] or pressed["buy" .. i .. "b"] then
 	        return i
         end
     end
