@@ -55,8 +55,18 @@ function storage_class:show_formspec(player)
 end
 
 function storage_class:receive_fields(player, fields)
+	local changed = false
+	if fields.private then
+	    self:set_private(fields.private == "true")
+		changed = true
+	end
+
 	if fields.title then
 		self:set_title(fields.title)
+		changed = true
+    end
+
+	if changed then
 		self:show_formspec(player)
 	end
 end

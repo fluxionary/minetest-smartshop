@@ -34,6 +34,8 @@ function api.build_owner_formspec(shop)
 	local refill = shop:get_refill()
 
 	local is_unlimited = shop:is_unlimited()
+	local is_strict_meta = shop:is_strict_meta()
+	local is_private = shop:is_private()
 	local owner = shop:get_owner()
 
 	local fs_parts = {
@@ -52,14 +54,22 @@ function api.build_owner_formspec(shop)
 		("list[nodemeta:%s;main;0,2;8,4;]"):format(fpos),
 		"list[current_player;main;0,6.2;8,4;]",
 		("listring[nodemeta:%s;main]"):format(fpos),
-		"listring[current_player;main]"
+		"listring[current_player;main]",
+		("checkbox[6,0.9;strict_meta;%s;%s]"):format(FS("Strict Metadata?"), is_strict_meta),
+		("tooltip[strict_meta;%s]"):format(FS("Check this if you are buying or selling items with unique properties " ..
+			"like written books or petz."
+		)),
+		("checkbox[6,1.2;private;%s;%s]"):format(FS("Private?"), is_private),
+		("tooltip[private;%s]"):format(FS("Uncheck this if you want to share control of the shop with anyone in the " ..
+			"protected area.")),
 	}
 
 	if is_unlimited then
 		table.insert(fs_parts, ("label[0.5,-0.4;%s]"):format(FS("Your stock is unlimited")))
 	end
 	if player_is_admin(owner) then
-		table.insert(fs_parts, ("button[6,1;2.2,1;toggle_unlimited;%s]"):format(FS("Toggle limit")))
+		table.insert(fs_parts, ("checkbox[6,0.6;is_unlimited;%s;%s]"):format(FS("Unlimited?"), is_unlimited))
+		table.insert(fs_parts, ("tooltip[is_unlimited;%s]"):format(FS("Check this to allow infinite exchanges")))
 	end
 
 	if not is_unlimited then
@@ -102,7 +112,7 @@ function api.build_client_formspec(shop)
 			return table.concat({
 				("list[nodemeta:%s;give%i;%f,0.375;1,1;]"):format(fpos, i, (i + 1) * (5 / 4) + (3 / 8)),
 				("image_button[%f,0.375;1,1;blank.png;buy%ia;]"):format((i + 1) * (5 / 4) + (3 / 8), i),
-				("tooltip[buy%ia;%s]"):format(i, F(give:to_string()))
+				("tooltip[buy%ia;%s\n%s]"):format(i, F(give:get_description()), F(give:to_string()))
 			}, "")
 		else
 			return ""
@@ -115,7 +125,7 @@ function api.build_client_formspec(shop)
 			return table.concat({
 				("list[nodemeta:%s;pay%i;%f,1.625;1,1;]"):format(fpos, i, (i + 1) * (5 / 4) + (3 / 8)),
 				("image_button[%f,1.625;1,1;blank.png;buy%ib;]"):format((i + 1) * (5 / 4) + (3 / 8), i),
-				("tooltip[buy%ib;%s]"):format(i, F(pay:to_string()))
+				("tooltip[buy%ib;%s\n%s]"):format(i, F(pay:get_description()), F(pay:to_string()))
 			}, "")
 		else
 			return ""
@@ -132,6 +142,7 @@ end
 
 function api.build_storage_formspec(storage)
 	local fpos = formspec_pos(storage.pos)
+	local is_private = storage:is_private()
 
 	local fs_parts = {
 		"size[12,9]",
@@ -143,6 +154,9 @@ function api.build_storage_formspec(storage)
 		"list[current_player;main;2,5;8,4;]",
 		("listring[nodemeta:%s;main]"):format(fpos),
 		"listring[current_player;main]",
+		("checkbox[0,7;private;%s;%s]"):format(FS("Private?"), is_private),
+		("tooltip[private;%s]"):format(FS("Uncheck this if you want to share control of the storage with anyone in " ..
+			"the protected area.")),
 	}
 
 	return table.concat(fs_parts, "")

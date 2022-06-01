@@ -27,9 +27,9 @@ function shop_class:initialize_metadata(player)
 	local player_name = player:get_player_name()
 	local is_admin = player_is_admin(player_name)
 
+	self:set_upgraded()
 	self:set_infotext(S("Shop by: @1", player_name))
 	self:set_unlimited(is_admin)
-	self:set_upgraded()
 	self:set_strict_meta(false)
 end
 
@@ -55,16 +55,16 @@ function shop_class:set_unlimited(value)
 	self.meta:mark_as_private("unlimited")
 end
 
-function shop_class:toggle_unlimited()
-	local owner_is_admin = player_is_admin(self:get_owner())
-	if self:is_unlimited() or not owner_is_admin then
-		self:set_unlimited(false)
-	else
-		self:set_unlimited(true)
-		self:set_send_pos()
-		self:set_refill_pos()
-	end
-end
+--function shop_class:toggle_unlimited()
+--	local owner_is_admin = player_is_admin(self:get_owner())
+--	if self:is_unlimited() or not owner_is_admin then
+--		self:set_unlimited(false)
+--	else
+--		self:set_unlimited(true)
+--		self:set_send_pos()
+--		self:set_refill_pos()
+--	end
+--end
 
 function shop_class:is_unlimited()
 	return self.meta:get_int("unlimited") == 1
@@ -403,25 +403,41 @@ local function get_buy_index(pressed)
 end
 
 function shop_class:receive_fields(player, fields)
-    if fields.tsend then
-        api.start_storage_linking(player, self, "send")
+	local buy_index = get_buy_index(fields)
+	local changed = false
 
-    elseif fields.trefill then
-        api.start_storage_linking(player, self, "refill")
+	if fields.tsend then
+		api.start_storage_linking(player, self, "send")
 
-    elseif fields.customer then
-        self:show_formspec(player, true)
+	elseif fields.trefill then
+		api.start_storage_linking(player, self, "refill")
 
-    elseif fields.toggle_unlimited then
-	    self:toggle_unlimited(player)
-        self:show_formspec(player)
+	elseif fields.customer then
+		self:show_formspec(player, true)
 
-    elseif not fields.quit then
-        local i = get_buy_index(fields)
-        if i then
-            api.try_purchase(player, self, i)
-        end
+	elseif buy_index then
+		api.try_purchase(player, self, buy_index)
+		changed = true
+
+    else
+		if fields.is_unlimited then
+			self:set_unlimited(fields.is_unlimited == "true")
+			changed = true
+
+		elseif fields.strict_meta then
+			self:set_strict_meta(fields.strict_meta == "true")
+			changed = true
+
+		elseif fields.private then
+			self:set_private(fields.private == "true")
+			changed = true
+
+		end
     end
+	
+	if changed then
+		self:show_formspec(player)
+	end
 
     self:update_appearance()
 end

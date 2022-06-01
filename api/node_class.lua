@@ -1,5 +1,6 @@
 local check_player_privs = minetest.check_player_privs
 local get_meta = minetest.get_meta
+local is_protected = minetest.is_protected
 local pos_to_string = minetest.pos_to_string
 
 local api = smartshop.api
@@ -42,9 +43,12 @@ end
 
 function node_class:is_owner(player)
 	if type(player) == "userdata" then
-		return player:get_player_name() == self:get_owner()
-	else
+		player = player:get_player_name()
+	end
+	if self:is_private() then
 		return player == self:get_owner()
+	else
+		return not is_protected(self.pos, player)
 	end
 end
 
@@ -54,6 +58,15 @@ end
 
 function node_class:get_infotext()
 	return self.meta:get_string("infotext")
+end
+
+function node_class:set_private(value)
+	self.meta:set_int("private", value and 1 or 0)
+	self.meta:mark_as_private("private")
+end
+
+function node_class:is_private()
+	return self.meta:get_int("private") == 1
 end
 
 --------------------
@@ -71,6 +84,7 @@ end
 function node_class:initialize_metadata(owner)
 	local player_name = owner:get_player_name()
 	self:set_owner(player_name)
+	self:set_private(true)
 end
 
 --------------------
