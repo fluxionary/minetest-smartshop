@@ -120,14 +120,14 @@ function util.round(x)
 end
 
 function util.check_shop_add_remainder(shop, remainder)
-	if remainder:get_count() == 0 then
+	if remainder:is_empty() then
 		return false
 	end
 
 	local owner = shop:get_owner()
 	local pos_as_string = shop:get_pos_as_string()
 
-	util.error("ERROR: %s's smartshop @ %s lost %s while adding", owner, pos_as_string, remainder:to_string())
+	util.error("ERROR: %s's smartshop @ %s lost %q while adding", owner, pos_as_string, remainder:to_string())
 
 	return true
 end
@@ -140,7 +140,7 @@ function util.check_shop_remove_remainder(shop, remainder, expected)
 	local owner = shop:get_owner()
 	local pos_as_string = shop:get_pos_as_string()
 
-	util.error("ERROR: %s's smartshop @ %s lost %s of %s while removing",
+	util.error("ERROR: %s's smartshop @ %s lost %q of %q while removing",
 		owner, pos_as_string, remainder:to_string(), expected:to_string())
 
 	return true
@@ -153,7 +153,7 @@ function util.check_player_add_remainder(player_inv, shop, remainder)
 
 	local player_name = player_inv.name
 
-	util.error("ERROR: %s lost %s on add using %'s shop @ %s",
+	util.error("ERROR: %s lost %q on add using %'s shop @ %s",
 		player_name, remainder:to_string(), shop:get_owner(), shop:get_pos_as_string())
 
 	return true
@@ -166,7 +166,7 @@ function util.check_player_remove_remainder(player_inv, shop, remainder, expecte
 
 	local player_name = player_inv.name
 
-	util.error("ERROR: %s lost %s of %s on remove from %'s shop @ %s",
+	util.error("ERROR: %s lost %q of %q on remove from %'s shop @ %s",
 		player_name, remainder:to_string(), expected:to_string(), shop:get_owner(), shop:get_pos_as_string())
 
 	return true

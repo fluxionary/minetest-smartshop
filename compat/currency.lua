@@ -292,18 +292,18 @@ api.register_purchase_mechanic({
 		end
 
 		if is_currency(pay_stack) then
-			local shop_remaining = currency.add_item(tmp_shop_inv, pay_stack, "pay")
+			local shop_remaining = currency.add_item(tmp_shop_inv, player_removed, "pay")
 			success = success and shop_remaining:is_empty()
 		else
-			local shop_remaining = tmp_shop_inv:add_item(pay_stack, "pay")
+			local shop_remaining = tmp_shop_inv:add_item(player_removed, "pay")
 			success = success and shop_remaining:is_empty()
 		end
 
 		if is_currency(give_stack) then
-			local player_remaining = currency.add_item(tmp_player_inv, give_stack, "give")
+			local player_remaining = currency.add_item(tmp_player_inv, shop_removed, "give")
 			success = success and player_remaining:is_empty()
 		else
-			local player_remaining = tmp_player_inv:add_item(give_stack, "give")
+			local player_remaining = tmp_player_inv:add_item(shop_removed, "give")
 			success = success and player_remaining:is_empty()
 		end
 
@@ -336,15 +336,15 @@ api.register_purchase_mechanic({
 		end
 
 		if is_currency(pay_stack) then
-			shop_remaining = currency.add_item(shop, pay_stack, "pay")
+			shop_remaining = currency.add_item(shop, player_removed, "pay")
 		else
-			shop_remaining = shop:add_item(pay_stack, "pay")
+			shop_remaining = shop:add_item(player_removed, "pay")
 		end
 
 		if is_currency(give_stack) then
-			player_remaining = currency.add_item(player_inv, give_stack, "give")
+			player_remaining = currency.add_item(player_inv, shop_removed, "give")
 		else
-			player_remaining = player_inv:add_item(give_stack, "give")
+			player_remaining = player_inv:add_item(shop_removed, "give")
 		end
 
 		check_shop_removed(shop, shop_removed, give_stack)

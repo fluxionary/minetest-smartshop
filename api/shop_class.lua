@@ -416,7 +416,7 @@ function shop_class:receive_fields(player, fields)
         self:show_formspec(player, true)
 
     else
-        if fields.is_unlimited then
+        if fields.is_unlimited and player_is_admin(player) then
             self:set_unlimited(fields.is_unlimited == "true")
             changed = true
         end
@@ -537,11 +537,11 @@ function shop_class:compute_variant()
     if n_total == 0 then
         -- unconfigured shop
         return "smartshop:shop"
-    elseif n_have_pay > 0 then
-        return "smartshop:shop_used"
     elseif n_have_give ~= n_total then
         -- something is sold out
         return "smartshop:shop_empty"
+    elseif n_have_pay > 0 then
+        return "smartshop:shop_used"
     elseif n_have_room_for_pay ~= n_total then
         -- something can't be bought because the shop is full
         return "smartshop:shop_full"

@@ -15,7 +15,7 @@ function tmp_shop_inv_class:__new(shop)
 	tmp_inv_class.__new(self, shop.inv)
 
 	self.is_unlimited = shop:is_unlimited()
-	self.match_meta = shop:is_strict_meta()
+	self.strict_meta = shop:is_strict_meta()
 
 	local refill = shop:get_refill()
 	local send = shop:get_send()
@@ -54,14 +54,20 @@ end
 
 --------------------
 
+function tmp_shop_inv_class:is_strict_meta()
+    return self.strict_meta
+end
+
+-------------------
+
 function tmp_shop_inv_class:get_all_counts(kind)
-	local match_meta = self.match_meta
-	local all_counts = tmp_inv_class.get_all_counts(self, match_meta)
+	local strict_meta = self.strict_meta
+	local all_counts = tmp_inv_class.get_all_counts(self, strict_meta)
 
 	if kind == "give" then
 		local refill = self.refill
 		if refill then
-			for key, value in pairs(refill:get_all_counts(match_meta)) do
+			for key, value in pairs(refill:get_all_counts(strict_meta)) do
 				all_counts[key] = (all_counts[key] or 0) + value
 			end
 		end
@@ -69,7 +75,7 @@ function tmp_shop_inv_class:get_all_counts(kind)
 	elseif kind == "pay" then
 		local send = self.send
 		if send then
-			for key, value in pairs(send:get_all_counts(match_meta)) do
+			for key, value in pairs(send:get_all_counts(strict_meta)) do
 				all_counts[key] = (all_counts[key] or 0) + value
 			end
 		end
@@ -79,19 +85,19 @@ function tmp_shop_inv_class:get_all_counts(kind)
 end
 
 function tmp_shop_inv_class:get_count(stack, kind)
-	local match_meta = self.match_meta
-	local count = tmp_inv_class.get_count(self, stack, match_meta)
+	local strict_meta = self.strict_meta
+	local count = tmp_inv_class.get_count(self, stack, strict_meta)
 
 	if kind == "give" then
 		local refill = self.refill
 		if refill then
-			count = count + refill:get_count(stack, match_meta)
+			count = count + refill:get_count(stack, strict_meta)
 		end
 
 	elseif kind == "pay" then
 		local send = self.send
 		if send then
-			count = count + send:get_count(stack, match_meta)
+			count = count + send:get_count(stack, strict_meta)
 		end
 	end
 
@@ -143,19 +149,19 @@ function tmp_shop_inv_class:contains_item(stack, kind)
 		return true
 	end
 
-	local match_meta = self.match_meta
+	local strict_meta = self.strict_meta
 
-	if tmp_inv_class.contains_item(self, stack, match_meta) then
+	if tmp_inv_class.contains_item(self, stack, strict_meta) then
 		return true
 	end
 
 	if kind == "give" then
 		local refill = self.refill
-		return refill and refill:contains_item(stack, match_meta)
+		return refill and refill:contains_item(stack, strict_meta)
 
 	elseif kind == "pay" then
 		local send = self.send
-		return send and send:contains_item(stack, match_meta)
+		return send and send:contains_item(stack, strict_meta)
 	end
 end
 
