@@ -91,7 +91,6 @@ api.register_purchase_mechanic({
 	name = "smartshop:basic_purchase",
 	allow_purchase = function(player, shop, i)
 		local player_inv = api.get_player_inv(player)
-		local strict_meta = shop:is_strict_meta()
 		local pay_stack = shop:get_pay_stack(i)
 		local give_stack = shop:get_give_stack(i)
 

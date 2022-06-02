@@ -1,6 +1,5 @@
 
 local class = smartshop.util.class
-local equals = smartshop.util.equals
 local get_stack_key = smartshop.util.get_stack_key
 local remove_stack_with_meta = smartshop.util.remove_stack_with_meta
 
