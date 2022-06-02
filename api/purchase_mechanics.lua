@@ -94,12 +94,23 @@ api.register_purchase_mechanic({
 		local pay_stack = shop:get_pay_stack(i)
 		local give_stack = shop:get_give_stack(i)
 
-		return (
-			shop:contains_item(give_stack, "give") and
-			shop:room_for_item(pay_stack, "pay") and
-			player_inv:contains_item(pay_stack) and
-			player_inv:room_for_item(give_stack)
-		)
+	    local tmp_shop_inv = shop:get_tmp_inv()
+	    local count_to_remove = give_stack:get_count()
+	    local removed = tmp_shop_inv:remove_item(give_stack, "give")
+	    local success = count_to_remove == removed:get_count()
+	    local leftover = tmp_shop_inv:add_item(pay_stack, "pay")
+	    success = success and (leftover:get_count() == 0)
+	    shop:destroy_tmp_inv(tmp_shop_inv)
+
+		local tmp_player_inv = player_inv:get_tmp_inv()
+		count_to_remove = pay_stack:get_count()
+		removed = tmp_player_inv:remove_item(pay_stack, "pay")
+		success = success and (count_to_remove == removed:get_count())
+	    leftover = tmp_player_inv:add_item(pay_stack, "give")
+	    success = success and (leftover:get_count() == 0)
+		player_inv:destroy_tmp_inv(tmp_player_inv)
+
+		return success
 	end,
 	do_purchase = function(player, shop, i)
 		local player_inv = api.get_player_inv(player)

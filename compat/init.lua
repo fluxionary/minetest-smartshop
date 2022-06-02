@@ -1,6 +1,6 @@
 smartshop.compat = {}
 
-smartshop.dofile("compat", "refunds")
+smartshop.dofile("compat", "old_smartshops")
 
 if smartshop.has.currency then
 	smartshop.dofile("compat", "currency")

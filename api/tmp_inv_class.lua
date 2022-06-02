@@ -7,7 +7,7 @@ local clone_tmp_inventory = smartshop.util.clone_tmp_inventory
 --------------------
 
 local inv_class = smartshop.inv_class
-local tmp_inv_class = class()
+local tmp_inv_class = class(inv_class)
 smartshop.tmp_inv_class = tmp_inv_class
 
 --------------------

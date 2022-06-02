@@ -55,17 +55,6 @@ function shop_class:set_unlimited(value)
     self.meta:mark_as_private("unlimited")
 end
 
---function shop_class:toggle_unlimited()
---	local owner_is_admin = player_is_admin(self:get_owner())
---	if self:is_unlimited() or not owner_is_admin then
---		self:set_unlimited(false)
---	else
---		self:set_unlimited(true)
---		self:set_send_pos()
---		self:set_refill_pos()
---	end
---end
-
 function shop_class:is_unlimited()
     return self.meta:get_int("unlimited") == 1
 end
@@ -268,12 +257,19 @@ function shop_class:room_for_pay(i)
 end
 
 function shop_class:can_exchange(i)
-    return (
-        self:give_is_valid(i) and
-            self:pay_is_valid(i) and
-            self:can_give(i) and
-            self:room_for_pay(i)
-    )
+    if not (self:give_is_valid(i) and self:pay_is_valid(i)) then
+        return false
+    end
+    local tmp_inv = self:get_tmp_inv()
+    local to_remove = self:get_give_stack(i)
+    local count_to_remove = to_remove:get_count()
+    local removed = tmp_inv:remove_item(to_remove, "give")
+    local success = count_to_remove == removed:get_count()
+    local to_pay = self:get_pay_stack(i)
+    local leftover = tmp_inv:add_item(to_pay, "pay")
+    success = success and (leftover:get_count() == 0)
+    self:destroy_tmp_inv(tmp_inv)
+    return success
 end
 
 function shop_class:room_for_item(stack, kind)
@@ -417,7 +413,7 @@ function shop_class:receive_fields(player, fields)
 
     elseif buy_index then
         api.try_purchase(player, self, buy_index)
-        changed = true
+        self:show_formspec(player, true)
 
     else
         if fields.is_unlimited then
@@ -451,7 +447,7 @@ end
 
 function shop_class:get_info_line(i)
 
-    if not self:give_is_valid(i) or not self:pay_is_valid(i) then
+    if not self:can_exchange(i) then
         return
     end
 
@@ -486,10 +482,20 @@ function shop_class:update_info()
 
     local owner = self:get_owner()
     if #lines == 0 then
-        self:set_infotext(S("(Smartshop by @1)\nThis shop is empty.", owner))
+        local variant = self:compute_variant()
+        if variant == "smartshop:shop_full" then
+            self:set_infotext(S("(Smartshop by @1)\nThis shop is over-full.", owner))
+
+        elseif variant == "smartshop:shop_empty" then
+            self:set_infotext(S("(Smartshop by @1)\nThis shop is sold out.", owner))
+
+        else
+            self:set_infotext(S("(Smartshop by @1)\nThis shop is not configured.", owner))
+        end
     else
         if self:is_unlimited() then
-            table.insert(lines, 1, S("(Smartshop by @1)\nStock is unlimited", owner))
+            table.insert(lines, 1, S("(Smartshop by @1)\nStock is unlimited.", owner))
+
         else
             table.insert(lines, 1, S("(Smartshop by @1)\nPurchases left:", owner))
         end
@@ -522,7 +528,7 @@ function shop_class:compute_variant()
             if self:has_pay(i) then
                 n_have_pay = n_have_pay + 1
             end
-            if self:room_for_pay(i) then
+            if self:can_exchange(i) then
                 n_have_room_for_pay = n_have_room_for_pay + 1
             end
         end
@@ -531,14 +537,14 @@ function shop_class:compute_variant()
     if n_total == 0 then
         -- unconfigured shop
         return "smartshop:shop"
-    elseif n_have_room_for_pay ~= n_total then
-        -- something can't be bought because the shop is full`
-        return "smartshop:shop_full"
     elseif n_have_pay > 0 then
         return "smartshop:shop_used"
     elseif n_have_give ~= n_total then
         -- something is sold out
         return "smartshop:shop_empty"
+    elseif n_have_room_for_pay ~= n_total then
+        -- something can't be bought because the shop is full
+        return "smartshop:shop_full"
     else
         -- shop is ready for use
         return "smartshop:shop"

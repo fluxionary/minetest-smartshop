@@ -1,14 +1,6 @@
-local function inv_count(inv, listname, item_name)
-    local count = 0
-    for _, item in ipairs(inv:get_list(listname)) do
-        if item:get_name() == item_name then
-            count = count + item:get_count()
-        end
-    end
-    return count
-end
+local inv_count = smartshop.tests.inv_count
 
-table.insert(smartshop.tests, {
+table.insert(smartshop.tests.tests, {
     name = "simulate a purchase",
     func = function(player, state)
         local shop_at = state.shop_at

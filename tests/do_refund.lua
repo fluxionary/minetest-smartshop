@@ -1,3 +1,5 @@
+local inv_count = smartshop.tests.inv_count
+
 local function init_old_shop(pos, player)
     local player_name = player:get_player_name()
     local meta = minetest.get_meta(pos)
@@ -19,17 +21,7 @@ local function init_old_shop(pos, player)
     inv:set_size("pay4", 1)
 end
 
-local function inv_count(inv, listname, item_name)
-    local count = 0
-    for _, item in ipairs(inv:get_list(listname)) do
-        if item:get_name() == item_name then
-            count = count + item:get_count()
-        end
-    end
-    return count
-end
-
-table.insert(smartshop.tests, {
+table.insert(smartshop.tests.tests, {
     name = "simulate refunds in empty shop",
     func = function(player, state)
         local shop_at = state.shop_at
@@ -55,7 +47,7 @@ table.insert(smartshop.tests, {
     end,
 })
 
-table.insert(smartshop.tests, {
+table.insert(smartshop.tests.tests, {
     name = "simulate refunds in full shop",
     func = function(player, state)
         local shop_at = state.shop_at

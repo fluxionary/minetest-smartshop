@@ -56,7 +56,7 @@ function inv_class:get_all_counts(match_meta)
 		all_counts[key] = count
 	end
 
-	return all_counts()
+	return all_counts
 end
 
 function inv_class:room_for_item(stack)
@@ -88,7 +88,7 @@ end
 --------------------
 
 function inv_class:get_tmp_inv()
-	return smartshop.tmp_inv_class:new(self)
+	return smartshop.tmp_inv_class:new(self.inv)
 end
 
 function inv_class:destroy_tmp_inv(tmp_inv)

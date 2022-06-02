@@ -1,9 +1,33 @@
-smartshop.tests = {}
+smartshop.tests = {
+    tests = {},
+    inv_count = function(inv, listname, item_name)
+        local count = 0
+        for _, item in ipairs(inv:get_list(listname)) do
+            if item:get_name() == item_name then
+                count = count + item:get_count()
+            end
+        end
+        return count
+    end,
+    put_in_shop = function(shop, item, player)
+        local stack = ItemStack(item)
+        for i = 1, 32 do
+            if shop.inv:get_stack("main", i):is_empty() then
+                shop.inv:set_stack("main", i, stack)
+                shop:on_metadata_inventory_put("main", i, stack, player)
+                return
+            end
+        end
+    end,
+}
+
 minetest.settings:set("movement_gravity", 0)
 
 local function run_test(name, state, i)
-    if not i then error(("? %s %s %s"):format(name, state, i)) end
-    if i > #smartshop.tests then
+    if not i then
+        error(("? %s %s %s"):format(name, state, i))
+    end
+    if i > #smartshop.tests.tests then
         return
     end
     local player = minetest.get_player_by_name(name)
@@ -11,7 +35,7 @@ local function run_test(name, state, i)
         return
     end
     local start = minetest.get_us_time()
-    local test = smartshop.tests[i]
+    local test = smartshop.tests.tests[i]
     local ok, res = xpcall(test.func, debug.traceback, player, state)
     local elapsed = (minetest.get_us_time() - start) / 1e6
     if ok then
@@ -41,3 +65,6 @@ smartshop.dofile("tests", "dig_shop")
 smartshop.dofile("tests", "configure_shop")
 smartshop.dofile("tests", "do_purchase")
 smartshop.dofile("tests", "do_refund")
+smartshop.dofile("tests", "storage")
+smartshop.dofile("tests", "currency")
+smartshop.dofile("tests", "shop_full")

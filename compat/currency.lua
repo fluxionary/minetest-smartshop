@@ -119,7 +119,7 @@ local function get_change_stacks(value)
 				table.insert(change_stack)
 			else
 				local change_stack = ItemStack(name)
-				change_stack:set_count()
+				change_stack:set_count(count_required)
 				table.insert(change_stacks, change_stack)
 			end
 
@@ -236,8 +236,11 @@ function currency.remove_item(inv, stack, kind)
 	local change_failed = false
 	if owed_value > 0 then
 		-- break the next largest bill
-
-		change_failed = try_to_change(inv, kind, name_to_break, owed_value, removed_items)
+		if not name_to_break then
+			change_failed = true
+		else
+			change_failed = try_to_change(inv, kind, name_to_break, owed_value, removed_items)
+		end
 	end
 
 	-- if we failed, put stuff back
@@ -260,33 +263,54 @@ api.register_purchase_mechanic({
 		local pay_stack = shop:get_pay_stack(i)
 		local give_stack = shop:get_give_stack(i)
 
-		local shop_contains_item
-		local shop_room_for_item
-		local player_contains_item
-		local player_room_for_item
+		if not (is_currency(pay_stack) or is_currency(give_stack)) then
+			return
+		end
+
+		local tmp_shop_inv = shop:get_tmp_inv()
+		local tmp_player_inv = player_inv:get_tmp_inv()
+
+		local success = true
+		local player_removed, shop_removed
 
 		if is_currency(pay_stack) then
-			shop_room_for_item = currency.room_for_item(shop, pay_stack, "pay")
-			player_contains_item = currency.contains_item(player_inv, pay_stack, "pay")
+			player_removed = currency.remove_item(tmp_player_inv, pay_stack, "pay")
+			success = success and not player_removed:is_empty()
 		else
-			shop_room_for_item = shop:room_for_item(pay_stack, "pay")
-			player_contains_item = player_inv:contains_item(pay_stack, "pay")
+			local count = pay_stack:get_count()
+			player_removed = tmp_player_inv:remove_item(pay_stack, "pay")
+			success = success and (count == player_removed:get_count())
 		end
 
 		if is_currency(give_stack) then
-			shop_contains_item = currency.contains_item(shop, give_stack, "give")
-			player_room_for_item = currency.room_for_item(player_inv, give_stack, "give")
+			shop_removed = currency.remove_item(tmp_shop_inv, give_stack, "give")
+			success = success and not shop_removed:is_empty()
 		else
-			shop_contains_item = shop:contains_item(give_stack, "give")
-			player_room_for_item = player_inv:room_for_item(give_stack, "give")
+			local count = give_stack:get_count()
+			shop_removed = tmp_shop_inv:remove_item(give_stack, "give")
+			success = success and (count == shop_removed:get_count())
 		end
 
-		return (
-			shop_contains_item and
-			shop_room_for_item and
-			player_contains_item and
-			player_room_for_item
-		)
+		if is_currency(pay_stack) then
+			local shop_remaining = currency.add_item(tmp_shop_inv, pay_stack, "pay")
+			success = success and shop_remaining:is_empty()
+		else
+			local shop_remaining = tmp_shop_inv:add_item(pay_stack, "pay")
+			success = success and shop_remaining:is_empty()
+		end
+
+		if is_currency(give_stack) then
+			local player_remaining = currency.add_item(tmp_player_inv, give_stack, "give")
+			success = success and player_remaining:is_empty()
+		else
+			local player_remaining = tmp_player_inv:add_item(give_stack, "give")
+			success = success and player_remaining:is_empty()
+		end
+
+	    shop:destroy_tmp_inv(tmp_shop_inv)
+		player_inv:destroy_tmp_inv(tmp_player_inv)
+
+		return success
 	end,
 	do_purchase = function(player, shop, i)
 		local player_inv = api.get_player_inv(player)
@@ -301,17 +325,25 @@ api.register_purchase_mechanic({
 
 		if is_currency(pay_stack) then
 			player_removed = currency.remove_item(player_inv, pay_stack, "pay")
-			shop_remaining = currency.add_item(shop, pay_stack, "pay")
 		else
 			player_removed = player_inv:remove_item(pay_stack, "pay")
-			shop_remaining = shop:add_item(pay_stack, "pay")
 		end
 
 		if is_currency(give_stack) then
 			shop_removed = currency.remove_item(shop, give_stack, "give")
-			player_remaining = currency.add_item(player_inv, give_stack, "give")
 		else
 			shop_removed = shop:remove_item(give_stack, "give")
+		end
+
+		if is_currency(pay_stack) then
+			shop_remaining = currency.add_item(shop, pay_stack, "pay")
+		else
+			shop_remaining = shop:add_item(pay_stack, "pay")
+		end
+
+		if is_currency(give_stack) then
+			player_remaining = currency.add_item(player_inv, give_stack, "give")
+		else
 			player_remaining = player_inv:add_item(give_stack, "give")
 		end
 
