@@ -8,9 +8,10 @@ smartshop.entities = {
 	entity_offset = vector.new(0.01, 6.5/16, 0.01),
 }
 
-smartshop.dofile("entities", "single_wielditem")
-smartshop.dofile("entities", "single_sprite")
 smartshop.dofile("entities", "quad_upright_sprite")
+smartshop.dofile("entities", "single_sprite")
+smartshop.dofile("entities", "single_upright_sprite")
+smartshop.dofile("entities", "single_wielditem")
 
 minetest.register_lbm({
 	name = "smartshop:load_shop",

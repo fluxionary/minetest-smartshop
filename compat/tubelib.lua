@@ -1,6 +1,6 @@
 -- luacheck: globals tubelib
 
-local deepcopy = smartshop.util.deepcopy
+local table_copy = table.copy
 
 local get_object = smartshop.api.get_object
 
@@ -52,7 +52,7 @@ local tubelib_callbacks = {
 
 local function tubelib_override(itemstring)
     local def = minetest.registered_nodes[itemstring]
-	local groups = deepcopy(def.groups or {})
+	local groups = table_copy(def.groups or {})
 	groups.tubedevice = 1
 	groups.tubedevice_receiver = 1
 

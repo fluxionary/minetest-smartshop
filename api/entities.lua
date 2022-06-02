@@ -199,25 +199,37 @@ end
 function api.update_entities(shop)
 	-- TODO this should also update existing entities, not just create new ones.
 	--      there should be no need to call clear_entities
+	-- Further comment: does that really help anything?
 	shop:clear_entities()
 
+	local seen = {}
 	local empty_count = 0
 	local sprite_count = 0
 	local entity_types = {}
+	local last_sprite_index
 	for index = 1, 4 do
+		local item = shop:get_give_stack(index):get_name()
 		local image_type = api.get_image_type(shop, index)
 		table.insert(entity_types, image_type)
-		if image_type == "none" then
+		if seen[item] or image_type == "none" then
 			empty_count = empty_count + 1
 		elseif image_type == "sprite" then
 			sprite_count = sprite_count + 1
+			last_sprite_index = index
 		end
+		seen[item] = true
 	end
 
 	-- luacheck: push ignore 542
 	if empty_count == 4 then
 		-- TODO: just remove any entities
 		-- luacheck: pop
+
+	elseif empty_count == 3 and sprite_count == 1 then
+		local obj = smartshop.entities.add_single_upright_sprite(shop, last_sprite_index)
+		if obj then
+			api.record_entity(shop.pos, obj)
+		end
 
 	elseif (sprite_count + empty_count) == 4 then
 		local obj = smartshop.entities.add_quad_upright_sprite(shop)

@@ -1,5 +1,5 @@
 local S = smartshop.S
-local deepcopy = smartshop.util.deepcopy
+local table_copy = table.copy
 local nodes = smartshop.nodes
 
 smartshop.shop_node_names = {}
@@ -36,7 +36,7 @@ local smartshop_def = {
 local function register_variant(name, overrides)
 	local variant_def
 	if overrides then
-		variant_def = deepcopy(smartshop_def)
+		variant_def = table_copy(smartshop_def)
 		for key, value in pairs(overrides) do
 			variant_def[key] = value
 		end

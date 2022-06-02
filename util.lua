@@ -37,29 +37,6 @@ function util.player_is_admin(player_or_name)
 	return minetest.check_player_privs(player_or_name, {[smartshop.settings.admin_shop_priv] = true})
 end
 
-function util.deepcopy(orig, _memo)
-	-- taken from lua documentation
-	_memo = _memo or {}
-	local orig_type = type(orig)
-	local copy
-	if orig_type == "table" then
-		if _memo[orig] then
-			copy = _memo[orig]
-		else
-			copy = {}
-			for orig_key, orig_value in next, orig, nil do
-				copy[util.deepcopy(orig_key, _memo)] = util.deepcopy(orig_value, _memo)
-			end
-			_memo[orig] = copy
-			setmetatable(copy, util.deepcopy(getmetatable(orig), _memo))
-		end
-	else
-		-- number, string, boolean, etc
-		copy = orig
-	end
-	return copy
-end
-
 function util.table_invert(t)
 	local inverted = {}
 	for k, v in pairs(t) do

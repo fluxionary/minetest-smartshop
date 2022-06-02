@@ -95,6 +95,10 @@ function api.build_owner_formspec(shop)
 end
 
 function api.build_client_formspec(shop)
+	-- we need formspec version3 here,
+	-- so that we can make the give/pay slots list[]s, and cover them w/ an invisible button
+	-- which fixes UI scaling issues for small screens
+
 	local fpos = formspec_pos(shop.pos)
 
 	local fs_parts = {

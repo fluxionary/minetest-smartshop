@@ -61,12 +61,14 @@ function node_class:get_infotext()
 end
 
 function node_class:set_private(value)
-	self.meta:set_int("private", value and 1 or 0)
-	self.meta:mark_as_private("private")
+	-- reverse the semantics of what's stored, because we want the default to be "is_private"
+	self.meta:set_int("shared", value and 0 or 1)
+	self.meta:mark_as_private("shared")
 end
 
 function node_class:is_private()
-	return self.meta:get_int("private") == 1
+	-- reverse the semantics of what's stored, because we want the default to be "is_private"
+	return self.meta:get_int("shared") == 0
 end
 
 --------------------

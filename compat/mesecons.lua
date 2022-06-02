@@ -2,13 +2,13 @@
 
 local S = smartshop.S
 
-local deepcopy = smartshop.util.deepcopy
+local table_copy = table.copy
 
 --------------------
 
 local function mesecons_override(itemstring)
     local def = minetest.registered_nodes[itemstring]
-	local groups = deepcopy(def.groups or {})
+	local groups = table_copy(def.groups or {})
 	local on_timer = def.on_timer
 	groups.mesecon = 2
 	minetest.override_item(itemstring, {
