@@ -75,8 +75,8 @@ function api.build_owner_formspec(shop)
 	else
 		table.insert(fs_parts, ("list[nodemeta:%s;main;0,2;8,4;]"):format(fpos))
 
-		table.insert(fs_parts, ("button_exit[5,0;1,1;tsend;%s]"):format(FS("send\nstorage")))
-		table.insert(fs_parts, ("button_exit[5,1;1,1;trefill;%s]"):format(FS("refill\nstorage")))
+		table.insert(fs_parts, ("button_exit[5,0;1,1;tsend;%s]"):format(FS("send")))
+		table.insert(fs_parts, ("button_exit[5,1;1,1;trefill;%s]"):format(FS("refill")))
 
 		if send then
 			local title = F(send:get_title())

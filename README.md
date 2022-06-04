@@ -17,6 +17,10 @@ TEXTURES:
 
 # USER DOCUMENTATION
 
+This mod provides two nodes - a shop, and an external storage. 
+
+![Preview](https://github.com/fluxionary/minetest-smartshop/screenshot.png)
+
 the top 4 slots are for things you want to sell. you don't need to fill them all. 
 the 4 slots below that are the price of the thing above them. this is what you'll get from players who buy things
 at your shop.
