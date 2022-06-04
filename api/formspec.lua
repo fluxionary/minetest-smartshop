@@ -40,9 +40,9 @@ function api.build_owner_formspec(shop)
 
 	local fs_parts = {
 		"size[8,10]",
-		("button[6,0;1.5,1;customer;%s]"):format(FS("Customer")),
-		("label[0,0.2;%s]"):format(FS("On Sale:")),
-		("label[0,1.2;%s]"):format(FS("Price:")),
+		("button[6,0;1.5,1;customer;%s]"):format(FS("customer")),
+		("label[0,0.2;%s]"):format(FS("for sale:")),
+		("label[0,1.2;%s]"):format(FS("price:")),
 		("list[nodemeta:%s;give1;1,0;1,1;]"):format(fpos),
 		("list[nodemeta:%s;pay1;1,1;1,1;]"):format(fpos),
 		("list[nodemeta:%s;give2;2,0;1,1;]"):format(fpos),
@@ -51,43 +51,45 @@ function api.build_owner_formspec(shop)
 		("list[nodemeta:%s;pay3;3,1;1,1;]"):format(fpos),
 		("list[nodemeta:%s;give4;4,0;1,1;]"):format(fpos),
 		("list[nodemeta:%s;pay4;4,1;1,1;]"):format(fpos),
-		("list[nodemeta:%s;main;0,2;8,4;]"):format(fpos),
 		"list[current_player;main;0,6.2;8,4;]",
 		("listring[nodemeta:%s;main]"):format(fpos),
 		"listring[current_player;main]",
-		("checkbox[6,0.9;strict_meta;%s;%s]"):format(FS("Strict Metadata?"), is_strict_meta),
-		("tooltip[strict_meta;%s]"):format(FS("Check this if you are buying or selling items with unique properties " ..
+		("checkbox[6,0.9;strict_meta;%s;%s]"):format(FS("strict metadata?"), is_strict_meta),
+		("tooltip[strict_meta;%s]"):format(FS("check this if you are buying or selling items with unique properties " ..
 			"like written books or petz."
 		)),
-		("checkbox[6,1.2;private;%s;%s]"):format(FS("Private?"), is_private),
-		("tooltip[private;%s]"):format(FS("Uncheck this if you want to share control of the shop with anyone in the " ..
+		("checkbox[6,1.2;private;%s;%s]"):format(FS("private?"), is_private),
+		("tooltip[private;%s]"):format(FS("uncheck this if you want to share control of the shop with anyone in the " ..
 			"protected area.")),
 	}
 
-	if is_unlimited then
-		table.insert(fs_parts, ("label[0.5,-0.4;%s]"):format(FS("Your stock is unlimited")))
-	end
 	if player_is_admin(owner) then
-		table.insert(fs_parts, ("checkbox[6,0.6;is_unlimited;%s;%s]"):format(FS("Unlimited?"), is_unlimited))
-		table.insert(fs_parts, ("tooltip[is_unlimited;%s]"):format(FS("Check this to allow infinite exchanges")))
+		table.insert(fs_parts, ("checkbox[6,0.6;is_unlimited;%s;%s]"):format(FS("unlimited?"), is_unlimited))
+		table.insert(fs_parts, ("tooltip[is_unlimited;%s]"):format(FS("check this allow exchanges ex nihilo. " ..
+			"shop contents will be ignored")))
 	end
 
-	if not is_unlimited then
-		table.insert(fs_parts, ("button_exit[5,0;1,1;tsend;%s]"):format(FS("Send")))
-		table.insert(fs_parts, ("button_exit[5,1;1,1;trefill;%s]"):format(FS("Refill")))
+	if is_unlimited then
+		table.insert(fs_parts, ("label[0.5,2.5;%s]"):format(FS("Stock is unlimited")))
+
+	else
+		table.insert(fs_parts, ("list[nodemeta:%s;main;0,2;8,4;]"):format(fpos))
+
+		table.insert(fs_parts, ("button_exit[5,0;1,1;tsend;%s]"):format(FS("send\nstorage")))
+		table.insert(fs_parts, ("button_exit[5,1;1,1;trefill;%s]"):format(FS("refill\nstorage")))
 
 		if send then
 			local title = F(send:get_title())
-			table.insert(fs_parts, ("tooltip[tsend;%s]"):format(FS("Payments sent to @1", title)))
+			table.insert(fs_parts, ("tooltip[tsend;%s]"):format(FS("payments sent to @1", title)))
 		else
-			table.insert(fs_parts, ("tooltip[tsend;%s]"):format(FS("Click to set send storage")))
+			table.insert(fs_parts, ("tooltip[tsend;%s]"):format(FS("click to set send storage")))
 		end
 
 		if refill then
 			local title = F(refill:get_title())
-			table.insert(fs_parts, ("tooltip[trefill;%s]"):format(FS("Automatically refilled from @1", title)))
+			table.insert(fs_parts, ("tooltip[trefill;%s]"):format(FS("automatically refilled from @1", title)))
 		else
-			table.insert(fs_parts, ("tooltip[trefill;%s]"):format(FS("Click to set refill storage")))
+			table.insert(fs_parts, ("tooltip[trefill;%s]"):format(FS("click to set refill storage")))
 		end
 	end
 
@@ -106,8 +108,8 @@ function api.build_client_formspec(shop)
 		"size[10.5,8]",
 		"style_type[image_button;bgcolor=#00000000;bgimg=blank.png;border=false]",
 		"list[current_player;main;0.375,3.125;8,4;]",
-		("label[0.375,0.625;%s]"):format(FS("On Sale:")),
-		("label[0.375,1.875;%s]"):format(FS("Price:")),
+		("label[0.375,0.625;%s]"):format(FS("for sale:")),
+		("label[0.375,1.875;%s]"):format(FS("price:")),
 	}
 
 	local function give_i(i)
@@ -152,14 +154,14 @@ function api.build_storage_formspec(storage)
 		"size[12,9]",
 		("field[0.3,5.3;2,1;title;;%s]"):format(F(storage:get_title())),
 		"field_close_on_enter[title;false]",
-		("tooltip[title;%s]"):format(FS("Used with connected smartshops")),
-		("button_exit[0,6;2,1;save;%s]"):format(FS("Save")),
+		("tooltip[title;%s]"):format(FS("used with connected smartshops")),
+		("button_exit[0,6;2,1;save;%s]"):format(FS("save")),
 		("list[nodemeta:%s;main;0,0;12,5;]"):format(fpos),
 		"list[current_player;main;2,5;8,4;]",
 		("listring[nodemeta:%s;main]"):format(fpos),
 		"listring[current_player;main]",
 		("checkbox[0,7;private;%s;%s]"):format(FS("Private?"), is_private),
-		("tooltip[private;%s]"):format(FS("Uncheck this if you want to share control of the storage with anyone in " ..
+		("tooltip[private;%s]"):format(FS("uncheck this if you want to share control of the storage with anyone in " ..
 			"the protected area.")),
 	}
 

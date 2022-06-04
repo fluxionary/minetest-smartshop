@@ -24,7 +24,13 @@ smartshop.shop_class = shop_class
 function shop_class:initialize_metadata(player)
     node_class.initialize_metadata(self, player)
 
-    local player_name = player:get_player_name()
+    local player_name
+    if type(player) == "string" then
+        player_name = player
+    else
+        player_name = player:get_player_name()
+    end
+
     local is_admin = player_is_admin(player_name)
 
     self:set_upgraded()

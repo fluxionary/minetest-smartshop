@@ -27,7 +27,12 @@ end
 function storage_class:initialize_metadata(player)
 	node_class.initialize_metadata(self, player)
 
-	local player_name = player:get_player_name()
+    local player_name
+    if type(player) == "string" then
+        player_name = player
+    else
+        player_name = player:get_player_name()
+    end
 
 	self:set_infotext(S("External storage by: @1", player_name))
 	self:set_title("storage@%s", self:get_pos_as_string())

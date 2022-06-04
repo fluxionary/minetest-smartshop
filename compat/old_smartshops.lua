@@ -39,21 +39,40 @@ end
 
 local function convert_metadata(pos)
     -- convert legacy metadata
+	local shop = api.get_object(pos)
     local meta = get_meta(pos)
-    local metatable = meta:to_table() or {}
-    if metatable.creative == 1 then
-        if not metatable.type or metatable.type == 0 then
-            metatable.unlimited = 1
-            metatable.item_send = nil
-            metatable.item_refill = nil
+    local old_metatable = meta:to_table() or {}
+	local fields = old_metatable.fields or {}
+	meta:from_table({inventory = old_metatable.inventory})
+	shop:initialize_metadata(fields.owner)
 
-        elseif metatable.type == 1 then
-            metatable.unlimited = 0
-        end
+    if fields.creative == 1 and (fields.type or 0) == 0 then
+        shop:set_unlimited(true)
+        shop:set_send_pos()
+        shop:set_refill_pos()
+    else
+	    if fields.item_send then
+			local x, y, z = fields.item_send:match("^%(?(-?%d+),(-?%d+),(-?%d+))?$")
+		    shop:set_send_pos(vector.new(tonumber(x), tonumber(y), tonumber(z)))
+	    end
+	    if fields.item_refill then
+			local x, y, z = fields.item_refill:match("^%(?(-?%d+),(-?%d+),(-?%d+))?$")
+		    shop:set_refill_pos(vector.new(tonumber(x), tonumber(y), tonumber(z)))
+	    end
     end
 
-    metatable.type = nil
-    meta:from_table(metatable)
+	if smartshop.settings.enable_refund then
+		meta:set_string("upgraded", fields.upgraded or "")
+		smartshop.compat.do_refund(pos)
+	end
+end
+
+function smartshop.compat.convert_legacy_shop(pos)
+	convert_metadata(pos)
+	clear_legacy_entities(pos)
+
+	local shop = api.get_object(pos)
+	shop:update_appearance()
 end
 
 minetest.register_lbm({
@@ -62,12 +81,8 @@ minetest.register_lbm({
         "smartshop:shop",
     },
     run_at_every_load = false,
-	action = function(pos, node)
-		convert_metadata(pos)
-		clear_legacy_entities(pos)
-
-		local shop = api.get_object(pos)
-		shop:update_appearance()
+	action = function(pos)
+		smartshop.compat.convert_legacy_shop(pos)
 	end,
 })
 
@@ -116,6 +131,7 @@ function smartshop.compat.do_refund(pos)
 
 	-- don't bother refunding admin shops
 	if shop:is_admin() then
+		shop:set_upgraded()
 		return
 	end
 

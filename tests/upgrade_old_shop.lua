@@ -1,6 +1,9 @@
 local inv_count = smartshop.tests.inv_count
 
 local function init_old_shop(pos, player)
+    minetest.remove_node(pos)
+    minetest.swap_node(pos, {name = "smartshop:shop"})
+
     local player_name = player:get_player_name()
     local meta = minetest.get_meta(pos)
     meta:set_int("state", 0)
@@ -25,8 +28,6 @@ table.insert(smartshop.tests.tests, {
     name = "simulate refunds in empty shop",
     func = function(player, state)
         local shop_at = state.shop_at
-        minetest.remove_node(shop_at)
-        minetest.swap_node(shop_at, {name = "smartshop:shop"})
         init_old_shop(shop_at, player)
         local meta = minetest.get_meta(shop_at)
         local inv = meta:get_inventory()
@@ -39,6 +40,7 @@ table.insert(smartshop.tests.tests, {
         inv:set_stack("pay3", 1, "smartshop:gold 99")
         inv:set_stack("pay4", 1, "smartshop:gold 20")
 
+        smartshop.compat.convert_legacy_shop(shop_at)
         smartshop.compat.do_refund(shop_at)
 
         assert(inv_count(inv, "main", "smartshop:node") == 105, "refunded correct amount")

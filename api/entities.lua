@@ -197,9 +197,7 @@ function api.get_image_type(shop, index)
 end
 
 function api.update_entities(shop)
-	-- TODO this should also update existing entities, not just create new ones.
-	--      there should be no need to call clear_entities
-	-- Further comment: does that really help anything?
+	-- TODO https://github.com/fluxionary/minetest-smartshop/issues/32
 	shop:clear_entities()
 
 	local seen = {}
@@ -222,7 +220,7 @@ function api.update_entities(shop)
 
 	-- luacheck: push ignore 542
 	if empty_count == 4 then
-		-- TODO: just remove any entities
+		-- just remove any entities
 		-- luacheck: pop
 
 	elseif empty_count == 3 and sprite_count == 1 then
@@ -238,7 +236,7 @@ function api.update_entities(shop)
 		end
 
 	else
-		for index, image_type in ipairs(entity_types) do
+		for index, image_type in pairs(entity_types) do
 			local obj
 			if image_type == "sprite" then
 				obj = smartshop.entities.add_single_sprite(shop, index)

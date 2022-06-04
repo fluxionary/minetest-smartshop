@@ -1,28 +1,12 @@
 * TESTING
+  * what remains: https://github.com/fluxionary/minetest-smartshop/issues/27
 
-* logic for updating color of storage nodes
-* update existing entities, not just create new ones.
-* don't show invalid exchanges in the customer view
-* luacheck
-* automated testing
 
-* needed features:
- * toggle for allowing empty buy/give lines
- * hide sold out items in the customer view
 
 * listed bugz
-  * NaN checks when working w/ lurkcoin #3
-  * Shops don't always indicate they have been "used" properly #6
-    * possibly fixed? need to test
-  * Some items appear as unknown nodes in shops. #7
-    E.g. the barrel cacti from desert life
-    * possibly fixed? need to test
-  * if an item is in multiple slots in a smartshop, only show one entity icon for it #11
-    * this should only be relevant when you can't show all 4 slots in a single entity
-  * show correct item metadata description in shop display #14
-    zua: Update smart shops to show the attributes of the actual animal/pet the user will buy by clicking on that item.
-    Currently it shows the attributes (color/speed) of the animal placed on the display cell and that does not change
-    based on the next animal to sell.
-  * Add a help button #16
-  * allow shared shops #23
-  * toggle for strict metadata (bug #24)
+  * #3 NaN checks when working w/ lurkcoin
+  * #31 toggle for allowing empty buy/give lines
+
+* MAYBE
+  * #28 logic for updating color of storage nodes (just "has had stuff put into it" and "ran out of stuff")
+  * update existing entities, not just create new ones.

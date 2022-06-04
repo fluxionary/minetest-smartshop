@@ -87,7 +87,13 @@ end
 --------------------
 
 function node_class:initialize_metadata(owner)
-	local player_name = owner:get_player_name()
+    local player_name
+    if type(owner) == "string" then
+        player_name = owner
+    else
+        player_name = owner:get_player_name()
+    end
+
 	self:set_owner(player_name)
 	self:set_private(true)
 end
