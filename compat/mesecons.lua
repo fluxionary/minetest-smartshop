@@ -17,7 +17,7 @@ local function mesecons_override(itemstring)
 			if on_timer then
 				on_timer(pos, elapsed)
 			end
-			mesecon.receptor_off(pos, elapsed)
+			mesecon.receptor_off(pos)
 		end
 	})
 end
