@@ -54,7 +54,7 @@ function api.build_owner_formspec(shop)
 		"list[current_player;main;0,6.2;8,4;]",
 		("listring[nodemeta:%s;main]"):format(fpos),
 		"listring[current_player;main]",
-		("checkbox[6,0.9;strict_meta;%s;%s]"):format(FS("strict metadata?"), is_strict_meta),
+		("checkbox[6,0.9;strict_meta;%s;%s]"):format(FS("strict meta?"), is_strict_meta),
 		("tooltip[strict_meta;%s]"):format(FS("check this if you are buying or selling items with unique properties " ..
 			"like written books or petz."
 		)),
