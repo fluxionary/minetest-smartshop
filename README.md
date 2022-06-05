@@ -41,7 +41,7 @@ here is a picture of what a customer will see when interacting with your shop:
 
 ![Preview](https://github.com/fluxionary/minetest-smartshop/raw/redo-redo/screenshot3.png)
 
-if the custom has gold in their inventory, and clicks on the icons, they will "trade" some of their gold
+if the customer has gold in their inventory, and clicks on the icons, they will "trade" some of their gold
 for the items that were in the shop. 
 
 only valid exchanges will show up in the shop. the border of the shop will turn red if the shop has sold
