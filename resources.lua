@@ -4,6 +4,7 @@ smartshop.resources = {
 }
 
 if smartshop.has.default then
+    -- luacheck: push globals default
     smartshop.resources.sounds.shop_sounds = default.node_sound_wood_defaults()
     smartshop.resources.sounds.storage_sounds = default.node_sound_wood_defaults()
 
@@ -15,4 +16,5 @@ if smartshop.has.default then
         steel_ingot = "default:steel_ingot",
         copper_ingot = "default:copper_ingot",
     }
+    -- luacheck: pop
 end
