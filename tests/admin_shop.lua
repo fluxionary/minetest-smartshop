@@ -1,5 +1,4 @@
 local inv_count = smartshop.tests.inv_count
-local put_in_shop = smartshop.tests.put_in_shop
 
 table.insert(smartshop.tests.tests, {
     name = "configure and use an admin shop",
