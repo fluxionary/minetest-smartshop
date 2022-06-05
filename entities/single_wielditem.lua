@@ -23,7 +23,7 @@ local element_offset = {
       vector.new(0.1, -0.2, -0.2), vector.new(0.1, -0.2, 0.2) },
 }
 
--- for nodebox and mesh drawtypes, which can't be drawn well by the above
+-- for nodebox and mesh drawtypes without an inventory image, which can't be drawn well otherwise
 minetest.register_entity("smartshop:single_wielditem", {
 	visual = "wielditem",
 	visual_size = {x = .20, y = .20},

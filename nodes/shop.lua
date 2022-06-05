@@ -8,6 +8,7 @@ local smartshop_def = {
 	description = S("Smartshop"),
 	tiles = {"(smartshop_face.png^[colorize:#FFFFFF77)^smartshop_border.png"},
 	use_texture_alpha = "opaque",
+	sounds = smartshop.resources.sounds.shop_sounds,
 	groups = {
 		choppy = 2,
         oddly_breakable_by_hand = 1,

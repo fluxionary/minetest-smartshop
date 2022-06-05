@@ -41,7 +41,7 @@ local known_currency = {
     ["currency:buck_500"]=50000,
     ["currency:buck_1000"]=100000,
 
-    -- mineunit tests
+    -- for testing code
     ["smartshop:currency_1"]=1,
     ["smartshop:currency_2"]=2,
     ["smartshop:currency_5"]=5,

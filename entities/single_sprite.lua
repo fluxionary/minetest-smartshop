@@ -48,7 +48,7 @@ function smartshop.entities.add_single_sprite(shop, index)
 
 	local obj = add_entity(entity_pos, "smartshop:single_sprite")
 	if not obj then
-		smartshop.log("warning", "could not create single_wielditem for %s @ %s", item_name, pos_to_string(shop_pos))
+		smartshop.log("warning", "could not create single_sprite for %s @ %s", item_name, pos_to_string(shop_pos))
 		return
 	end
 

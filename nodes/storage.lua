@@ -9,6 +9,7 @@ local storage_def = {
 	description = S("Smartshop external storage"),
 	tiles = {"smartshop_face.png^[colorize:#ffffff77^smartshop_border.png"},
 	use_texture_alpha = "opaque",
+	sounds = smartshop.resources.sounds.storage_sounds,
 	groups = {
 		choppy = 2,
 		oddly_breakable_by_hand = 1,

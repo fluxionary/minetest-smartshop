@@ -37,52 +37,8 @@ function util.player_is_admin(player_or_name)
 	return minetest.check_player_privs(player_or_name, {[smartshop.settings.admin_shop_priv] = true})
 end
 
-function util.table_invert(t)
-	local inverted = {}
-	for k, v in pairs(t) do
-		inverted[v] = k
-	end
-	return inverted
-end
-
-function util.table_reversed(t)
-	local len = #t
-	local reversed = {}
-	for i = len, 1, -1 do
-		reversed[len - i + 1] = t[i]
-	end
-	return reversed
-end
-
-function util.table_contains(t, value)
-	for _, v in ipairs(t) do
-		if v == value then
-			return true
-		end
-	end
-	return false
-end
-
 function util.table_is_empty(t)
 	return not next(t)
-end
-
-function util.pairs_by_keys(t, sort_func)
-	local sorted_keys = {}
-	for key in pairs(t) do
-		table.insert(sorted_keys, key)
-	end
-	table.sort(sorted_keys, sort_func)
-	local i = 0
-	return function()
-		i = i + 1
-		local current_key = sorted_keys[i]
-		if current_key == nil then
-			return nil
-		else
-			return current_key, t[current_key]
-		end
-	end
 end
 
 function util.pairs_by_value(t, sort_function)
@@ -107,15 +63,6 @@ function util.pairs_by_value(t, sort_function)
 		else
 			return nil
 		end
-	end
-end
-
-function util.round(x)
-	-- approved by kahan
-	if x % 2 == 0.5 then
-		return x - 0.5
-	else
-		return math.floor(x + 0.5)
 	end
 end
 

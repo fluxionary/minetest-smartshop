@@ -14,6 +14,8 @@ breaks the node, before the LBM has been run.
 local v_eq = vector.equals
 local v_round = vector.round
 
+local string_to_pos = smartshop.util.string_to_pos
+
 local get_meta = minetest.get_meta
 local get_objects_inside_radius = minetest.get_objects_inside_radius
 
@@ -52,12 +54,16 @@ local function convert_metadata(pos)
         shop:set_refill_pos()
     else
 	    if fields.item_send then
-			local x, y, z = fields.item_send:match("^%(?(-?%d+),(-?%d+),(-?%d+))?$")
-		    shop:set_send_pos(vector.new(tonumber(x), tonumber(y), tonumber(z)))
+			local pos2 = string_to_pos(fields.item_send)
+		    if pos2 then
+			    shop:set_send_pos(pos2)
+		    end
 	    end
 	    if fields.item_refill then
-			local x, y, z = fields.item_refill:match("^%(?(-?%d+),(-?%d+),(-?%d+))?$")
-		    shop:set_refill_pos(vector.new(tonumber(x), tonumber(y), tonumber(z)))
+			local pos2 = string_to_pos(fields.item_refill)
+		    if pos2 then
+			    shop:set_refill_pos(pos2)
+		    end
 	    end
     end
 
