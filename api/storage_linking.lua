@@ -45,7 +45,7 @@ function api.try_link_storage(storage, player)
 	if not storage:is_owner(shop:get_owner()) then
 		smartshop.chat_send_player(player_name, "You do not own this storage!")
 
-	elseif vector.distance(data.shop.pos, storage.pos) > storage_max_distance then
+	elseif storage_max_distance > 0 and vector.distance(data.shop.pos, storage.pos) > storage_max_distance then
 		smartshop.chat_send_player(player_name, "Storage is too far from shop to link!")
 
 	else

@@ -51,12 +51,16 @@ local known_currency = {
     ["smartshop:currency_100"]=100,
 }
 
-currency.available_currency = {}
-for name, value in pairs(known_currency) do
+function currency.register_currency(name, value)
     if minetest.registered_items[name] then
         currency.available_currency[name] = value
         smartshop.log("action", "available currency: %s=%q", name, tostring(value))
     end
+end
+
+currency.available_currency = {}
+for name, value in pairs(known_currency) do
+	currency.register_currency(name, value)
 end
 
 local decreasing_values = {}
