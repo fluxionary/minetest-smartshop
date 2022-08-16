@@ -31,14 +31,12 @@ minetest.register_entity("smartshop:single_upright_sprite", {
 	smartshop2 = true,
 
 	get_staticdata = function(self)
-		minetest.log("action", "get_staticdata single")
 		return serialize({
 			self.pos, self.item,
 		})
 	end,
 
 	on_activate = function(self, staticdata, dtime_s)
-		minetest.log("action", "on_activate single")
 		local pos, item = unpack(deserialize(staticdata))
 		local obj = self.object
 

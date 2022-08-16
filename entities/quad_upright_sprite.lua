@@ -30,14 +30,12 @@ minetest.register_entity("smartshop:quad_upright_sprite", {
 	smartshop2 = true,
 
 	get_staticdata = function(self)
-		minetest.log("action", "get_staticdata quad")
 		return serialize({
 			self.pos, self.items,
 		})
 	end,
 
 	on_activate = function(self, staticdata, dtime_s)
-		minetest.log("action", "on_activate quad")
 		local pos, items = unpack(deserialize(staticdata))
 		local obj = self.object
 

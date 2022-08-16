@@ -37,14 +37,12 @@ minetest.register_entity("smartshop:single_wielditem", {
 	smartshop2 = true,
 
 	get_staticdata = function(self)
-		minetest.log("action", "get_staticdata wielditem")
 		return minetest.serialize({
 			self.pos, self.index, self.item,
 		})
 	end,
 
 	on_activate = function(self, staticdata, dtime_s)
-		minetest.log("action", "on_activate wielditem")
 		local pos, index, item = unpack(deserialize(staticdata))
 		local obj = self.object
 
