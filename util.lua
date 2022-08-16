@@ -1,9 +1,6 @@
-local create_detached_inventory = minetest.create_detached_inventory
-
 local error_behavior = smartshop.settings.error_behavior
 
-smartshop.util = {}
-local util = smartshop.util
+local util = {}
 
 function util.error(messagefmt, ...)
 	local message = messagefmt:format(...)
@@ -196,39 +193,25 @@ function util.get_stack_key(stack, match_meta)
 	end
 end
 
-function util.clone_tmp_inventory(inv_name, src_inv)
-	local tmp_inv = create_detached_inventory(inv_name, {})
-
-	for name, _ in pairs(src_inv:get_lists()) do
-		if not tmp_inv:is_empty(name) or tmp_inv:get_size(name) ~= 0 then
-			util.error("attempt to re-use existing temporary inventory %s", inv_name)
-			return
-		end
-	end
-
-	for name, list in pairs(src_inv:get_lists()) do
-		tmp_inv:set_size(name, src_inv:get_size(name))
-		tmp_inv:set_list(name, list)
-	end
-
-	return tmp_inv
-end
-
 function util.class(super)
     local class = {}
 	class.__index = class
 
+	local meta = {
+		__call = function(_, ...)
+	        local obj = setmetatable({}, class)
+	        if obj._init then
+	            obj:_init(...)
+	        end
+	        return obj
+	    end
+	}
+
 	if super then
-		setmetatable(class, {__index = super})
+		meta.__index = super
 	end
 
-    function class:new(...)
-        local obj = setmetatable({}, class)
-        if obj.__new then
-            obj:__new(...)
-        end
-        return obj
-    end
+	setmetatable(class, meta)
 
     return class
 end
@@ -434,3 +417,44 @@ function util.get_short_description(itemstack)
 	local single_line = table.concat(unparse(single_line_parsed), "")
 	return single_line
 end
+
+local max_dist_xz = smartshop.settings.entity_reaction_distance_xz
+local max_dist_y = smartshop.settings.entity_reaction_distance_y
+
+function util.is_near_player(pos)
+	local x = pos.x
+	local y = pos.y
+	local z = pos.z
+	local players = minetest.get_connected_players()
+	for i = 1, #players do
+		local ppos = players[i]:get_pos()
+		if (
+			ppos and
+			(math.abs(ppos.x - x) < max_dist_xz) and
+			(math.abs(ppos.y + 1 - y) < max_dist_y) and
+			(math.abs(ppos.z - z) < max_dist_xz)
+		) then
+			return true
+		end
+	end
+	return false
+end
+
+function util.memoize1(f)
+	local memo = {}
+	return function(arg)
+		if arg == nil then
+			return f(arg)
+		end
+		local rv = memo[arg]
+
+		if not rv then
+			rv = f(arg)
+			memo[arg] = rv
+		end
+
+		return rv
+	end
+end
+
+smartshop.util = util
