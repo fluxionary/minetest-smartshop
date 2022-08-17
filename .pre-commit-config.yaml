@@ -17,4 +17,3 @@ repos:
         entry: luacheck
         types: [lua]
         args: [-q]
-        always_run: true
