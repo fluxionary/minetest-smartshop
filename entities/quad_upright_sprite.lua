@@ -46,7 +46,7 @@ minetest.register_entity("smartshop:quad_upright_sprite", {
 
 		self.pos = pos
 
-		for _, other_obj in ipairs(api.get_entities(pos)) do
+		for other_obj in api.iterate_entities(pos) do
 			if obj ~= other_obj then
 				obj:remove()
 				return

@@ -13,7 +13,7 @@ local v_sub = vector.subtract
 local debug = false
 local debug_cache = {}
 
--- i wanted to cache these, but see
+-- i wanted to cache entities by position, but see
 -- https://github.com/minetest/minetest/blob/8bf1609cccba24e2516ecb98dbf694b91fe697bf/doc/lua_api.txt#L6824-L6829
 function api.get_entities(pos)
 	local objects = {}
@@ -21,16 +21,46 @@ function api.get_entities(pos)
 	for _, obj in ipairs(get_objects_in_area(v_sub(pos, 0.5), v_add(pos, 0.5))) do
 		local ent = obj:get_luaentity()
 		if ent and ent.name:sub(1, 10) == "smartshop:" then
-			if not ent.pos then
+			local ent_pos = ent.pos
+			if not ent_pos then
 				obj:remove()
 
-			elseif vector.equals(ent.pos, pos) then
+			elseif vector.equals(ent_pos, pos) then
 				table.insert(objects, obj)
 			end
 		end
 	end
 
 	return objects
+end
+
+function api.iterate_entities(pos)
+	local entities = ipairs(get_objects_in_area(v_sub(pos, 0.5), v_add(pos, 0.5)))
+	local index = 0
+
+	return function()
+		while true do
+			index = index + 1
+
+			local obj = entities[index]
+
+			if not obj then
+				return
+			end
+
+			local ent = obj:get_luaentity()
+
+			if ent and ent.name:sub(1, 10) == "smartshop:" then
+				local ent_pos = ent.pos
+				if not ent_pos then
+					obj:remove()
+
+				elseif vector.equals(ent_pos, pos) then
+					return obj
+				end
+			end
+		end
+	end
 end
 
 function api.clear_entities(pos)

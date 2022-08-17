@@ -1,3 +1,5 @@
+local v_new = vector.new
+
 local error_behavior = smartshop.settings.error_behavior
 
 local util = {}
@@ -22,7 +24,7 @@ function util.string_to_pos(pos_as_string)
 	end
 	local x, y, z = pos_as_string:match("^%s*%(?%s*(%-?%d+)[%s,]+(%-?%d+)[%s,]+(%-?%d+)%s*%)?%s*$")
 	if x and y and z then
-		return vector.new(tonumber(x), tonumber(y), tonumber(z))
+		return v_new(tonumber(x), tonumber(y), tonumber(z))
 	end
 end
 
@@ -127,8 +129,6 @@ function util.table_size(t)
 	return size
 end
 
-local table_size = util.table_size
-
 function util.equals(a, b)
 	local t = type(a)
 	if t ~= type(b) then
@@ -144,13 +144,13 @@ function util.equals(a, b)
 			end
 			size_a = size_a + 1
 		end
-		return size_a == table_size(b)
+		return size_a == util.table_size(b)
 	end
 end
 
-local equals = util.equals
-
 function util.remove_stack_with_meta(inv, list_name, stack)
+	local equals = util.equals
+
 	local stack_name = stack:get_name()
 	local stack_count = stack:get_count()
 	local stack_wear = stack:get_wear()
@@ -194,11 +194,8 @@ function util.get_stack_key(stack, match_meta)
 end
 
 function util.class(super)
-    local class = {}
-	class.__index = class
-
 	local meta = {
-		__call = function(_, ...)
+		__call = function(class, ...)
 	        local obj = setmetatable({}, class)
 	        if obj._init then
 	            obj:_init(...)
@@ -210,6 +207,9 @@ function util.class(super)
 	if super then
 		meta.__index = super
 	end
+
+    local class = {}
+	class.__index = class
 
 	setmetatable(class, meta)
 
@@ -416,28 +416,6 @@ function util.get_short_description(itemstack)
 	local single_line_parsed = erase_after_newline(parsed)
 	local single_line = table.concat(unparse(single_line_parsed), "")
 	return single_line
-end
-
-local max_dist_xz = smartshop.settings.entity_reaction_distance_xz
-local max_dist_y = smartshop.settings.entity_reaction_distance_y
-
-function util.is_near_player(pos)
-	local x = pos.x
-	local y = pos.y
-	local z = pos.z
-	local players = minetest.get_connected_players()
-	for i = 1, #players do
-		local ppos = players[i]:get_pos()
-		if (
-			ppos and
-			(math.abs(ppos.x - x) < max_dist_xz) and
-			(math.abs(ppos.y + 1 - y) < max_dist_y) and
-			(math.abs(ppos.z - z) < max_dist_xz)
-		) then
-			return true
-		end
-	end
-	return false
 end
 
 function util.memoize1(f)

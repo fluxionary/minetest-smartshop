@@ -48,6 +48,7 @@ smartshop = {
 }
 
 smartshop.dofile("settings")
+smartshop.dofile("privs")
 smartshop.dofile("resources")
 smartshop.dofile("util")
 smartshop.dofile("fake_inventory")

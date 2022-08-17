@@ -54,7 +54,7 @@ minetest.register_entity("smartshop:single_sprite", {
 		self.pos = pos
 		self.index = index
 
-		for _, other_obj in ipairs(api.get_entities(pos)) do
+		for other_obj in api.iterate_entities(pos) do
 			local entity = other_obj:get_luaentity()
 			if (not entity.index) or (entity.index == index and obj ~= other_obj) then
 				obj:remove()
