@@ -35,7 +35,7 @@ function api.get_entities(pos)
 end
 
 function api.iterate_entities(pos)
-	local entities = ipairs(get_objects_in_area(v_sub(pos, 0.5), v_add(pos, 0.5)))
+	local entities = get_objects_in_area(v_sub(pos, 0.5), v_add(pos, 0.5))
 	local index = 0
 
 	return function()
@@ -273,12 +273,16 @@ function api.get_image_type(shop, index)
 	local item_name = shop:get_give_stack(index):get_name()
 
 	local def = minetest.registered_items[item_name]
+
 	if not def or item_name == "" then
 		return "none"
+
 	elseif def.inventory_image and def.inventory_image ~= "" then
 		return "sprite"
+
 	elseif api.is_complicated_drawtype(def.drawtype) then
 		return "wielditem"
+
 	else
 		return "sprite"
 	end
@@ -308,6 +312,10 @@ function api.get_expected_entities(shop)
 			end
 
 			seen[item] = true
+
+		else
+			empty_count = empty_count + 1
+			table_insert(entity_types, "none")
 		end
 	end
 
