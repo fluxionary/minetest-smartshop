@@ -26,7 +26,7 @@ function api.get_entities(pos)
 				obj:remove()
 
 			elseif vector.equals(ent_pos, pos) then
-				table.insert(objects, obj)
+				table_insert(objects, obj)
 			end
 		end
 	end
@@ -231,7 +231,7 @@ api.get_image = memoize1(function(item)
 		local parts = {("could not determine image for displaying %q.\ndefinition:"):format(item)}
 
 		for key, value in pairs(def) do
-			table.insert(parts, ("    %q = %q"):format(key, dump(value)))
+			table_insert(parts, ("    %q = %q"):format(key, dump(value)))
 		end
 
 		smartshop.log("warning", table.concat(parts, "\n"))

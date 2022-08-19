@@ -54,7 +54,7 @@ minetest.register_entity("smartshop:single_upright_sprite", {
 			end
 		end
 
-		self.items = item
+		self.item = item
 
 		obj:set_properties({textures = {api.get_image(item)}})
 	end,
