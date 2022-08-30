@@ -71,6 +71,12 @@ end
 function smartshop.entities.add_single_upright_sprite(shop, index)
 	local shop_pos = shop.pos
 	local param2 = get_node(shop_pos).param2
+	if param2 >= 4 then
+		smartshop.util.error("shop @ %s has bad param2 value %s; cannot create entityes",
+			pos_to_string(shop_pos), param2)
+		return
+	end
+
 	local item = shop:get_give_stack(index):get_name()
 
 	local entity_pos = get_entity_pos(shop_pos, param2)

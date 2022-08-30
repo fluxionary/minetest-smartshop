@@ -82,6 +82,12 @@ end
 function smartshop.entities.add_quad_upright_sprite(shop)
 	local shop_pos = shop.pos
 	local param2 = get_node(shop_pos).param2
+	if param2 >= 4 then
+		smartshop.util.error("shop @ %s has bad param2 value %s; cannot create entityes",
+			pos_to_string(shop_pos), param2)
+		return
+	end
+
 	local items = get_items(shop)
 
 	local entity_pos = get_entity_pos(shop_pos, param2)
