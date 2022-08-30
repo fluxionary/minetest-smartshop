@@ -23,6 +23,13 @@ local smartshop_def = {
 	paramtype = "light",
 	sunlight_propagates = true,
 	light_source = 10,
+	on_construct = function(pos)
+		local node = minetest.get_node(pos)
+		if node.param2 >= 4 then
+			node.param2 = node.param2 % 4
+			minetest.swap_node(pos, node)
+		end
+	end,
 	after_place_node = nodes.after_place_node,
 	on_rightclick = nodes.on_rightclick,
 	allow_metadata_inventory_put = nodes.allow_metadata_inventory_put,
@@ -33,6 +40,7 @@ local smartshop_def = {
 	can_dig = nodes.can_dig,
 	on_destruct = nodes.on_destruct,
 	on_blast = function() end,  -- explosion-proof
+	on_rotate = false,  -- disallow rotation via screwdriver (entities get confused)
 }
 
 local function register_shop_variant(name, overrides)
