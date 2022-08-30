@@ -51,8 +51,8 @@ minetest.register_entity("smartshop:single_wielditem", {
 			return
 		end
 
-		self.pos = pos
-		self.index = index
+		self.pos = pos  -- *MUST* set before calling api.get_entity
+		self.index = index  -- *MUST* set before calling api.get_entity
 
 		for other_obj in api.iterate_entities(pos) do
 			local entity = other_obj:get_luaentity()

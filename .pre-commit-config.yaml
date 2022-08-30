@@ -15,5 +15,5 @@ repos:
         name: luacheck
         language: system
         entry: luacheck
-        types: [lua]
-        args: [-q]
+        pass_filenames: false
+        args: [-q,.]

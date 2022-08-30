@@ -45,7 +45,7 @@ minetest.register_entity("smartshop:single_upright_sprite", {
 			return
 		end
 
-		self.pos = pos
+		self.pos = pos  -- *MUST* set before calling api.get_entity
 
 		for other_obj in api.iterate_entities(pos) do
 			if obj ~= other_obj then
