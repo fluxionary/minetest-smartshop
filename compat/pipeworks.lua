@@ -47,7 +47,8 @@ local function pipeworks_override(itemstring)
 				bottom = 1
             },
 		},
-        on_rotate = pipeworks.on_rotate,
+	    -- we disallow rotation, so don't use this
+        -- on_rotate = pipeworks.on_rotate,
     })
 end
 
