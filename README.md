@@ -65,6 +65,8 @@ admin users also have the option to create a shop with unlimited inventory.
 
 # ADMIN DOCUMENTATION
 
+note: now requires [futil](https://github.com/fluxionary/minetest-futil)
+
 why should you use this fork over AiTechEye's?
 
 ## features:
