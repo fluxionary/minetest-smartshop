@@ -4,8 +4,8 @@ local table_insert = table.insert
 
 local get_objects_in_area = minetest.get_objects_in_area
 
-local escape_texture = smartshop.util.escape_texture
-local memoize1 = smartshop.util.memoize1
+local escape_texture = futil.escape_texture
+local memoize1 = futil.memoize1
 
 local v_add = vector.add
 local v_sub = vector.subtract

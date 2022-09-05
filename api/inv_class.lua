@@ -1,5 +1,5 @@
 
-local class = smartshop.util.class
+local class = futil.class1
 local get_stack_key = smartshop.util.get_stack_key
 local remove_stack_with_meta = smartshop.util.remove_stack_with_meta
 

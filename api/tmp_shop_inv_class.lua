@@ -1,4 +1,4 @@
-local class = smartshop.util.class
+local class = futil.class
 
 --------------------
 

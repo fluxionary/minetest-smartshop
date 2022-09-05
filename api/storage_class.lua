@@ -3,7 +3,7 @@ local swap_node = minetest.swap_node
 
 local S = smartshop.S
 local api = smartshop.api
-local class = smartshop.util.class
+local class = futil.class
 
 --------------------
 

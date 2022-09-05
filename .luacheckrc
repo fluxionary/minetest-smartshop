@@ -26,6 +26,7 @@ stds.smartshop = {
 		"smartshop",
 	},
 	read_globals = {
+		"futil",
 		"minetest",
 		"node_entity_queue",
 	},

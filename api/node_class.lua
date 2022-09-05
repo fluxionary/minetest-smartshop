@@ -6,8 +6,8 @@ local api = smartshop.api
 
 local player_is_admin = smartshop.util.player_is_admin
 
-local class = smartshop.util.class
-local formspec_pos = smartshop.util.formspec_pos
+local class = futil.class1
+local formspec_pos = futil.formspec_pos
 
 --------------------
 

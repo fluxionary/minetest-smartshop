@@ -6,11 +6,12 @@ local swap_node = minetest.swap_node
 local write_json = minetest.write_json
 
 local S = smartshop.S
-local class = smartshop.util.class
 local get_short_description = smartshop.util.get_short_description
 local player_is_admin = smartshop.util.player_is_admin
 local string_to_pos = smartshop.util.string_to_pos
-local table_is_empty = smartshop.util.table_is_empty
+
+local class = futil.class1
+local table_is_empty = futil.table_is_empty
 
 local api = smartshop.api
 

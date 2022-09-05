@@ -2,6 +2,8 @@ local v_new = vector.new
 
 local error_behavior = smartshop.settings.error_behavior
 
+local equals = futil.equals
+
 local util = {}
 
 function util.error(messagefmt, ...)
@@ -28,44 +30,8 @@ function util.string_to_pos(pos_as_string)
 	end
 end
 
-function util.formspec_pos(pos)
-	return ("%i,%i,%i"):format(pos.x, pos.y, pos.z)
-end
-
 function util.player_is_admin(player_or_name)
 	return minetest.check_player_privs(player_or_name, {[smartshop.settings.admin_shop_priv] = true})
-end
-
-function util.table_is_empty(t)
-	return next(t) == nil
-end
-
-function util.pairs_by_value(t, sort_function)
-	local s = {}
-	for k, v in pairs(t) do
-		table.insert(s, {k, v})
-	end
-
-	if sort_function then
-		table.sort(s, function(a, b)
-			return sort_function(a[2], b[2])
-		end)
-	else
-		table.sort(s, function(a, b)
-			return a[2] < b[2]
-		end)
-	end
-
-	local i = 0
-	return function()
-		i = i + 1
-		local v = s[i]
-		if v then
-			return unpack(v)
-		else
-			return nil
-		end
-	end
 end
 
 function util.check_shop_add_remainder(shop, remainder)
@@ -121,36 +87,7 @@ function util.check_player_remove_remainder(player_inv, shop, remainder, expecte
 	return true
 end
 
-function util.table_size(t)
-	local size = 0
-	for _ in pairs(t) do
-		size = size + 1
-	end
-	return size
-end
-
-function util.equals(a, b)
-	local t = type(a)
-	if t ~= type(b) then
-		return false
-	end
-	if t ~= "table" then
-		return a == b
-	else
-		local size_a = 0
-		for key, value in pairs(a) do
-			if not util.equals(value, b[key]) then
-				return false
-			end
-			size_a = size_a + 1
-		end
-		return size_a == util.table_size(b)
-	end
-end
-
 function util.remove_stack_with_meta(inv, list_name, stack)
-	local equals = util.equals
-
 	local stack_name = stack:get_name()
 	local stack_count = stack:get_count()
 	local stack_wear = stack:get_wear()
@@ -190,44 +127,6 @@ function util.get_stack_key(stack, match_meta)
 		return key_stack:to_string()
 	else
 		return stack:get_name()
-	end
-end
-
-function util.class(super)
-	local meta = {
-		__call = function(class, ...)
-	        local obj = setmetatable({}, class)
-	        if obj._init then
-	            obj:_init(...)
-	        end
-	        return obj
-	    end
-	}
-
-	if super then
-		meta.__index = super
-	end
-
-    local class = {}
-	class.__index = class
-
-	setmetatable(class, meta)
-
-    return class
-end
-
--- https://github.com/minetest/minetest/blob/9fc018ded10225589d2559d24a5db739e891fb31/doc/lua_api.txt#L453-L462
-function util.escape_texture(texturestring)
-	-- store in a variable so we don't return both rvs of gsub
-	local v = texturestring:gsub("%^", "\\^"):gsub(":", "\\:")
-	return v
-end
-
-function util.truncate(s, max_length)
-	if s:len() > max_length then
-		return s:sub(1, max_length - 3) .. "..."
-	else
-		return s
 	end
 end
 
@@ -416,23 +315,6 @@ function util.get_short_description(itemstack)
 	local single_line_parsed = erase_after_newline(parsed)
 	local single_line = table.concat(unparse(single_line_parsed), "")
 	return single_line
-end
-
-function util.memoize1(f)
-	local memo = {}
-	return function(arg)
-		if arg == nil then
-			return f(arg)
-		end
-		local rv = memo[arg]
-
-		if not rv then
-			rv = f(arg)
-			memo[arg] = rv
-		end
-
-		return rv
-	end
 end
 
 smartshop.util = util

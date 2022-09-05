@@ -9,10 +9,11 @@ local function FS(text, ...)
 	return F(S(text, ...))
 end
 
-local formspec_pos = smartshop.util.formspec_pos
 local get_short_description = smartshop.util.get_short_description
 local player_is_admin = smartshop.util.player_is_admin
-local truncate = smartshop.util.truncate
+
+local formspec_pos = futil.formspec_pos
+local truncate = futil.truncate
 
 local history_max = smartshop.settings.history_max
 

@@ -1,4 +1,4 @@
-local class = smartshop.util.class
+local class = futil.class
 local clone_fake_inventory = smartshop.util.clone_fake_inventory
 
 --------------------

@@ -1,6 +1,6 @@
 -- this will allow us to more easily extend behavior e.g. interacting directly w/ inventory bags
 
-local class = smartshop.util.class
+local class = futil.class1
 
 --------------------
 
