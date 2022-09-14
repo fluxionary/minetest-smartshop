@@ -1,4 +1,3 @@
-
 local F = minetest.formspec_escape
 local string_to_pos = minetest.string_to_pos
 

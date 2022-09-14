@@ -111,24 +111,24 @@ api.register_purchase_mechanic({
 		local pay_stack = shop:get_pay_stack(i)
 		local give_stack = shop:get_give_stack(i)
 
-	    local tmp_shop_inv = shop:get_tmp_inv()
+		local tmp_shop_inv = shop:get_tmp_inv()
 		local tmp_player_inv = player_inv:get_tmp_inv()
 
-	    local count_to_remove = give_stack:get_count()
-	    local shop_removed = tmp_shop_inv:remove_item(give_stack, "give")
-	    local success = count_to_remove == shop_removed:get_count()
+		local count_to_remove = give_stack:get_count()
+		local shop_removed = tmp_shop_inv:remove_item(give_stack, "give")
+		local success = count_to_remove == shop_removed:get_count()
 
 		count_to_remove = pay_stack:get_count()
 		local player_removed = tmp_player_inv:remove_item(pay_stack, "pay")
 		success = success and (count_to_remove == player_removed:get_count())
 
-	    local leftover = tmp_shop_inv:add_item(player_removed, "pay")
-	    success = success and (leftover:get_count() == 0)
+		local leftover = tmp_shop_inv:add_item(player_removed, "pay")
+		success = success and (leftover:get_count() == 0)
 
-	    leftover = tmp_player_inv:add_item(shop_removed, "give")
-	    success = success and (leftover:get_count() == 0)
+		leftover = tmp_player_inv:add_item(shop_removed, "give")
+		success = success and (leftover:get_count() == 0)
 
-	    shop:destroy_tmp_inv(tmp_shop_inv)
+		shop:destroy_tmp_inv(tmp_shop_inv)
 		player_inv:destroy_tmp_inv(tmp_player_inv)
 
 		return success

@@ -50,6 +50,7 @@ local known_currency = {
     ["smartshop:currency_20"]=20,
     ["smartshop:currency_50"]=50,
     ["smartshop:currency_100"]=100,
+    ["smartshop:currency_10000"]=10000,
 }
 
 function currency.register_currency(name, value)
@@ -85,6 +86,7 @@ local function is_currency(stack)
 	local name
 	if type(stack) == "string" then
 		name = stack
+
 	else
 		name = stack:get_name()
 	end
@@ -122,6 +124,7 @@ local function get_change_stacks(value)
 				local change_stack = ItemStack(name)
 				change_stack:set_count(remainder)
 				table.insert(change_stack)
+
 			else
 				local change_stack = ItemStack(name)
 				change_stack:set_count(count_required)
@@ -218,6 +221,7 @@ function currency.remove_item(inv, stack, kind)
 	if inv:contains_item(stack, kind) then
 		return inv:remove_item(stack, kind)
 	end
+
 	-- here be dragons
 	local owed_value = sum_stack(stack)
 	local removed_items = {}
@@ -243,6 +247,7 @@ function currency.remove_item(inv, stack, kind)
 		-- break the next largest bill
 		if not name_to_break then
 			change_failed = true
+
 		else
 			change_failed = try_to_change(inv, kind, name_to_break, owed_value, removed_items)
 		end
@@ -258,7 +263,6 @@ function currency.remove_item(inv, stack, kind)
 
 	return ItemStack(stack)
 end
-
 
 api.register_purchase_mechanic({
 	name = "smartshop:currency",
@@ -291,6 +295,7 @@ api.register_purchase_mechanic({
 		if is_currency(give_stack) then
 			shop_removed = currency.remove_item(tmp_shop_inv, give_stack, "give")
 			success = success and not shop_removed:is_empty()
+
 		else
 			local count = give_stack:get_count()
 			shop_removed = tmp_shop_inv:remove_item(give_stack, "give")
@@ -300,6 +305,7 @@ api.register_purchase_mechanic({
 		if is_currency(pay_stack) then
 			local shop_remaining = currency.add_item(tmp_shop_inv, player_removed, "pay")
 			success = success and shop_remaining:is_empty()
+
 		else
 			local shop_remaining = tmp_shop_inv:add_item(player_removed, "pay")
 			success = success and shop_remaining:is_empty()
@@ -308,6 +314,7 @@ api.register_purchase_mechanic({
 		if is_currency(give_stack) then
 			local player_remaining = currency.add_item(tmp_player_inv, shop_removed, "give")
 			success = success and player_remaining:is_empty()
+
 		else
 			local player_remaining = tmp_player_inv:add_item(shop_removed, "give")
 			success = success and player_remaining:is_empty()

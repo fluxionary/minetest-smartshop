@@ -11,7 +11,7 @@ local smartshop_def = {
 	sounds = smartshop.resources.sounds.shop_sounds,
 	groups = {
 		choppy = 2,
-        oddly_breakable_by_hand = 1,
+		oddly_breakable_by_hand = 1,
 		smartshop = 1,
 	},
 	drawtype = "nodebox",
@@ -39,8 +39,9 @@ local smartshop_def = {
 	on_metadata_inventory_take = nodes.on_metadata_inventory_take,
 	can_dig = nodes.can_dig,
 	on_destruct = nodes.on_destruct,
-	on_blast = function() end,  -- explosion-proof
-	on_rotate = false,  -- disallow rotation via screwdriver (entities get confused)
+	on_blast = function()
+	end, -- explosion-proof
+	on_rotate = false, -- disallow rotation via screwdriver (entities get confused)
 }
 
 local function register_shop_variant(name, overrides)

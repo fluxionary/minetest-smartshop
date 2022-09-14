@@ -26,7 +26,8 @@ local storage_def = {
 	on_metadata_inventory_put = nodes.on_metadata_inventory_put,
 	on_metadata_inventory_take = nodes.on_metadata_inventory_take,
 	can_dig = nodes.can_dig,
-	on_blast = function() end,  -- explosion-proof
+	on_blast = function()
+	end, -- explosion-proof
 	on_punch = function(pos, node, puncher, pointed_thing)
 		local storage = api.get_object(pos)
 		api.try_link_storage(storage, puncher)

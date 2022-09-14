@@ -51,7 +51,7 @@ end
 --------------------
 
 function tmp_shop_inv_class:is_strict_meta()
-    return self.strict_meta
+	return self.strict_meta
 end
 
 -------------------

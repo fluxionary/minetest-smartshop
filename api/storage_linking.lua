@@ -37,7 +37,9 @@ end
 function api.try_link_storage(storage, player)
 	local player_name = player:get_player_name()
 	local data = data_by_player_name[player_name]
-	if not data then return end
+	if not data then
+		return
+	end
 
 	local shop = data.shop
 	local storage_type = data.storage_type

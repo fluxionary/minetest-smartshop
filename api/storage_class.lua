@@ -30,12 +30,12 @@ end
 function storage_class:initialize_metadata(player)
 	node_class.initialize_metadata(self, player)
 
-    local player_name
-    if type(player) == "string" then
-        player_name = player
-    else
-        player_name = player:get_player_name()
-    end
+	local player_name
+	if type(player) == "string" then
+		player_name = player
+	else
+		player_name = player:get_player_name()
+	end
 
 	self:set_infotext(S("External storage by: @1", player_name))
 	self:set_title("storage@%s", self:get_pos_as_string())
@@ -65,14 +65,14 @@ end
 function storage_class:receive_fields(player, fields)
 	local changed = false
 	if fields.private then
-	    self:set_private(fields.private == "true")
+		self:set_private(fields.private == "true")
 		changed = true
 	end
 
 	if fields.title then
 		self:set_title(fields.title)
 		changed = true
-    end
+	end
 
 	if changed then
 		self:show_formspec(player)
@@ -83,10 +83,10 @@ end
 
 function storage_class:set_variant(variant)
 	local node = get_node(self.pos)
-    if node.name ~= variant then
-	    node.name = variant
-        swap_node(self.pos, node)
-    end
+	if node.name ~= variant then
+		node.name = variant
+		swap_node(self.pos, node)
+	end
 end
 
 function storage_class:add_item(stack)
