@@ -9,7 +9,7 @@ local function FS(text, ...)
 	return F(S(text, ...))
 end
 
-local get_short_description = smartshop.util.get_short_description
+local get_safe_short_description = futil.get_safe_short_description
 local player_is_admin = smartshop.util.player_is_admin
 
 local formspec_pos = futil.formspec_pos
@@ -146,7 +146,7 @@ function api.build_client_formspec(shop)
 
 			if strict_meta then
 				table.insert(give_parts, ("tooltip[buy%ia;%s\n%s]"):format(
-					i, F(get_short_description(give_stack)), F(truncate(give_stack:to_string(), 50))
+					i, F(get_safe_short_description(give_stack)), F(truncate(give_stack:to_string(), 50))
 				))
 
 			else
@@ -180,7 +180,7 @@ function api.build_client_formspec(shop)
 
 			if strict_meta then
 				table.insert(pay_parts, ("tooltip[buy%ib;%s\n%s]"):format(
-					i, F(get_short_description(pay_stack)), F(truncate(pay_stack:to_string(), 50))
+					i, F(get_safe_short_description(pay_stack)), F(truncate(pay_stack:to_string(), 50))
 				))
 
 			else

@@ -6,7 +6,7 @@ local swap_node = minetest.swap_node
 local write_json = minetest.write_json
 
 local S = smartshop.S
-local get_short_description = smartshop.util.get_short_description
+local get_safe_short_description = futil.get_safe_short_description
 local player_is_admin = smartshop.util.player_is_admin
 local string_to_pos = smartshop.util.string_to_pos
 
@@ -207,8 +207,8 @@ function shop_class:log_purchase(player, i, mechanic)
 
     local give_item, pay_item
     if strict_meta then
-        give_item = get_short_description(give_stack)
-        pay_item = get_short_description(pay_stack)
+        give_item = get_safe_short_description(give_stack)
+        pay_item = get_safe_short_description(pay_stack)
     else
         give_item = give_stack:get_name()
         pay_item = pay_stack:get_name()
@@ -601,7 +601,7 @@ function shop_class:get_info_line(i)
 
     local give = self:get_give_stack(i)
 
-    local description = get_short_description(give):gsub("%%", "%%%%")
+    local description = get_safe_short_description(give):gsub("%%", "%%%%")
 
     local count = give:get_count()
     if count > 1 then
