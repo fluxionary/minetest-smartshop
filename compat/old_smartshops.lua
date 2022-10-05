@@ -28,6 +28,7 @@ local function convert_metadata(pos)
         shop:set_unlimited(true)
         shop:set_send_pos()
         shop:set_refill_pos()
+
     else
 	    if fields.item_send then
 			local pos2 = string_to_pos(fields.item_send)

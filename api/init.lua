@@ -40,6 +40,8 @@ function smartshop.api.get_object(pos)
 		return
 	end
 
+	minetest.load_area(pos)
+
 	if smartshop.api.is_shop(pos) then
 		return smartshop.shop_class(pos)
 
