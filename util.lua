@@ -3,6 +3,7 @@ local v_new = vector.new
 local error_behavior = smartshop.settings.error_behavior
 
 local equals = futil.equals
+local pairs_by_key = futil.pairs_by_key
 
 local util = {}
 
@@ -123,8 +124,14 @@ end
 function util.get_stack_key(stack, match_meta)
 	if match_meta then
 		local key_stack = ItemStack(stack) -- clone
-		key_stack:set_count(1)
-		return key_stack:to_string()
+		local name = key_stack:get_name()
+		local wear = key_stack:get_wear()
+		local meta_parts = {}
+		for key, value in pairs_by_key(key_stack:get_meta():to_table().fields) do
+			table.insert(meta_parts, ("%s=%s"):format(key, value))
+		end
+
+		return ("%s %s %s"):format(name, wear, table.concat(meta_parts, ","))
 	else
 		return stack:get_name()
 	end
