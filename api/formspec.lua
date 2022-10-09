@@ -12,7 +12,7 @@ local get_safe_short_description = futil.get_safe_short_description
 local player_is_admin = smartshop.util.player_is_admin
 
 local formspec_pos = futil.formspec_pos
-local truncate = futil.truncate
+local truncate = string.truncate
 
 local history_max = smartshop.settings.history_max
 
