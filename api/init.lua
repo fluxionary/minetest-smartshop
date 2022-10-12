@@ -42,6 +42,12 @@ function smartshop.api.get_object(pos)
 
 	minetest.load_area(pos)
 
+	if not minetest.get_node_or_nil(pos) then
+		smartshop.log("warning", "trying to get shop/storage object for an unloaded area @ %s",
+			minetest.pos_to_string(pos)
+		)
+	end
+
 	if smartshop.api.is_shop(pos) then
 		return smartshop.shop_class(pos)
 
