@@ -601,7 +601,14 @@ function shop_class:get_info_line(i)
 
 	local give = self:get_give_stack(i)
 
-	local description = get_safe_short_description(give):gsub("%%", "%%%%")
+	local description
+
+	if self:is_strict_meta() then
+		description = get_safe_short_description(give):gsub("%%", "%%%%")
+
+	else
+		description = get_safe_short_description(give:get_name()):gsub("%%", "%%%%")
+	end
 
 	local count = give:get_count()
 	if count > 1 then
