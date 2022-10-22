@@ -11,7 +11,7 @@ local player_is_admin = smartshop.util.player_is_admin
 local string_to_pos = smartshop.util.string_to_pos
 
 local class = futil.class1
-local table_is_empty = table.is_empty
+local table_is_empty = futil.table.is_empty
 
 local api = smartshop.api
 

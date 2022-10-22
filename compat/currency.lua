@@ -6,7 +6,7 @@ local check_shop_add = util.check_shop_add_remainder
 local check_shop_removed = util.check_shop_remove_remainder
 local check_player_add = util.check_player_add_remainder
 local check_player_removed = util.check_player_remove_remainder
-local pairs_by_value = table.pairs_by_value
+local pairs_by_value = futil.table.pairs_by_value
 
 smartshop.currency = {}
 local currency = smartshop.currency

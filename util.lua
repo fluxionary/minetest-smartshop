@@ -3,7 +3,7 @@ local v_new = vector.new
 local error_behavior = smartshop.settings.error_behavior
 
 local equals = futil.equals
-local pairs_by_key = table.pairs_by_key
+local pairs_by_key = futil.table.pairs_by_key
 
 local util = {}
 
