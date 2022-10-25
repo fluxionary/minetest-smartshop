@@ -22,7 +22,7 @@ local function convert_metadata(pos)
     local old_metatable = meta:to_table() or {}
 	local fields = old_metatable.fields or {}
 	meta:from_table({inventory = old_metatable.inventory})
-	shop:initialize_metadata(fields.owner)
+	shop:initialize_metadata(fields.owner or minetest.settings:get("name") or "")
 
     if fields.creative == 1 and (fields.type or 0) == 0 then
         shop:set_unlimited(true)
