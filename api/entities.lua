@@ -149,6 +149,13 @@ local function get_image_cube(tiles)
 			get_image_from_tile(tiles[3] or "")
 		)
 
+	elseif #tiles == 5 then
+		return minetest.inventorycube(
+			get_image_from_tile(tiles[1] or ""),
+			get_image_from_tile(tiles[5] or ""),
+			get_image_from_tile(tiles[3] or "")
+		)
+
 	elseif #tiles == 4 then
 		return minetest.inventorycube(
 			get_image_from_tile(tiles[1] or ""),
@@ -250,10 +257,10 @@ function api.get_quad_image(items)
 		if image == "unknown_node.png" then
 			image = "blank.png"
 		end
-		table_insert(images, escape_texture(image .. "^[resize:32x32"))
+		table_insert(images, escape_texture(image .. "^[resize:128x128"))
 	end
 
-	return ("[combine:68x68:1,1=%s:1,36=%s:36,1=%s:36,36=%s"):format(unpack(images))
+	return ("[combine:260x260:1,1=%s:1,132=%s:132,1=%s:132,132=%s"):format(unpack(images))
 end
 
 function api.is_complicated_drawtype(drawtype)
