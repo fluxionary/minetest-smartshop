@@ -9,6 +9,8 @@ local pos_to_string = minetest.pos_to_string
 local serialize = minetest.serialize
 local deserialize = minetest.deserialize
 
+local get_wield_image = futil.get_wield_image
+
 local api = smartshop.api
 
 local element_dir = smartshop.entities.element_dir
@@ -56,7 +58,7 @@ minetest.register_entity("smartshop:single_upright_sprite", {
 
 		self.item = item
 
-		obj:set_properties({textures = {api.get_image(item)}})
+		obj:set_properties({textures = {get_wield_image(item)}})
 	end,
 })
 

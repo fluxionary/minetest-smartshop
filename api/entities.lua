@@ -5,13 +5,10 @@ local table_insert = table.insert
 local get_objects_in_area = minetest.get_objects_in_area
 
 local escape_texture = futil.escape_texture
-local memoize1 = futil.memoize1
+local get_wield_image = futil.get_wield_image
 
 local v_add = vector.add
 local v_sub = vector.subtract
-
-local debug = false
-local debug_cache = {}
 
 -- i wanted to cache entities by position, but see
 -- https://github.com/minetest/minetest/blob/8bf1609cccba24e2516ecb98dbf694b91fe697bf/doc/lua_api.txt#L6824-L6829
@@ -76,187 +73,11 @@ function api.clear_entities(pos)
 	end
 end
 
-local function is_vertical_frames(animation)
-	return (
-		animation.type == "vertical_frames" and
-		animation.aspect_w and
-		animation.aspect_h
-	)
-end
-
-local function get_single_frame(animation, image_name)
-	return ("smartshop_animation_mask.png^[resize:%ix%i^[mask:%s"):format(
-		animation.aspect_w,
-		animation.aspect_h,
-		image_name
-	)
-end
-
-local function is_sheet_2d(animation)
-	return (
-		animation.type == "sheet_2d" and
-		animation.frames_w and
-		animation.frames_h
-	)
-end
-
-local function get_sheet_2d(animation, image_name)
-	return ("%s^[sheet:%ix%i:0,0"):format(
-		image_name,
-		animation.frames_w,
-		animation.frames_h
-	)
-end
-
-local get_image_from_tile = memoize1(function(tile)
-	if type(tile) == "string" then
-		return tile
-
-	elseif type(tile) == "table" then
-		local image_name
-
-		if type(tile.image) == "string" then
-			image_name = tile.image
-
-		elseif type(tile.name) == "string" then
-			image_name = tile.name
-
-		end
-
-		if image_name then
-			local animation = tile.animation
-			if animation then
-				if is_vertical_frames(animation) then
-					return get_single_frame(animation, image_name)
-
-				elseif is_sheet_2d(animation) then
-					return get_sheet_2d(animation, image_name)
-				end
-			end
-
-			return image_name
-		end
-	end
-
-	return "unknown_node.png"
-end)
-
-local function get_image_cube(tiles)
-	if #tiles == 6 then
-		return minetest.inventorycube(
-			get_image_from_tile(tiles[1] or ""),
-			get_image_from_tile(tiles[6] or ""),
-			get_image_from_tile(tiles[3] or "")
-		)
-
-	elseif #tiles == 5 then
-		return minetest.inventorycube(
-			get_image_from_tile(tiles[1] or ""),
-			get_image_from_tile(tiles[5] or ""),
-			get_image_from_tile(tiles[3] or "")
-		)
-
-	elseif #tiles == 4 then
-		return minetest.inventorycube(
-			get_image_from_tile(tiles[1] or ""),
-			get_image_from_tile(tiles[4] or ""),
-			get_image_from_tile(tiles[3] or "")
-		)
-
-	elseif #tiles == 3 then
-		return minetest.inventorycube(
-			get_image_from_tile(tiles[1] or ""),
-			get_image_from_tile(tiles[3] or ""),
-			get_image_from_tile(tiles[3] or "")
-		)
-
-	elseif #tiles >= 1 then
-		return minetest.inventorycube(
-			get_image_from_tile(tiles[1] or ""),
-			get_image_from_tile(tiles[1] or ""),
-			get_image_from_tile(tiles[1] or "")
-		)
-	end
-
-	return "unknown_node.png"
-end
-
-local function is_normal_node(def)
-	local drawtype = def.drawtype
-	return (def.type == "node" and (
-		drawtype == "normal" or
-		drawtype == "allfaces" or
-		drawtype == "allfaces_optional" or
-		drawtype == "glasslike" or
-		drawtype == "glasslike_framed" or
-		drawtype == "glasslike_framed_optional" or
-		drawtype == "liquid"
-	))
-end
-
-api.get_image = memoize1(function(item)
-	if not item or item == "" then
-		return "blank.png"
-	end
-
-	local def = minetest.registered_items[item]
-
-	if not def then
-		return "unknown_node.png"
-	end
-
-	local image
-	local tiles = def.tiles or def.tile_images
-	local inventory_image = def.inventory_image
-
-	if inventory_image and inventory_image ~= "" then
-		if type(inventory_image) == "string" then
-			image = inventory_image
-
-		elseif type(inventory_image) == "table" and #inventory_image == 1 and type(inventory_image[1]) == "string" then
-			image = inventory_image[1]
-
-		else
-			smartshop.log("warning", "could not decode inventory image for %s", item)
-			image = "unknown_node.png"
-		end
-
-	elseif tiles then
-		if type(tiles) == "string" then
-			image = tiles
-
-		elseif type(tiles) == "table" then
-			if is_normal_node(def) then
-				image = get_image_cube(tiles)
-			else
-				image = get_image_from_tile(tiles[1])
-			end
-		end
-	end
-
-	if (debug or not image or image == "" or image == "unknown_node.png") and not debug_cache[item] then
-		local parts = {("could not determine image for displaying %q.\ndefinition:"):format(item)}
-
-		for key, value in pairs(def) do
-			table_insert(parts, ("    %q = %q"):format(key, dump(value)))
-		end
-
-		smartshop.log("warning", table.concat(parts, "\n"))
-
-		debug_cache[item] = true
-	end
-
-	return image or "unknown_node.png"
-end)
-
 function api.get_quad_image(items)
 	local images = {}
 
 	for i = 1, 4 do
-		local image = api.get_image(items[i])
-		if image == "unknown_node.png" then
-			image = "blank.png"
-		end
+		local image = get_wield_image(items[i])
 		table_insert(images, escape_texture(image .. "^[resize:128x128"))
 	end
 
@@ -360,7 +181,7 @@ local function check_update_objects(shop, expected_types)
 		return true
 	end
 
-	local get_image = api.get_image
+	local get_image = get_wield_image
 
 	for i = 1, #ents do
 		local obj = ents[i]

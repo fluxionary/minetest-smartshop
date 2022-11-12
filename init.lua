@@ -3,8 +3,8 @@ local modpath = minetest.get_modpath(modname)
 local S = minetest.get_translator(modname)
 
 assert(
-	type(futil.version) == "number" and futil.version >= os.time({year = 2022, month = 10, day = 24}),
-	"please update futil"
+	type(futil.version) == "number" and futil.version >= os.time({year = 2022, month = 11, day = 11}),
+	"please update futil https://content.minetest.net/packages/rheo/futil/"
 )
 
 smartshop = {
