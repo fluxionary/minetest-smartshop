@@ -105,7 +105,7 @@ function api.get_image_type(shop, index)
 	if not def or item_name == "" then
 		return "none"
 
-	elseif def.inventory_image and def.inventory_image ~= "" then
+	elseif (def.inventory_image or "") ~= "" or (def.wield_image or "") ~= "" then
 		return "sprite"
 
 	elseif api.is_complicated_drawtype(def.drawtype) then
