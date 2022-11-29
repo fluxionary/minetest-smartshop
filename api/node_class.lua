@@ -133,10 +133,7 @@ end
 --------------------
 
 function node_class:can_access(player)
-	return (
-		self:is_owner(player) or
-		check_player_privs(player, {protection_bypass = true})
-	)
+	return (self:is_owner(player) or check_player_privs(player, { protection_bypass = true }))
 end
 
 function node_class:can_dig(player)
@@ -148,7 +145,6 @@ end
 function node_class:allow_metadata_inventory_put(listname, index, stack, player)
 	if not self:can_access(player) or stack:get_wear() ~= 0 or not stack:is_known() then
 		return 0
-
 	else
 		return stack:get_count()
 	end
@@ -157,7 +153,6 @@ end
 function node_class:allow_metadata_inventory_take(listname, index, stack, player)
 	if not self:can_access(player) then
 		return 0
-
 	else
 		return stack:get_count()
 	end
@@ -166,14 +161,15 @@ end
 function node_class:allow_metadata_inventory_move(from_list, from_index, to_list, to_index, count, player)
 	if not self:can_access(player) then
 		return 0
-
 	else
 		return count
 	end
 end
 
 function node_class:on_metadata_inventory_put(listname, index, stack, player)
-	smartshop.log("action", "%s put %q in %s @ %s",
+	smartshop.log(
+		"action",
+		"%s put %q in %s @ %s",
 		player:get_player_name(),
 		stack:to_string(),
 		minetest.get_node(self.pos).name,
@@ -182,7 +178,9 @@ function node_class:on_metadata_inventory_put(listname, index, stack, player)
 end
 
 function node_class:on_metadata_inventory_take(listname, index, stack, player)
-	smartshop.log("action", "%s took %q from %s @ %s",
+	smartshop.log(
+		"action",
+		"%s took %q from %s @ %s",
 		player:get_player_name(),
 		stack:to_string(),
 		minetest.get_node(self.pos).name,

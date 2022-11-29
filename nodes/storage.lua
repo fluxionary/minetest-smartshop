@@ -7,7 +7,7 @@ smartshop.nodes.storage_node_names = {}
 
 local storage_def = {
 	description = S("Smartshop external storage"),
-	tiles = {"smartshop_face.png^[colorize:#ffffff77^smartshop_border.png"},
+	tiles = { "smartshop_face.png^[colorize:#ffffff77^smartshop_border.png" },
 	use_texture_alpha = "opaque",
 	sounds = smartshop.resources.sounds.storage_sounds,
 	groups = {
@@ -26,8 +26,7 @@ local storage_def = {
 	on_metadata_inventory_put = nodes.on_metadata_inventory_put,
 	on_metadata_inventory_take = nodes.on_metadata_inventory_take,
 	can_dig = nodes.can_dig,
-	on_blast = function()
-	end, -- explosion-proof
+	on_blast = function() end, -- explosion-proof
 	on_punch = function(pos, node, puncher, pointed_thing)
 		local storage = api.get_object(pos)
 		api.try_link_storage(storage, puncher)
@@ -56,9 +55,9 @@ local make_variant_tiles = smartshop.nodes.make_variant_tiles
 register_storage_variant("smartshop:storage")
 
 register_storage_variant("smartshop:storage_lacks_refill", {
-	tiles = make_variant_tiles("#FF000077")
+	tiles = make_variant_tiles("#FF000077"),
 })
 
 register_storage_variant("smartshop:storage_has_send", {
-	tiles = make_variant_tiles("#00FF0077")
+	tiles = make_variant_tiles("#00FF0077"),
 })

@@ -73,7 +73,6 @@ function inv_class:remove_item(stack, match_meta)
 	local removed
 	if match_meta then
 		removed = remove_stack_with_meta(inv, "main", stack)
-
 	else
 		removed = inv:remove_item("main", stack)
 	end

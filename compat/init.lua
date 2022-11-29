@@ -2,7 +2,7 @@ smartshop.compat = {}
 
 smartshop.dofile("compat", "old_smartshops")
 
-if smartshop.has.currency then
+if smartshop.has.currency and smartshop.settings.change_currency then
 	smartshop.dofile("compat", "currency")
 end
 

@@ -21,7 +21,6 @@ function api.get_entities(pos)
 			local ent_pos = ent.pos
 			if not ent_pos then
 				obj:remove()
-
 			elseif vector.equals(ent_pos, pos) then
 				table_insert(objects, obj)
 			end
@@ -51,7 +50,6 @@ function api.iterate_entities(pos)
 				local ent_pos = ent.pos
 				if not ent_pos then
 					obj:remove()
-
 				elseif vector.equals(ent_pos, pos) then
 					return obj
 				end
@@ -85,12 +83,7 @@ function api.get_quad_image(items)
 end
 
 function api.is_complicated_drawtype(drawtype)
-	return (
-		drawtype == "fencelike" or
-		drawtype == "raillike" or
-		drawtype == "nodebox" or
-		drawtype == "mesh"
-	)
+	return (drawtype == "fencelike" or drawtype == "raillike" or drawtype == "nodebox" or drawtype == "mesh")
 end
 
 function api.get_image_type(shop, index)
@@ -104,13 +97,10 @@ function api.get_image_type(shop, index)
 
 	if not def or item_name == "" then
 		return "none"
-
 	elseif (def.inventory_image or "") ~= "" or (def.wield_image or "") ~= "" then
 		return "sprite"
-
 	elseif api.is_complicated_drawtype(def.drawtype) then
 		return "wielditem"
-
 	else
 		return "sprite"
 	end
@@ -133,14 +123,12 @@ function api.get_expected_entities(shop)
 
 			if seen[item] or image_type == "none" then
 				empty_count = empty_count + 1
-
 			elseif image_type == "sprite" then
 				sprite_count = sprite_count + 1
 				last_sprite_index = index
 			end
 
 			seen[item] = true
-
 		else
 			empty_count = empty_count + 1
 			table_insert(entity_types, "none")
@@ -150,18 +138,15 @@ function api.get_expected_entities(shop)
 	local expected_entities = {}
 
 	if empty_count == 3 and sprite_count == 1 then
-		table_insert(expected_entities, {"single_upright_sprite", last_sprite_index})
-
+		table_insert(expected_entities, { "single_upright_sprite", last_sprite_index })
 	elseif (sprite_count + empty_count) == 4 then
-		table_insert(expected_entities, {"quad_upright_sprite"})
-
+		table_insert(expected_entities, { "quad_upright_sprite" })
 	else
 		for index, image_type in pairs(entity_types) do
 			if image_type == "sprite" then
-				table_insert(expected_entities, {"single_sprite", index})
-
+				table_insert(expected_entities, { "single_sprite", index })
 			elseif image_type == "wielditem" then
-				table_insert(expected_entities, {"single_wielditem", index})
+				table_insert(expected_entities, { "single_wielditem", index })
 			end
 		end
 	end
@@ -199,10 +184,9 @@ local function check_update_objects(shop, expected_types)
 			local expected_item = shop:get_give_stack(index_arg):get_name()
 			if entity.item ~= expected_item then
 				local texture = get_image(expected_item)
-				obj:set_properties({textures = {texture}})
+				obj:set_properties({ textures = { texture } })
 				entity.item = expected_item
 			end
-
 		elseif type == "quad_upright_sprite" then
 			if entity.name ~= "smartshop:quad_upright_sprite" then
 				return false
@@ -225,10 +209,9 @@ local function check_update_objects(shop, expected_types)
 
 			if not all_expected then
 				local texture = api.get_quad_image(expected_items)
-				obj:set_properties({textures = {texture}})
+				obj:set_properties({ textures = { texture } })
 				entity.items = expected_items
 			end
-
 		elseif type == "single_sprite" then
 			if entity.name ~= "smartshop:single_sprite" then
 				return false
@@ -239,10 +222,9 @@ local function check_update_objects(shop, expected_types)
 			local expected_item = shop:get_give_stack(index_arg):get_name()
 			if entity.item ~= expected_item then
 				local texture = get_image(expected_item)
-				obj:set_properties({textures = {texture}})
+				obj:set_properties({ textures = { texture } })
 				entity.item = expected_item
 			end
-
 		elseif type == "single_wielditem" then
 			if entity.name ~= "smartshop:single_wielditem" then
 				return false
@@ -252,7 +234,7 @@ local function check_update_objects(shop, expected_types)
 			end
 			local expected_item = shop:get_give_stack(index_arg):get_name()
 			if entity.item ~= expected_item then
-				obj:set_properties({wield_item = expected_item})
+				obj:set_properties({ wield_item = expected_item })
 				entity.item = expected_item
 			end
 		end

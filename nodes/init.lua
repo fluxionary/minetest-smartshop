@@ -49,7 +49,7 @@ smartshop.nodes = {
 	end,
 
 	make_variant_tiles = function(color)
-		return {("(smartshop_face.png^[colorize:#FFFFFF77)^(smartshop_border.png^[colorize:%s)"):format(color)}
+		return { ("(smartshop_face.png^[colorize:#FFFFFF77)^(smartshop_border.png^[colorize:%s)"):format(color) }
 	end,
 }
 

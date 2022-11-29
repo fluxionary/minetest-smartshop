@@ -8,7 +8,7 @@ smartshop.storage_max_distance (max from shop to storage) int 30 1 0
 smartshop.storage_link_time (time given to link storage) int 30 1 3600
 
 # automatically make change for currency, if currency is present
-smartshop.change_currency (automatically change currency) bool false
+smartshop.change_currency (automatically change currency) bool true
 
 # whether to refund the pay/give line of "old" shops. if you are not upgrading from the old version, set this to false
 # to disable an LBM that otherwise has to run on every load.

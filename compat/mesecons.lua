@@ -7,7 +7,7 @@ local table_copy = table.copy
 --------------------
 
 local function mesecons_override(itemstring)
-    local def = minetest.registered_nodes[itemstring]
+	local def = minetest.registered_nodes[itemstring]
 	local groups = table_copy(def.groups or {})
 	local on_timer = def.on_timer
 	groups.mesecon = 2
@@ -18,7 +18,7 @@ local function mesecons_override(itemstring)
 				on_timer(pos, elapsed)
 			end
 			mesecon.receptor_off(pos)
-		end
+		end,
 	})
 end
 
@@ -44,7 +44,7 @@ local old_shop_initialize_metadata = shop_class.initialize_metadata
 function shop_class:initialize_metadata(player)
 	old_shop_initialize_metadata(self, player)
 
-	self:set_state(0)  -- is this actually needed by mesecons, or what?
+	self:set_state(0) -- is this actually needed by mesecons, or what?
 end
 
 --------------------
@@ -58,7 +58,7 @@ local mesein_descriptions = {
 
 local old_build_storage_formspec = smartshop.api.build_storage_formspec
 function smartshop.api.build_storage_formspec(storage)
-	local fs_parts = {old_build_storage_formspec(storage)}
+	local fs_parts = { old_build_storage_formspec(storage) }
 
 	local mesein = storage:get_mesein()
 	local description = mesein_descriptions[mesein + 1]
@@ -106,8 +106,8 @@ end
 
 smartshop.api.register_on_purchase(function(player, shop, i)
 	local pos = shop.pos
-    mesecon.receptor_on(pos)
-    minetest.get_node_timer(pos):start(1)
+	mesecon.receptor_on(pos)
+	minetest.get_node_timer(pos):start(1)
 
 	local send = shop:get_send()
 	if send then

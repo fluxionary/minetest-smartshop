@@ -1,0 +1,11 @@
+{
+    "type": "MOD",
+    "name": "smartshop",
+    "title": "smartshop (flux's fork)",
+    "short_description": "a smarter and easier shop",
+    "repo": "https://github.com/fluxionary/minetest-smartshop.git",
+    "website": "https://github.com/fluxionary/minetest-smartshop",
+    "issue_tracker": "https://github.com/fluxionary/minetest-smartshop/issues",
+    "license": "AGPL-3.0-or-later",
+    "media_license": "CC-BY-SA-3.0"
+}

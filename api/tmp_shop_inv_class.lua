@@ -67,7 +67,6 @@ function tmp_shop_inv_class:get_all_counts(kind)
 				all_counts[key] = (all_counts[key] or 0) + value
 			end
 		end
-
 	elseif kind == "pay" then
 		local send = self.send
 		if send then
@@ -89,7 +88,6 @@ function tmp_shop_inv_class:get_count(stack, kind)
 		if refill then
 			count = count + refill:get_count(stack, strict_meta)
 		end
-
 	elseif kind == "pay" then
 		local send = self.send
 		if send then
@@ -112,7 +110,6 @@ function tmp_shop_inv_class:room_for_item(stack, kind)
 	if kind == "give" then
 		local refill = self.refill
 		return refill and refill:room_for_item(stack)
-
 	elseif kind == "pay" then
 		local send = self.send
 		return send and send:room_for_item(stack)
@@ -129,7 +126,6 @@ function tmp_shop_inv_class:add_item(stack, kind)
 		if refill and refill:room_for_item(stack) then
 			return refill:add_item(stack)
 		end
-
 	elseif kind == "pay" then
 		local send = self.send
 		if send and send:room_for_item(stack) then
@@ -154,7 +150,6 @@ function tmp_shop_inv_class:contains_item(stack, kind)
 	if kind == "give" then
 		local refill = self.refill
 		return refill and refill:contains_item(stack, strict_meta)
-
 	elseif kind == "pay" then
 		local send = self.send
 		return send and send:contains_item(stack, strict_meta)
@@ -173,7 +168,6 @@ function tmp_shop_inv_class:remove_item(stack, kind)
 		if refill and refill:contains_item(stack, strict_meta) then
 			return refill:remove_item(stack, strict_meta)
 		end
-
 	elseif kind == "pay" then
 		local send = self.send
 		if send and send:contains_item(stack, strict_meta) then

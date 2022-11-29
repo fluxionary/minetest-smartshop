@@ -1,9 +1,10 @@
 local v_new = vector.new
 
-local error_behavior = smartshop.settings.error_behavior
-
 local equals = futil.equals
 local pairs_by_key = futil.table.pairs_by_key
+local FakeInventory = futil.FakeInventory
+
+local error_behavior = smartshop.settings.error_behavior
 
 local util = {}
 
@@ -12,7 +13,6 @@ function util.error(messagefmt, ...)
 
 	if error_behavior == "crash" then
 		error(message)
-
 	elseif error_behavior == "announce" then
 		minetest.chat_send_all(message)
 	end
@@ -32,7 +32,7 @@ function util.string_to_pos(pos_as_string)
 end
 
 function util.player_is_admin(player_or_name)
-	return minetest.check_player_privs(player_or_name, {[smartshop.settings.admin_shop_priv] = true})
+	return minetest.check_player_privs(player_or_name, { [smartshop.settings.admin_shop_priv] = true })
 end
 
 function util.check_shop_add_remainder(shop, remainder)
@@ -56,8 +56,13 @@ function util.check_shop_remove_remainder(shop, remainder, expected)
 	local owner = shop:get_owner()
 	local pos_as_string = shop:get_pos_as_string()
 
-	util.error("ERROR: %s's smartshop @ %s lost %q of %q while removing",
-		owner, pos_as_string, remainder:to_string(), expected:to_string())
+	util.error(
+		"ERROR: %s's smartshop @ %s lost %q of %q while removing",
+		owner,
+		pos_as_string,
+		remainder:to_string(),
+		expected:to_string()
+	)
 
 	return true
 end
@@ -69,8 +74,13 @@ function util.check_player_add_remainder(player_inv, shop, remainder)
 
 	local player_name = player_inv.name
 
-	util.error("ERROR: %s lost %q on add using %'s shop @ %s",
-		player_name, remainder:to_string(), shop:get_owner(), shop:get_pos_as_string())
+	util.error(
+		"ERROR: %s lost %q on add using %'s shop @ %s",
+		player_name,
+		remainder:to_string(),
+		shop:get_owner(),
+		shop:get_pos_as_string()
+	)
 
 	return true
 end
@@ -82,8 +92,14 @@ function util.check_player_remove_remainder(player_inv, shop, remainder, expecte
 
 	local player_name = player_inv.name
 
-	util.error("ERROR: %s lost %q of %q on remove from %'s shop @ %s",
-		player_name, remainder:to_string(), expected:to_string(), shop:get_owner(), shop:get_pos_as_string())
+	util.error(
+		"ERROR: %s lost %q of %q on remove from %'s shop @ %s",
+		player_name,
+		remainder:to_string(),
+		expected:to_string(),
+		shop:get_owner(),
+		shop:get_pos_as_string()
+	)
 
 	return true
 end
@@ -135,6 +151,15 @@ function util.get_stack_key(stack, match_meta)
 	else
 		return stack:get_name()
 	end
+end
+
+function util.clone_fake_inventory(src_inv)
+	local fake_inv = FakeInventory()
+
+	fake_inv:set_size("main", src_inv:get_size("main"))
+	fake_inv:set_list("main", src_inv:get_list("main"))
+
+	return fake_inv
 end
 
 smartshop.util = util

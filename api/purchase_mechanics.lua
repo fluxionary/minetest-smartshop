@@ -77,7 +77,6 @@ function api.try_purchase(player, shop, i)
 
 	if reason == "Shop is sold out" then
 		api.on_shop_empty(player, shop, i)
-
 	elseif reason == "Shop is full" then
 		api.on_shop_full(player, shop, i)
 	end
@@ -150,5 +149,5 @@ api.register_purchase_mechanic({
 		check_player_removed(player_inv, shop, player_removed, pay_stack)
 		check_player_add(player_inv, shop, player_remaining)
 		check_shop_add(shop, shop_remaining)
-	end
+	end,
 })

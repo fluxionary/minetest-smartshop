@@ -55,15 +55,13 @@ local function run_test(name, state, i)
 end
 
 minetest.register_chatcommand("smartshop_tests", {
-	privs = {server = true},
+	privs = { server = true },
 	func = function(name)
 		run_test(name, {}, 1)
-	end
+	end,
 })
 
 smartshop.dofile("tests", "define_items")
-
-smartshop.dofile("tests", "fake_inventory")
 
 smartshop.dofile("tests", "initialize")
 smartshop.dofile("tests", "place_shop")

@@ -16,33 +16,32 @@ local api = smartshop.api
 local string_to_pos = smartshop.util.string_to_pos
 
 local function convert_metadata(pos)
-    -- convert legacy metadata
+	-- convert legacy metadata
 	local shop = api.get_object(pos)
-    local meta = get_meta(pos)
-    local old_metatable = meta:to_table() or {}
+	local meta = get_meta(pos)
+	local old_metatable = meta:to_table() or {}
 	local fields = old_metatable.fields or {}
-	meta:from_table({inventory = old_metatable.inventory})
+	meta:from_table({ inventory = old_metatable.inventory })
 	shop:initialize_metadata(fields.owner or minetest.settings:get("name") or "")
 
-    if fields.creative == 1 and (fields.type or 0) == 0 then
-        shop:set_unlimited(true)
-        shop:set_send_pos()
-        shop:set_refill_pos()
-
-    else
-	    if fields.item_send then
+	if fields.creative == 1 and (fields.type or 0) == 0 then
+		shop:set_unlimited(true)
+		shop:set_send_pos()
+		shop:set_refill_pos()
+	else
+		if fields.item_send then
 			local pos2 = string_to_pos(fields.item_send)
-		    if pos2 then
-			    shop:set_send_pos(pos2)
-		    end
-	    end
-	    if fields.item_refill then
+			if pos2 then
+				shop:set_send_pos(pos2)
+			end
+		end
+		if fields.item_refill then
 			local pos2 = string_to_pos(fields.item_refill)
-		    if pos2 then
-			    shop:set_refill_pos(pos2)
-		    end
-	    end
-    end
+			if pos2 then
+				shop:set_refill_pos(pos2)
+			end
+		end
+	end
 
 	if smartshop.settings.enable_refund then
 		meta:set_string("upgraded", fields.upgraded or "")
@@ -60,9 +59,9 @@ end
 minetest.register_lbm({
 	name = "smartshop:convert_legacy",
 	nodenames = {
-        "smartshop:shop",
-    },
-    run_at_every_load = false,
+		"smartshop:shop",
+	},
+	run_at_every_load = false,
 	action = function(pos)
 		smartshop.compat.convert_legacy_shop(pos)
 	end,
@@ -76,8 +75,12 @@ local function try_refund(shop)
 	for _, itemstring in ipairs(shop:get_refund()) do
 		local itemstack = ItemStack(itemstring)
 		if shop:room_for_item(itemstack) then
-			smartshop.log("action", "refunding %s to %s's shop at %s",
-				itemstring, owner, minetest.pos_to_string(shop.pos, 0)
+			smartshop.log(
+				"action",
+				"refunding %s to %s's shop at %s",
+				itemstring,
+				owner,
+				minetest.pos_to_string(shop.pos, 0)
 			)
 			shop:add_item(itemstack)
 		else

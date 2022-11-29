@@ -181,10 +181,9 @@ end
 function shop_class:get_purchase_history()
 	local history = self.meta:get("purchase_history")
 	if history then
-		return minetest.deserialize(history) or {index = 0}
-
+		return minetest.deserialize(history) or { index = 0 }
 	else
-		return {index = 0}
+		return { index = 0 }
 	end
 end
 
@@ -194,8 +193,15 @@ function shop_class:log_purchase(player, i, mechanic)
 	local give_stack = self:get_give_stack(i)
 	local pay_stack = self:get_pay_stack(i)
 
-	smartshop.log("action", "%s bought %q for %q from %s's shop @ %s via %s",
-		player_name, give_stack:to_string(), pay_stack:to_string(), self:get_owner(), self:get_pos_as_string(), mechanic
+	smartshop.log(
+		"action",
+		"%s bought %q for %q from %s's shop @ %s via %s",
+		player_name,
+		give_stack:to_string(),
+		pay_stack:to_string(),
+		self:get_owner(),
+		self:get_pos_as_string(),
+		mechanic
 	)
 
 	if history_max == 0 then
@@ -220,24 +226,22 @@ function shop_class:log_purchase(player, i, mechanic)
 	local history = self:get_purchase_history()
 	local most_recent = history[history.index]
 
-	if (
-		most_recent and
-			most_recent.player_name == player_name and
-			most_recent.give_item == give_item and
-			most_recent.pay_item == pay_item and
-			most_recent.timestamp + 60 >= now
-	) then
+	if
+		most_recent
+		and most_recent.player_name == player_name
+		and most_recent.give_item == give_item
+		and most_recent.pay_item == pay_item
+		and most_recent.timestamp + 60 >= now
+	then
 		most_recent.give_count = most_recent.give_count + give_count
 		most_recent.pay_count = most_recent.pay_count + pay_count
 		most_recent.timestamp = now
-
 	else
 		-- treat the history like a ring buffer
 		local cur_index = history.index
 		local next_index
 		if history_max > 0 and cur_index == history_max then
 			next_index = 1
-
 		else
 			next_index = cur_index + 1
 		end
@@ -250,7 +254,7 @@ function shop_class:log_purchase(player, i, mechanic)
 			pay_item = pay_item,
 			pay_count = pay_count,
 			timestamp = now,
-			method = mechanic
+			method = mechanic,
 		}
 	end
 
@@ -276,7 +280,6 @@ end
 function shop_class:link_storage(storage, storage_type)
 	if storage_type == "send" then
 		self:set_send_pos(storage.pos)
-
 	elseif storage_type == "refill" then
 		self:set_refill_pos(storage.pos)
 	end
@@ -295,13 +298,11 @@ function shop_class:get_count(stack, kind)
 		if refill then
 			count = count + refill:get_count(stack, match_meta)
 		end
-
 	elseif kind == "pay" then
 		local send = self:get_send()
 		if send then
 			count = count + send:get_count(stack, match_meta)
 		end
-
 	end
 
 	return count
@@ -318,7 +319,6 @@ function shop_class:get_all_counts(kind)
 				all_counts[key] = (all_counts[key] or 0) + value
 			end
 		end
-
 	elseif kind == "pay" then
 		local send = self:get_send()
 		if send then
@@ -336,7 +336,6 @@ function shop_class:give_is_valid(i)
 
 	if give_stack:is_known() and not give_stack:is_empty() then
 		return true
-
 	elseif self:allow_freebies() then
 		local pay_stack = self:get_pay_stack(i)
 		return pay_stack:is_known() and not pay_stack:is_empty()
@@ -355,7 +354,6 @@ function shop_class:pay_is_valid(i)
 
 	if pay_stack:is_known() and not pay_stack:is_empty() then
 		return true
-
 	elseif self:allow_freebies() then
 		local give_stack = self:get_give_stack(i)
 		return give_stack:is_known() and not give_stack:is_empty()
@@ -407,7 +405,6 @@ function shop_class:room_for_item(stack, kind)
 	if kind == "give" then
 		local refill = self:get_refill()
 		return refill and refill:room_for_item(stack)
-
 	elseif kind == "pay" then
 		local send = self:get_send()
 		return send and send:room_for_item(stack)
@@ -424,7 +421,6 @@ function shop_class:add_item(stack, kind)
 		if refill and refill:room_for_item(stack) then
 			return refill:add_item(stack)
 		end
-
 	elseif kind == "pay" then
 		local send = self:get_send()
 		if send and send:room_for_item(stack) then
@@ -450,7 +446,6 @@ function shop_class:contains_item(stack, kind, ignore_storage)
 		if kind == "give" then
 			local refill = self:get_refill()
 			return refill and refill:contains_item(stack, match_meta)
-
 		elseif kind == "pay" then
 			local send = self:get_send()
 			return send and send:contains_item(stack, match_meta)
@@ -472,7 +467,6 @@ function shop_class:remove_item(stack, kind)
 		if refill and refill:contains_item(stack, strict_meta) then
 			return refill:remove_item(stack, strict_meta)
 		end
-
 	elseif kind == "pay" then
 		local send = self:get_send()
 		if send and send:contains_item(stack, strict_meta) then
@@ -543,23 +537,17 @@ function shop_class:receive_fields(player, fields)
 
 	if fields.history then
 		self:show_history(player)
-
 	elseif fields.close_history then
 		self:show_formspec(player)
-
 	elseif fields.tsend then
 		api.start_storage_linking(player, self, "send")
-
 	elseif fields.trefill then
 		api.start_storage_linking(player, self, "refill")
-
 	elseif fields.customer then
 		self:show_formspec(player, true)
-
 	elseif buy_index then
 		api.try_purchase(player, self, buy_index)
 		self:show_formspec(player, true)
-
 	else
 		if fields.is_unlimited and player_is_admin(player) then
 			self:set_unlimited(fields.is_unlimited == "true")
@@ -605,7 +593,6 @@ function shop_class:get_info_line(i)
 
 	if self:is_strict_meta() then
 		description = get_safe_short_description(give):gsub("%%", "%%%%")
-
 	else
 		description = get_safe_short_description(give:get_name()):gsub("%%", "%%%%")
 	end
@@ -628,7 +615,7 @@ end
 
 function shop_class:update_info()
 	local owner = self:get_owner()
-	local lines = {S("(Smartshop by @1)", owner)}
+	local lines = { S("(Smartshop by @1)", owner) }
 
 	local info_lines = {}
 	for i = 1, 4 do
@@ -642,14 +629,11 @@ function shop_class:update_info()
 		local variant = self:compute_variant()
 		if variant == "smartshop:shop_full" then
 			table.insert(lines, S("This shop is over-full."))
-
 		elseif variant == "smartshop:shop_empty" then
 			table.insert(lines, S("This shop is sold out."))
-
 		else
 			table.insert(lines, S("This shop is not configured."))
 		end
-
 	else
 		table.insert_all(lines, info_lines)
 	end
@@ -691,18 +675,14 @@ function shop_class:compute_variant()
 	if n_total == 0 then
 		-- unconfigured shop
 		return "smartshop:shop"
-
 	elseif n_have_give ~= n_total then
 		-- something is sold out
 		return "smartshop:shop_empty"
-
 	elseif n_have_pay > 0 then
 		return "smartshop:shop_used"
-
 	elseif n_can_exchange ~= n_total then
 		-- something can't be bought
 		return "smartshop:shop_full"
-
 	else
 		-- shop is ready for use
 		return "smartshop:shop"
@@ -717,7 +697,7 @@ function shop_class:update_variant()
 		swap_node(self.pos, {
 			name = to_swap,
 			param1 = node.param1,
-			param2 = node.param2
+			param2 = node.param2,
 		})
 	end
 end
@@ -731,7 +711,6 @@ function shop_class:update_entities()
 		queue:push_back(function()
 			api.update_entities(self)
 		end)
-
 	else
 		api.update_entities(self)
 	end
@@ -742,10 +721,8 @@ end
 function shop_class:allow_metadata_inventory_put(listname, index, stack, player)
 	if node_class.allow_metadata_inventory_put(self, listname, index, stack, player) == 0 then
 		return 0
-
 	elseif listname == "main" then
 		return stack:get_count()
-
 	else
 		-- interacting with give/pay slots
 		local inv = self.inv
@@ -758,7 +735,6 @@ function shop_class:allow_metadata_inventory_put(listname, index, stack, player)
 			local new_count = math.min(old_count + add_count, max_count)
 			old_stack:set_count(new_count)
 			inv:set_stack(listname, index, old_stack)
-
 		else
 			inv:set_stack(listname, index, stack)
 		end
@@ -771,10 +747,8 @@ end
 function shop_class:allow_metadata_inventory_take(listname, index, stack, player)
 	if node_class.allow_metadata_inventory_take(self, listname, index, stack, player) == 0 then
 		return 0
-
 	elseif listname == "main" then
 		return stack:get_count()
-
 	else
 		local inv = self.inv
 		local cur_stack = inv:get_stack(listname, index)
@@ -792,16 +766,13 @@ end
 function shop_class:allow_metadata_inventory_move(from_list, from_index, to_list, to_index, count, player)
 	if node_class.allow_metadata_inventory_move(self, from_list, from_index, to_list, to_index, count, player) == 0 then
 		return 0
-
 	elseif from_list == "main" and to_list == "main" then
 		return count
-
 	elseif from_list == "main" then
 		local inv = self.inv
 		local stack = inv:get_stack(from_list, from_index)
 		stack:set_count(count)
 		return self:allow_metadata_inventory_put(to_list, to_index, stack, player)
-
 	elseif to_list == "main" then
 		local inv = self.inv
 		local stack = inv:get_stack(to_list, to_index)

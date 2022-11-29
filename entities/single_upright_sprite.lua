@@ -17,24 +17,25 @@ local element_dir = smartshop.entities.element_dir
 local entity_offset = smartshop.entities.entity_offset
 
 local element_offset = {
-    vector.new(0, 0, -0.1),
-    vector.new(-0.1, 0, 0),
-    vector.new(0, 0, 0.1),
-    vector.new(0.1, 0, 0),
+	vector.new(0, 0, -0.1),
+	vector.new(-0.1, 0, 0),
+	vector.new(0, 0, 0.1),
+	vector.new(0.1, 0, 0),
 }
 
 minetest.register_entity("smartshop:single_upright_sprite", {
 	hp_max = 1,
 	visual = "upright_sprite",
-	visual_size = {x = 0.9, y = 0.9},
-	collisionbox = {0, 0, 0, 0, 0, 0},
+	visual_size = { x = 0.9, y = 0.9 },
+	collisionbox = { 0, 0, 0, 0, 0, 0 },
 	physical = false,
-	textures = {"air"},
+	textures = { "air" },
 	smartshop2 = true,
 
 	get_staticdata = function(self)
 		return serialize({
-			self.pos, self.item,
+			self.pos,
+			self.item,
 		})
 	end,
 
@@ -47,7 +48,7 @@ minetest.register_entity("smartshop:single_upright_sprite", {
 			return
 		end
 
-		self.pos = pos  -- *MUST* set before calling api.get_entity
+		self.pos = pos -- *MUST* set before calling api.get_entity
 
 		for other_obj in api.iterate_entities(pos) do
 			if obj ~= other_obj then
@@ -58,14 +59,14 @@ minetest.register_entity("smartshop:single_upright_sprite", {
 
 		self.item = item
 
-		obj:set_properties({textures = {get_wield_image(item)}})
+		obj:set_properties({ textures = { get_wield_image(item) } })
 	end,
 })
 
 local function get_entity_pos(shop_pos, param2)
 	local dir = element_dir[param2 + 1]
-    local base_pos = v_add(shop_pos, v_mul(dir, entity_offset))
-    local offset = element_offset[param2 + 1]
+	local base_pos = v_add(shop_pos, v_mul(dir, entity_offset))
+	local offset = element_offset[param2 + 1]
 
 	return v_add(base_pos, offset)
 end
@@ -74,15 +75,18 @@ function smartshop.entities.add_single_upright_sprite(shop, index)
 	local shop_pos = shop.pos
 	local param2 = get_node(shop_pos).param2
 	if param2 >= 4 then
-		smartshop.util.error("shop @ %s has bad param2 value %s; cannot create entities",
-			pos_to_string(shop_pos), param2)
+		smartshop.util.error(
+			"shop @ %s has bad param2 value %s; cannot create entities",
+			pos_to_string(shop_pos),
+			param2
+		)
 		return
 	end
 
 	local item = shop:get_give_stack(index):get_name()
 
 	local entity_pos = get_entity_pos(shop_pos, param2)
-	local staticdata = serialize({shop_pos, item})
+	local staticdata = serialize({ shop_pos, item })
 	local obj = add_entity(entity_pos, "smartshop:single_upright_sprite", staticdata)
 
 	if not obj then

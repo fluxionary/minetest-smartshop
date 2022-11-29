@@ -61,14 +61,17 @@ function api.build_owner_formspec(shop)
 		("tooltip[customer;%s]"):format(FS("view the shop as a customer")),
 
 		("checkbox[6,0.9;strict_meta;%s;%s]"):format(FS("strict meta?"), tostring(is_strict_meta)),
-		("tooltip[strict_meta;%s]"):format(FS("check this if you are buying or selling items with unique properties " ..
-			"like written books or petz.")),
+		("tooltip[strict_meta;%s]"):format(
+			FS("check this if you are buying or selling items with unique properties " .. "like written books or petz.")
+		),
 		("checkbox[6,1.2;private;%s;%s]"):format(FS("private?"), tostring(is_private)),
-		("tooltip[private;%s]"):format(FS("uncheck this if you want to share control of the shop with anyone in the " ..
-			"protected area.")),
+		("tooltip[private;%s]"):format(
+			FS("uncheck this if you want to share control of the shop with anyone in the " .. "protected area.")
+		),
 		("checkbox[6,1.5;freebies;%s;%s]"):format(FS("freebies?"), tostring(allow_freebies)),
-		("tooltip[freebies;%s]"):format(FS("check this if you want to be able to give/receive items without " ..
-			"an exchange")),
+		("tooltip[freebies;%s]"):format(
+			FS("check this if you want to be able to give/receive items without " .. "an exchange")
+		),
 
 		"list[current_player;main;0,7.2;8,4;]",
 		("listring[nodemeta:%s;main]"):format(fpos),
@@ -78,8 +81,9 @@ function api.build_owner_formspec(shop)
 	if player_is_admin(owner) then
 		table.insert_all(fs_parts, {
 			("checkbox[6,0.6;is_unlimited;%s;%s]"):format(FS("unlimited?"), tostring(is_unlimited)),
-			("tooltip[is_unlimited;%s]"):format(FS("check this allow exchanges ex nihilo. " ..
-				"shop contents will be ignored")),
+			("tooltip[is_unlimited;%s]"):format(
+				FS("check this allow exchanges ex nihilo. " .. "shop contents will be ignored")
+			),
 		})
 	end
 
@@ -92,7 +96,6 @@ function api.build_owner_formspec(shop)
 
 	if is_unlimited then
 		table.insert(fs_parts, ("label[0.5,2.5;%s]"):format(FS("Stock is unlimited")))
-
 	else
 		table.insert_all(fs_parts, {
 			("list[nodemeta:%s;main;0,3;8,4;]"):format(fpos),
@@ -144,10 +147,14 @@ function api.build_client_formspec(shop)
 			}
 
 			if strict_meta then
-				table.insert(give_parts, ("tooltip[buy%ia;%s\n%s]"):format(
-					i, F(get_safe_short_description(give_stack)), F(truncate(give_stack:to_string(), 50))
-				))
-
+				table.insert(
+					give_parts,
+					("tooltip[buy%ia;%s\n%s]"):format(
+						i,
+						F(get_safe_short_description(give_stack)),
+						F(truncate(give_stack:to_string(), 50))
+					)
+				)
 			else
 				local item_name = give_stack:get_name()
 				local def = minetest.registered_items[item_name]
@@ -158,9 +165,7 @@ function api.build_client_formspec(shop)
 					description = item_name
 				end
 
-				table.insert(give_parts, ("tooltip[buy%ia;%s\n%s]"):format(
-					i, F(description), F(item_name)
-				))
+				table.insert(give_parts, ("tooltip[buy%ia;%s\n%s]"):format(i, F(description), F(item_name)))
 			end
 
 			return table.concat(give_parts, "")
@@ -178,10 +183,14 @@ function api.build_client_formspec(shop)
 			}
 
 			if strict_meta then
-				table.insert(pay_parts, ("tooltip[buy%ib;%s\n%s]"):format(
-					i, F(get_safe_short_description(pay_stack)), F(truncate(pay_stack:to_string(), 50))
-				))
-
+				table.insert(
+					pay_parts,
+					("tooltip[buy%ib;%s\n%s]"):format(
+						i,
+						F(get_safe_short_description(pay_stack)),
+						F(truncate(pay_stack:to_string(), 50))
+					)
+				)
 			else
 				local item_name = pay_stack:get_name()
 				local def = minetest.registered_items[item_name]
@@ -192,9 +201,7 @@ function api.build_client_formspec(shop)
 					description = item_name
 				end
 
-				table.insert(pay_parts, ("tooltip[buy%ib;%s\n%s]"):format(
-					i, F(description), F(item_name)
-				))
+				table.insert(pay_parts, ("tooltip[buy%ib;%s\n%s]"):format(i, F(description), F(item_name)))
 			end
 
 			return table.concat(pay_parts, "")
@@ -226,8 +233,9 @@ function api.build_storage_formspec(storage)
 		("listring[nodemeta:%s;main]"):format(fpos),
 		"listring[current_player;main]",
 		("checkbox[0,7;private;%s;%s]"):format(FS("Private?"), tostring(is_private)),
-		("tooltip[private;%s]"):format(FS("uncheck this if you want to share control of the storage with anyone in " ..
-			"the protected area.")),
+		("tooltip[private;%s]"):format(
+			FS("uncheck this if you want to share control of the storage with anyone in " .. "the protected area.")
+		),
 	}
 
 	return table.concat(fs_parts, "")
@@ -240,10 +248,8 @@ end
 local function format_item(item, count)
 	if count == 0 then
 		return "nothing"
-
 	elseif count == 1 then
 		return item
-
 	else
 		return ("%i*%s"):format(count, item)
 	end
@@ -268,12 +274,16 @@ function api.build_history_formspec(shop)
 			break
 		end
 
-		table.insert(tl_parts, FS("@1 @2 bought @3 for @4",
-			format_timestamp(entry.timestamp),
-			entry.player_name,
-			format_item(entry.give_item, entry.give_count),
-			format_item(entry.pay_item, entry.pay_count)
-		))
+		table.insert(
+			tl_parts,
+			FS(
+				"@1 @2 bought @3 for @4",
+				format_timestamp(entry.timestamp),
+				entry.player_name,
+				format_item(entry.give_item, entry.give_count),
+				format_item(entry.pay_item, entry.pay_count)
+			)
+		)
 
 		i = i - 1
 		if i == 0 then

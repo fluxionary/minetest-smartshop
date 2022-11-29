@@ -12,52 +12,52 @@ smartshop.currency = {}
 local currency = smartshop.currency
 
 local known_currency = {
-    -- standard currency
-    ["currency:minegeld_cent_5"]=5,
-    ["currency:minegeld_cent_10"]=10,
-    ["currency:minegeld_cent_25"]=25,
-    ["currency:minegeld"]=100,
-    ["currency:minegeld_2"]=200,
-    ["currency:minegeld_5"]=500,
-    ["currency:minegeld_10"]=1000,
-    ["currency:minegeld_20"]=2000,
-    ["currency:minegeld_50"]=5000,
-    ["currency:minegeld_100"]=10000,
+	-- standard currency
+	["currency:minegeld_cent_5"] = 5,
+	["currency:minegeld_cent_10"] = 10,
+	["currency:minegeld_cent_25"] = 25,
+	["currency:minegeld"] = 100,
+	["currency:minegeld_2"] = 200,
+	["currency:minegeld_5"] = 500,
+	["currency:minegeld_10"] = 1000,
+	["currency:minegeld_20"] = 2000,
+	["currency:minegeld_50"] = 5000,
+	["currency:minegeld_100"] = 10000,
 
-    -- tunneler's abyss
-    ["currency:cent_1"]=1,
-    ["currency:cent_2"]=2,
-    ["currency:cent_5"]=5,
-    ["currency:cent_10"]=10,
-    ["currency:cent_20"]=20,
-    ["currency:cent_50"]=50,
-    ["currency:buck_1"]=100,
-    ["currency:buck_2"]=200,
-    ["currency:buck_5"]=500,
-    ["currency:buck_10"]=1000,
-    ["currency:buck_20"]=2000,
-    ["currency:buck_50"]=5000,
-    ["currency:buck_100"]=10000,
-    ["currency:buck_200"]=20000,
-    ["currency:buck_500"]=50000,
-    ["currency:buck_1000"]=100000,
+	-- tunneler's abyss
+	["currency:cent_1"] = 1,
+	["currency:cent_2"] = 2,
+	["currency:cent_5"] = 5,
+	["currency:cent_10"] = 10,
+	["currency:cent_20"] = 20,
+	["currency:cent_50"] = 50,
+	["currency:buck_1"] = 100,
+	["currency:buck_2"] = 200,
+	["currency:buck_5"] = 500,
+	["currency:buck_10"] = 1000,
+	["currency:buck_20"] = 2000,
+	["currency:buck_50"] = 5000,
+	["currency:buck_100"] = 10000,
+	["currency:buck_200"] = 20000,
+	["currency:buck_500"] = 50000,
+	["currency:buck_1000"] = 100000,
 
-    -- for testing code
-    ["smartshop:currency_1"]=1,
-    ["smartshop:currency_2"]=2,
-    ["smartshop:currency_5"]=5,
-    ["smartshop:currency_10"]=10,
-    ["smartshop:currency_20"]=20,
-    ["smartshop:currency_50"]=50,
-    ["smartshop:currency_100"]=100,
-    ["smartshop:currency_10000"]=10000,
+	-- for testing code
+	["smartshop:currency_1"] = 1,
+	["smartshop:currency_2"] = 2,
+	["smartshop:currency_5"] = 5,
+	["smartshop:currency_10"] = 10,
+	["smartshop:currency_20"] = 20,
+	["smartshop:currency_50"] = 50,
+	["smartshop:currency_100"] = 100,
+	["smartshop:currency_10000"] = 10000,
 }
 
 function currency.register_currency(name, value)
-    if minetest.registered_items[name] then
-        currency.available_currency[name] = value
-        smartshop.log("action", "available currency: %s=%q", name, tostring(value))
-    end
+	if minetest.registered_items[name] then
+		currency.available_currency[name] = value
+		smartshop.log("action", "available currency: %s=%q", name, tostring(value))
+	end
 end
 
 currency.available_currency = {}
@@ -66,8 +66,12 @@ for name, value in pairs(known_currency) do
 end
 
 local decreasing_values = {}
-for name, value in pairs_by_value(currency.available_currency, function(a, b) return b < a end) do
-	table.insert(decreasing_values, {name, value})
+for name, value in
+	pairs_by_value(currency.available_currency, function(a, b)
+		return b < a
+	end)
+do
+	table.insert(decreasing_values, { name, value })
 end
 
 local stack_sizes = {}
@@ -76,25 +80,24 @@ for name, _ in pairs(currency.available_currency) do
 end
 
 local function sum_stack(stack)
-    local name = stack:get_name()
-    local count = stack:get_count()
-    local value = currency.available_currency[name] or 0
-    return value * count
+	local name = stack:get_name()
+	local count = stack:get_count()
+	local value = currency.available_currency[name] or 0
+	return value * count
 end
 
 local function is_currency(stack)
 	local name
 	if type(stack) == "string" then
 		name = stack
-
 	else
 		name = stack:get_name()
 	end
-    return currency.available_currency[name]
+	return currency.available_currency[name]
 end
 
 local function sort_currency_counts(a, b)
-    return currency.available_currency[a[1]] < currency.available_currency[b[1]]
+	return currency.available_currency[a[1]] < currency.available_currency[b[1]]
 end
 
 function currency.room_for_item(inv, stack, kind)
@@ -124,7 +127,6 @@ local function get_change_stacks(value)
 				local change_stack = ItemStack(name)
 				change_stack:set_count(remainder)
 				table.insert(change_stack)
-
 			else
 				local change_stack = ItemStack(name)
 				change_stack:set_count(count_required)
@@ -149,7 +151,7 @@ local function get_currency_counts(inv, kind)
 	local all_counts = inv:get_all_counts(kind)
 	for item, count in pairs(all_counts) do
 		if is_currency(item) then
-			table.insert(currency_counts, {item, count})
+			table.insert(currency_counts, { item, count })
 		end
 	end
 	table.sort(currency_counts, sort_currency_counts)
@@ -158,7 +160,7 @@ end
 
 local function remove_small_bills(inv, kind, currency_counts, owed_value, removed_items)
 	-- remove small bills
-	local name_to_break  -- name of bill to break, if value is left over
+	local name_to_break -- name of bill to break, if value is left over
 	for _, currency_count in ipairs(currency_counts) do
 		local name, count = unpack(currency_count)
 		local value = currency.available_currency[name]
@@ -168,10 +170,21 @@ local function remove_small_bills(inv, kind, currency_counts, owed_value, remove
 			break
 		end
 
-		local stack_to_remove = ItemStack(name)
-		stack_to_remove:set_count(count_to_remove)
-		table.insert(removed_items, inv:remove_item(stack_to_remove, kind))
-		owed_value = owed_value - (count_to_remove * value)
+		while count_to_remove > 0 do
+			local next_count_to_remove
+			if count_to_remove > 65535 then
+				next_count_to_remove = 65535
+			else
+				next_count_to_remove = count_to_remove
+			end
+
+			local stack_to_remove = ItemStack(name)
+			stack_to_remove:set_count(next_count_to_remove)
+			table.insert(removed_items, inv:remove_item(stack_to_remove, kind))
+			owed_value = owed_value - (next_count_to_remove * value)
+
+			count_to_remove = count_to_remove - next_count_to_remove
+		end
 	end
 
 	return name_to_break, owed_value
@@ -247,7 +260,6 @@ function currency.remove_item(inv, stack, kind)
 		-- break the next largest bill
 		if not name_to_break then
 			change_failed = true
-
 		else
 			change_failed = try_to_change(inv, kind, name_to_break, owed_value, removed_items)
 		end
@@ -295,7 +307,6 @@ api.register_purchase_mechanic({
 		if is_currency(give_stack) then
 			shop_removed = currency.remove_item(tmp_shop_inv, give_stack, "give")
 			success = success and not shop_removed:is_empty()
-
 		else
 			local count = give_stack:get_count()
 			shop_removed = tmp_shop_inv:remove_item(give_stack, "give")
@@ -305,7 +316,6 @@ api.register_purchase_mechanic({
 		if is_currency(pay_stack) then
 			local shop_remaining = currency.add_item(tmp_shop_inv, player_removed, "pay")
 			success = success and shop_remaining:is_empty()
-
 		else
 			local shop_remaining = tmp_shop_inv:add_item(player_removed, "pay")
 			success = success and shop_remaining:is_empty()
@@ -314,13 +324,12 @@ api.register_purchase_mechanic({
 		if is_currency(give_stack) then
 			local player_remaining = currency.add_item(tmp_player_inv, shop_removed, "give")
 			success = success and player_remaining:is_empty()
-
 		else
 			local player_remaining = tmp_player_inv:add_item(shop_removed, "give")
 			success = success and player_remaining:is_empty()
 		end
 
-	    shop:destroy_tmp_inv(tmp_shop_inv)
+		shop:destroy_tmp_inv(tmp_shop_inv)
 		player_inv:destroy_tmp_inv(tmp_player_inv)
 
 		return success

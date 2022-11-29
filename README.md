@@ -13,7 +13,6 @@ CODE:
 TEXTURES:
 * smartshop_border.png (c) celeron55 CC BY-SA 3.0
 * smartshop_face.png (c) celeron55 CC BY-SA 3.0
-* smartshop_animation_mask.png (unknown, i think i made it? it's a single white pixel? ~flux)
 
 # USER DOCUMENTATION
 

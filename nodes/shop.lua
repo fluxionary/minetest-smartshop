@@ -6,7 +6,7 @@ smartshop.nodes.shop_node_names = {}
 
 local smartshop_def = {
 	description = S("Smartshop"),
-	tiles = {"(smartshop_face.png^[colorize:#FFFFFF77)^smartshop_border.png"},
+	tiles = { "(smartshop_face.png^[colorize:#FFFFFF77)^smartshop_border.png" },
 	use_texture_alpha = "opaque",
 	sounds = smartshop.resources.sounds.shop_sounds,
 	groups = {
@@ -17,7 +17,7 @@ local smartshop_def = {
 	drawtype = "nodebox",
 	node_box = {
 		type = "fixed",
-		fixed = {-0.5, -0.5, -0.0, 0.5, 0.5, 0.5}
+		fixed = { -0.5, -0.5, -0.0, 0.5, 0.5, 0.5 },
 	},
 	paramtype2 = "facedir",
 	paramtype = "light",
@@ -39,8 +39,7 @@ local smartshop_def = {
 	on_metadata_inventory_take = nodes.on_metadata_inventory_take,
 	can_dig = nodes.can_dig,
 	on_destruct = nodes.on_destruct,
-	on_blast = function()
-	end, -- explosion-proof
+	on_blast = function() end, -- explosion-proof
 	on_rotate = false, -- disallow rotation via screwdriver (entities get confused)
 }
 
@@ -66,17 +65,17 @@ local make_variant_tiles = smartshop.nodes.make_variant_tiles
 register_shop_variant("smartshop:shop")
 
 register_shop_variant("smartshop:shop_full", {
-	tiles = make_variant_tiles("#80008077")
+	tiles = make_variant_tiles("#80008077"),
 })
 
 register_shop_variant("smartshop:shop_empty", {
-	tiles = make_variant_tiles("#FF000077")
+	tiles = make_variant_tiles("#FF000077"),
 })
 
 register_shop_variant("smartshop:shop_used", {
-	tiles = make_variant_tiles("#00FF0077")
+	tiles = make_variant_tiles("#00FF0077"),
 })
 
 register_shop_variant("smartshop:shop_admin", {
-	tiles = make_variant_tiles("#00FFFF77")
+	tiles = make_variant_tiles("#00FFFF77"),
 })
