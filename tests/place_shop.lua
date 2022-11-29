@@ -8,6 +8,7 @@ smartshop.tests.register_test({
 			player,
 			{ type = "node", under = under, above = shop_at }
 		)
+		assert(placed_pos, "place succeeded")
 		assert(vector.equals(placed_pos, shop_at), "placed to right position")
 		assert(placed_stack:is_empty(), "no rv after place")
 		local node = minetest.get_node(shop_at)

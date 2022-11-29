@@ -1,4 +1,6 @@
 local class = futil.class1
+local DefaultTable = futil.DefaultTable
+
 local get_stack_key = smartshop.util.get_stack_key
 local remove_stack_with_meta = smartshop.util.remove_stack_with_meta
 
@@ -43,13 +45,15 @@ end
 
 function inv_class:get_all_counts(match_meta)
 	local inv = self.inv
-	local all_counts = {}
+	local all_counts = DefaultTable(function()
+		return 0
+	end)
 
 	for _, stack in ipairs(inv:get_list("main")) do
 		local key = get_stack_key(stack, match_meta)
-		local count = all_counts[key] or 0
-		count = count + stack:get_count()
-		all_counts[key] = count
+		if key ~= "" then
+			all_counts[key] = all_counts[key] + stack:get_count()
+		end
 	end
 
 	return all_counts

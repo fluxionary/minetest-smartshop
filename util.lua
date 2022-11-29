@@ -14,7 +14,7 @@ function util.error(messagefmt, ...)
 	if error_behavior == "crash" then
 		error(message)
 	elseif error_behavior == "announce" then
-		minetest.chat_send_all(message)
+		smartshop.chat_send_all(message)
 	end
 
 	smartshop.log("error", message)
@@ -146,8 +146,16 @@ function util.get_stack_key(stack, match_meta)
 		for key, value in pairs_by_key(key_stack:get_meta():to_table().fields) do
 			table.insert(meta_parts, ("%s=%s"):format(key, value))
 		end
+		local key_parts = { name }
+		if wear > 0 or #meta_parts > 0 then
+			table.insert(key_parts, "1")
+			table.insert(key_parts, tostring(wear))
+		end
+		if #meta_parts > 0 then
+			table.insert(key_parts, table.concat(meta_parts, ","))
+		end
 
-		return ("%s %s %s"):format(name, wear, table.concat(meta_parts, ","))
+		return table.concat(key_parts, " ")
 	else
 		return stack:get_name()
 	end

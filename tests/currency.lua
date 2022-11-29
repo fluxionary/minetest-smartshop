@@ -80,7 +80,10 @@ smartshop.tests.register_test({
 		shop:receive_fields(player, { buy1a = true })
 
 		assert(inv_count(player_inv, "main", "smartshop:currency_20") == 1, "correct amount was spent")
-		assert(inv_count(player_inv, "main", "smartshop:currency_1") == 19, "correct amount was spent")
+		assert(inv_count(player_inv, "main", "smartshop:currency_10") == 1, "correct amount was spent")
+		assert(inv_count(player_inv, "main", "smartshop:currency_5") == 1, "correct amount was spent")
+		assert(inv_count(player_inv, "main", "smartshop:currency_2") == 2, "correct amount was spent")
+		assert(inv_count(player_inv, "main", "smartshop:currency_1") == 0, "correct amount was spent")
 		assert(inv_count(player_inv, "main", "smartshop:node") == 6, "got correct # of nodes")
 		assert(inv_count(player_inv, "main", "smartshop:tool") == 1, "got correct # of tools")
 
