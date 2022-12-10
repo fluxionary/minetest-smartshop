@@ -1,14 +1,19 @@
-local api = smartshop.api
-
 local table_insert = table.insert
 
+local f = string.format
+
+local v_add = vector.add
+local v_sub = vector.subtract
+
+local F = minetest.formspec_escape
 local get_objects_in_area = minetest.get_objects_in_area
 
 local escape_texture = futil.escape_texture
 local get_wield_image = futil.get_wield_image
 
-local v_add = vector.add
-local v_sub = vector.subtract
+local entity_mode = smartshop.settings.entity_mode
+
+local api = smartshop.api
 
 -- i wanted to cache entities by position, but see
 -- https://github.com/minetest/minetest/blob/8bf1609cccba24e2516ecb98dbf694b91fe697bf/doc/lua_api.txt#L6824-L6829
@@ -76,34 +81,46 @@ function api.get_quad_image(items)
 
 	for i = 1, 4 do
 		local image = get_wield_image(items[i])
-		table_insert(images, escape_texture(image .. "^[resize:128x128"))
+		table_insert(images, F(escape_texture(image .. "^[resize:128x128")))
 	end
 
-	return ("[combine:260x260:1,1=%s:1,132=%s:132,1=%s:132,132=%s"):format(unpack(images))
+	return f("[combine:260x260:1,1=%s:1,132=%s:132,1=%s:132,132=%s", unpack(images))
 end
 
 function api.is_complicated_drawtype(drawtype)
 	return (drawtype == "fencelike" or drawtype == "raillike" or drawtype == "nodebox" or drawtype == "mesh")
 end
 
-function api.get_image_type(shop, index)
-	if not shop:can_exchange(index) then
-		return "none"
-	end
+if entity_mode == "legacy" then
+	function api.get_image_type(shop, index)
+		if not shop:can_exchange(index) then
+			return "none"
+		end
 
-	local item_name = shop:get_give_stack(index):get_name()
-
-	local def = minetest.registered_items[item_name]
-
-	if not def or item_name == "" then
-		return "none"
-	elseif (def.inventory_image or "") ~= "" or (def.wield_image or "") ~= "" then
-		return "sprite"
-	elseif api.is_complicated_drawtype(def.drawtype) then
 		return "wielditem"
-	else
-		return "sprite"
 	end
+elseif entity_mode == "optimize_fps" or entity_mode == "upright_and_wielditem_only" then
+	function api.get_image_type(shop, index)
+		if not shop:can_exchange(index) then
+			return "none"
+		end
+
+		local item_name = shop:get_give_stack(index):get_name()
+
+		local def = minetest.registered_items[item_name]
+
+		if not def or item_name == "" then
+			return "none"
+		elseif (def.inventory_image or "") ~= "" or (def.wield_image or "") ~= "" then
+			return "sprite"
+		elseif api.is_complicated_drawtype(def.drawtype) then
+			return "wielditem"
+		else
+			return "sprite"
+		end
+	end
+else
+	error(f("invalid entity mode: %q", entity_mode))
 end
 
 function api.get_expected_entities(shop)
@@ -144,7 +161,11 @@ function api.get_expected_entities(shop)
 	else
 		for index, image_type in pairs(entity_types) do
 			if image_type == "sprite" then
-				table_insert(expected_entities, { "single_sprite", index })
+				if entity_mode == "optimize_fps" then
+					table_insert(expected_entities, { "single_sprite", index })
+				else
+					table_insert(expected_entities, { "single_upright_sprite", index })
+				end
 			elseif image_type == "wielditem" then
 				table_insert(expected_entities, { "single_wielditem", index })
 			end
