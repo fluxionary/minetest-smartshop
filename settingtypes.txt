@@ -22,12 +22,6 @@ smartshop.admin_shop_priv (name of the shop admin priv) string smartshop_admin
 # to an inventory, resulting in possible lost items.
 smartshop.error_behavior (behavior on non-fatal serious error) enum announce crash,announce,log
 
-# controls the appearance of the entities in the smartshop.
-# legacy: creates the same appearance as AiTechEye's original shop - each item for sale is represented by a wielditem entity
-# optimize_fps: allows using entities w/ different drawtypes to help w/ FPS issues on low-power machines. however, item entities may look strange when not viewed head-on.
-# upright_and_wielditem_only: a compromise between the other two options, in which the "always facing player" sprite drawtype is disabled.
-smartshop.entity_mode (entity mode) enum optimize_fps legacy,optimize_fps,upright_and_wielditem_only
-
 # enable if you want to run the testing suite. do not enable in general, and do not use on a real world, as it is
 # destructive
 smartshop.enable_tests (enable test mode - dangerous!) bool false
