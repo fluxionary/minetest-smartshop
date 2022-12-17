@@ -172,3 +172,40 @@ smartshop.tests.register_test({
 		assert(inv_count(shop.inv, "main", "smartshop:node") == 1, "correct amount were removed")
 	end,
 })
+
+smartshop.tests.register_test({
+	name = "test that currency changing works (complex)",
+	func = function(player, state)
+		local under = state.place_shop_against
+		local shop_at = vector.subtract(state.place_shop_against, vector.new(0, 0, 1))
+
+		minetest.remove_node(shop_at)
+		minetest.item_place_node(ItemStack("smartshop:shop"), player, { type = "node", under = under, above = shop_at })
+
+		local shop = smartshop.api.get_object(shop_at)
+
+		shop.inv:set_stack("pay1", 1, "smartshop:currency_1 256")
+		shop.inv:set_stack("give1", 1, "smartshop:node")
+
+		put_in_shop(shop, "smartshop:node 2", player)
+
+		shop:update_appearance()
+
+		local player_inv = smartshop.api.get_player_inv(player)
+		player_inv.inv:set_list("main", {})
+		player_inv:add_item("smartshop:currency_1 1")
+		player_inv:add_item("smartshop:currency_10 30")
+
+		shop:receive_fields(player, { buy1a = true })
+
+		assert(
+			smartshop.compat.currency.get_inv_value(player_inv, "take") == (301 - 256),
+			"correct amount of change received"
+		)
+
+		assert(inv_count(player_inv.inv, "main", "smartshop:node") == 1, "got correct # of nodes")
+
+		assert(inv_count(shop.inv, "main", "smartshop:currency_1") == 256, "correct amount was received")
+		assert(inv_count(shop.inv, "main", "smartshop:node") == 1, "correct amount were removed")
+	end,
+})

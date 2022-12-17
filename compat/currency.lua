@@ -12,12 +12,11 @@ local check_player_add = util.check_player_add_remainder
 local check_player_removed = util.check_player_remove_remainder
 
 local currency = {}
-local available_currency = {}
-currency.available_currency = available_currency
+currency.available_currency = {}
 
 function currency.register_currency(name, value)
 	if minetest.registered_items[name] then
-		available_currency[name] = value
+		currency.available_currency[name] = value
 	else
 		error(f("attempt to register unknown item as currency: %q", name))
 	end
@@ -70,31 +69,31 @@ for name, value in pairs({
 	end
 end
 
-local function is_currency(stack)
+function currency.is_currency(stack)
 	if type(stack) == "string" then
 		stack = ItemStack(stack)
 	end
 	local name = stack:get_name()
-	return available_currency[name] ~= nil
+	return currency.available_currency[name] ~= nil
 end
 
-local function get_single_value(stack)
+function currency.get_single_value(stack)
 	if type(stack) == "string" then
 		stack = ItemStack(stack)
 	end
 	local name = stack:get_name()
-	return available_currency[name] or 0
+	return currency.available_currency[name] or 0
 end
 
-local function get_stack_value(stack)
-	return get_single_value(stack) * stack:get_count()
+function currency.get_stack_value(stack)
+	return currency.get_single_value(stack) * stack:get_count()
 end
 
-local function get_all_currency_in_inv(inv, kind)
+function currency.get_all_currency_in_inv(inv, kind)
 	local all_currency = {}
 	local all_counts = inv:get_all_counts(kind)
 	for item, count in pairs(all_counts) do
-		if is_currency(item) then
+		if currency.is_currency(item) then
 			while count > 0 do
 				local stack = ItemStack(item)
 				local maxed_count = math.min(stack:get_stack_max(), count)
@@ -106,28 +105,27 @@ local function get_all_currency_in_inv(inv, kind)
 	end
 	-- sort by the value of individual bills, smallest bills first
 	table.sort(all_currency, function(a, b)
-		return get_single_value(a) < get_single_value(b)
+		return currency.get_single_value(a) < currency.get_single_value(b)
 	end)
 	return all_currency
 end
 
-local function get_inv_value(inv, kind)
+function currency.get_inv_value(inv, kind)
 	local total_value = 0
-	local all_currency = get_all_currency_in_inv(inv, kind)
+	local all_currency = currency.get_all_currency_in_inv(inv, kind)
 	for i = 1, #all_currency do
-		total_value = total_value + get_stack_value(all_currency[i])
+		total_value = total_value + currency.get_stack_value(all_currency[i])
 	end
 	return total_value
 end
 
 local function get_change_for_value(value)
 	local items = {}
-	for name, currency_value in
-		pairs_by_value(available_currency, function(a, b)
-			return b < a
-		end)
-	do
-		if currency_value < value then
+	local largest_first = pairs_by_value(currency.available_currency, function(a, b)
+		return b < a
+	end)
+	for name, currency_value in largest_first do
+		if currency_value <= value then
 			local count = math.floor(value / currency_value)
 			while count > 0 do
 				local stack = ItemStack(name)
@@ -143,33 +141,34 @@ local function get_change_for_value(value)
 		end
 	end
 	if value > 0 then
-		smartshop.util.error("currency changing: some value is remaining", value)
+		smartshop.util.error("currency changing: some value (%s) is remaining %s", value)
 	end
 	return items
 end
 
 function currency.remove_item(inv, stack, kind)
-	local owed_value = get_stack_value(stack)
-	local inv_total_value = get_inv_value(inv, kind)
+	local owed_value = currency.get_stack_value(stack)
+	local inv_total_value = currency.get_inv_value(inv, kind)
 	if owed_value > inv_total_value then
 		return ItemStack()
 	end
 
-	local all_currency = get_all_currency_in_inv(inv, kind)
+	local all_currency = currency.get_all_currency_in_inv(inv, kind)
 	local i = 1
 	while owed_value > 0 do
 		local currency_stack = all_currency[i]
-		local value = get_stack_value(currency_stack)
+		local value = currency.get_stack_value(currency_stack)
 		if value <= owed_value then
 			inv:remove_item(currency_stack)
 			owed_value = owed_value - value
+			i = i + 1
 		else
-			local item_value = get_single_value(currency_stack)
+			local item_value = currency.get_single_value(currency_stack)
 			local number_to_remove = math.ceil(owed_value / item_value)
 			local stack_to_remove = ItemStack(currency_stack)
 			stack_to_remove:set_count(number_to_remove)
 			inv:remove_item(stack_to_remove)
-			owed_value = owed_value - get_stack_value(stack_to_remove)
+			owed_value = owed_value - currency.get_stack_value(stack_to_remove)
 			break
 		end
 	end
@@ -196,7 +195,7 @@ api.register_purchase_mechanic({
 		local pay_stack = shop:get_pay_stack(i)
 		local give_stack = shop:get_give_stack(i)
 
-		if not (is_currency(pay_stack) or is_currency(give_stack)) then
+		if not (currency.is_currency(pay_stack) or currency.is_currency(give_stack)) then
 			return
 		end
 
@@ -206,7 +205,7 @@ api.register_purchase_mechanic({
 		local success = true
 		local player_removed, shop_removed
 
-		if is_currency(pay_stack) then
+		if currency.is_currency(pay_stack) then
 			player_removed = currency.remove_item(tmp_player_inv, pay_stack, "pay")
 			success = success and not player_removed:is_empty()
 		else
@@ -221,7 +220,7 @@ api.register_purchase_mechanic({
 			return false
 		end
 
-		if is_currency(give_stack) then
+		if currency.is_currency(give_stack) then
 			shop_removed = currency.remove_item(tmp_shop_inv, give_stack, "give")
 			success = success and not shop_removed:is_empty()
 		else
@@ -264,13 +263,13 @@ api.register_purchase_mechanic({
 		local player_removed
 		local player_remaining
 
-		if is_currency(pay_stack) then
+		if currency.is_currency(pay_stack) then
 			player_removed = currency.remove_item(player_inv, pay_stack, "pay")
 		else
 			player_removed = player_inv:remove_item(pay_stack, "pay")
 		end
 
-		if is_currency(give_stack) then
+		if currency.is_currency(give_stack) then
 			shop_removed = currency.remove_item(shop, give_stack, "give")
 		else
 			shop_removed = shop:remove_item(give_stack, "give")
