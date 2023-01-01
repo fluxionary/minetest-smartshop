@@ -9,6 +9,8 @@ local deserialize = minetest.deserialize
 
 local get_wield_image = futil.get_wield_image
 
+local ss_error = smartshop.util.error
+
 local api = smartshop.api
 
 local element_dir = smartshop.entities.element_dir
@@ -70,6 +72,15 @@ minetest.register_entity("smartshop:single_sprite", {
 			return
 		end
 
+		local param2 = get_node(pos).param2
+		if 0 <= param2 and param2 < 4 then
+			obj:set_yaw(math.pi * (2 - (param2 / 2)))
+		else
+			ss_error("shop @ %s has bad param2 value %s; cannot create entities", pos_to_string(pos), param2)
+			obj:remove()
+			return
+		end
+
 		self.pos = pos -- *MUST* set before calling api.get_entity
 		self.index = index -- *MUST* set before calling api.get_entity
 
@@ -99,11 +110,7 @@ function smartshop.entities.add_single_sprite(shop, index)
 	local shop_pos = shop.pos
 	local param2 = get_node(shop_pos).param2
 	if param2 >= 4 then
-		smartshop.util.error(
-			"shop @ %s has bad param2 value %s; cannot create entities",
-			pos_to_string(shop_pos),
-			param2
-		)
+		ss_error("shop @ %s has bad param2 value %s; cannot create entities", pos_to_string(shop_pos), param2)
 		return
 	end
 
@@ -118,7 +125,7 @@ function smartshop.entities.add_single_sprite(shop, index)
 		return
 	end
 
-	obj:set_yaw(math.pi * (2 - (param2 / 2)))
+	obj:set_yaw(math.pi * (2 - (param2 / 2))) -- is yaw even meaningful for basic sprite? *shrug*
 
 	return obj
 end

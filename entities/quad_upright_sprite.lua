@@ -7,6 +7,8 @@ local pos_to_string = minetest.pos_to_string
 local serialize = minetest.serialize
 local deserialize = minetest.deserialize
 
+local ss_error = smartshop.util.error
+
 local api = smartshop.api
 
 local element_dir = smartshop.entities.element_dir
@@ -40,6 +42,15 @@ minetest.register_entity("smartshop:quad_upright_sprite", {
 		local obj = self.object
 
 		if not (pos and items and api.is_shop(pos)) then
+			obj:remove()
+			return
+		end
+
+		local param2 = get_node(pos).param2
+		if 0 <= param2 and param2 < 4 then
+			obj:set_yaw(math.pi * (2 - (param2 / 2)))
+		else
+			ss_error("shop @ %s has bad param2 value %s; cannot create entities", pos_to_string(pos), param2)
 			obj:remove()
 			return
 		end
@@ -83,11 +94,7 @@ function smartshop.entities.add_quad_upright_sprite(shop)
 	local shop_pos = shop.pos
 	local param2 = get_node(shop_pos).param2
 	if param2 >= 4 then
-		smartshop.util.error(
-			"shop @ %s has bad param2 value %s; cannot create entities",
-			pos_to_string(shop_pos),
-			param2
-		)
+		ss_error("shop @ %s has bad param2 value %s; cannot create entities", pos_to_string(shop_pos), param2)
 		return
 	end
 
