@@ -1,5 +1,5 @@
 local F = minetest.formspec_escape
-local string_to_pos = minetest.string_to_pos
+local show_formspec = minetest.show_formspec
 
 local S = smartshop.S
 local api = smartshop.api
@@ -18,9 +18,29 @@ local history_max = smartshop.settings.history_max
 
 --------------------
 
+local pos_by_player_name = {}
+
+function api.show_formspec(player, pos, formspec)
+	local player_name = player:get_player_name()
+	pos_by_player_name[player_name] = pos
+	show_formspec(player_name, "smartshop:form", formspec)
+end
+
+function api.close_formspec(player)
+	local player_name = player:get_player_name()
+	pos_by_player_name[player_name] = nil
+end
+
+minetest.register_on_leaveplayer(function(player)
+	api.close_formspec(player)
+end)
+
 function api.on_player_receive_fields(player, formname, fields)
-	local spos = formname:match("^smartshop:(.+)$")
-	local pos = spos and string_to_pos(spos)
+	if formname ~= "smartshop:form" then
+		return
+	end
+	local player_name = player:get_player_name()
+	local pos = pos_by_player_name[player_name]
 	local obj = api.get_object(pos)
 	if obj then
 		obj:receive_fields(player, fields)

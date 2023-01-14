@@ -1,7 +1,6 @@
 local get_node = minetest.get_node
 local parse_json = minetest.parse_json
 local pos_to_string = minetest.pos_to_string
-local show_formspec = minetest.show_formspec
 local swap_node = minetest.swap_node
 local write_json = minetest.write_json
 
@@ -505,10 +504,7 @@ function shop_class:show_formspec(player, force_client_view)
 		formspec = api.build_client_formspec(self)
 	end
 
-	local formname = ("smartshop:%s"):format(self:get_pos_as_string())
-	local player_name = player:get_player_name()
-
-	show_formspec(player_name, formname, formspec)
+	api.show_formspec(player, self.pos, formspec)
 end
 
 function shop_class:show_history(player)
@@ -517,10 +513,8 @@ function shop_class:show_history(player)
 	end
 
 	local formspec = api.build_history_formspec(self)
-	local formname = ("smartshop:%s"):format(self:get_pos_as_string())
-	local player_name = player:get_player_name()
 
-	show_formspec(player_name, formname, formspec)
+	api.show_formspec(player, self.pos, formspec)
 end
 
 local function get_buy_index(pressed)
@@ -535,7 +529,9 @@ function shop_class:receive_fields(player, fields)
 	local buy_index = get_buy_index(fields)
 	local changed = false
 
-	if buy_index then
+	if fields.quit then
+		api.close_formspec(player)
+	elseif buy_index then
 		api.try_purchase(player, self, buy_index)
 		self:show_formspec(player, true)
 	elseif self:is_owner(player) then

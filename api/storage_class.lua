@@ -55,14 +55,17 @@ function storage_class:show_formspec(player)
 		return
 	end
 
-	local player_name = player:get_player_name()
 	local formspec = api.build_storage_formspec(self)
-	local formname = ("smartshop:%s"):format(self:get_pos_as_string())
 
-	minetest.show_formspec(player_name, formname, formspec)
+	api.show_formspec(player, self.pos, formspec)
 end
 
 function storage_class:receive_fields(player, fields)
+	if fields.quit then
+		api.close_formspec(player)
+		return
+	end
+
 	if not self:is_owner(player) then
 		return
 	end
