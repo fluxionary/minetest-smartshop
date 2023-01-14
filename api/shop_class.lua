@@ -535,35 +535,37 @@ function shop_class:receive_fields(player, fields)
 	local buy_index = get_buy_index(fields)
 	local changed = false
 
-	if fields.history then
-		self:show_history(player)
-	elseif fields.close_history then
-		self:show_formspec(player)
-	elseif fields.tsend then
-		api.start_storage_linking(player, self, "send")
-	elseif fields.trefill then
-		api.start_storage_linking(player, self, "refill")
-	elseif fields.customer then
-		self:show_formspec(player, true)
-	elseif buy_index then
+	if buy_index then
 		api.try_purchase(player, self, buy_index)
 		self:show_formspec(player, true)
-	else
-		if fields.is_unlimited and player_is_admin(player) then
-			self:set_unlimited(fields.is_unlimited == "true")
-			changed = true
-		end
-		if fields.strict_meta then
-			self:set_strict_meta(fields.strict_meta == "true")
-			changed = true
-		end
-		if fields.private then
-			self:set_private(fields.private == "true")
-			changed = true
-		end
-		if fields.freebies then
-			self:set_freebies(fields.freebies == "true")
-			changed = true
+	elseif self:is_owner(player) then
+		if fields.history then
+			self:show_history(player)
+		elseif fields.close_history then
+			self:show_formspec(player)
+		elseif fields.tsend then
+			api.start_storage_linking(player, self, "send")
+		elseif fields.trefill then
+			api.start_storage_linking(player, self, "refill")
+		elseif fields.customer then
+			self:show_formspec(player, true)
+		else
+			if fields.is_unlimited and player_is_admin(player) then
+				self:set_unlimited(fields.is_unlimited == "true")
+				changed = true
+			end
+			if fields.strict_meta then
+				self:set_strict_meta(fields.strict_meta == "true")
+				changed = true
+			end
+			if fields.private then
+				self:set_private(fields.private == "true")
+				changed = true
+			end
+			if fields.freebies then
+				self:set_freebies(fields.freebies == "true")
+				changed = true
+			end
 		end
 	end
 

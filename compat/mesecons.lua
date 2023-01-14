@@ -94,7 +94,7 @@ end
 
 local old_storage_receive_fields = storage_class.receive_fields
 function storage_class:receive_fields(player, fields)
-	if fields.mesesin then
+	if fields.mesesin and self:is_owner(player) then
 		self:toggle_mesein()
 		self:show_formspec(player)
 	else

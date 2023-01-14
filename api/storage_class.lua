@@ -63,6 +63,10 @@ function storage_class:show_formspec(player)
 end
 
 function storage_class:receive_fields(player, fields)
+	if not self:is_owner(player) then
+		return
+	end
+
 	local changed = false
 	if fields.private then
 		self:set_private(fields.private == "true")
