@@ -16,6 +16,7 @@ repos:
         entry: luacheck
         pass_filenames: true
         types: [ file, lua ]
+        exclude: ^modtest/
         args: [ -q ]
       - id: stylua
         name: stylua

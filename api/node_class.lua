@@ -49,7 +49,7 @@ function node_class:get_owner()
 end
 
 function node_class:is_owner(player)
-	if type(player) == "userdata" then
+	if minetest.is_player(player) then
 		player = player:get_player_name()
 	end
 	if player_is_admin(player) then

@@ -38,7 +38,7 @@ if smartshop.has.node_entity_queue then
 else
 	minetest.register_lbm({
 		name = "smartshop:load_shop",
-		nodenames = "group:smartshop",
+		nodenames = { "group:smartshop" },
 		run_at_every_load = true,
 		action = function(pos, node)
 			-- make sure that shops w/ weird param2 are normal before creating entities
