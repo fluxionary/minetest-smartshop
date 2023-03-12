@@ -39,11 +39,17 @@ modtest.with_fresh_environment(function(state, env)
 		inv:set_stack("pay3", 1, "smartshop:gold 99")
 		inv:set_stack("pay4", 1, "smartshop:gold 20")
 
+		assert.are.equal("smartshop:node 99", ItemStack("smartshop:node 99"):to_string())
+
+		local mt = meta:to_table()
+		assert(mt.fields, "metatable lacks fields?")
+		assert(mt.inventory, "metatable lacks inventory?")
+
 		state:activate_mapblock(modtest.util.get_blockpos(shop_pos))
 
 		assert(not inv:is_empty("main"), "main inventory shouldn't still be empty")
-		assert(env.inv_count(inv, "main", "smartshop:node") == 105, "refunded correct amount of nodes")
-		assert(env.inv_count(inv, "main", "smartshop:tool") == 1, "refunded correct amount of tools")
-		assert(env.inv_count(inv, "main", "smartshop:gold") == 125, "refunded correct amount of gold")
+		assert.are.equal(105, env.inv_count(inv, "main", "smartshop:node"), "refunded correct amount of nodes")
+		assert.are.equal(1, env.inv_count(inv, "main", "smartshop:tool"), "refunded correct amount of tools")
+		assert.are.equal(125, env.inv_count(inv, "main", "smartshop:gold"), "refunded correct amount of gold")
 	end)
 end)
