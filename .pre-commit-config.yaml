@@ -10,6 +10,12 @@ repos:
 
   - repo: local
     hooks:
+      - id: stylua
+        name: stylua
+        language: system
+        entry: stylua
+        pass_filenames: true
+        types: [ file, lua ]
       - id: luacheck
         name: luacheck
         language: system
@@ -18,9 +24,3 @@ repos:
         types: [ file, lua ]
         exclude: ^modtest/
         args: [ -q ]
-      - id: stylua
-        name: stylua
-        language: system
-        entry: stylua
-        pass_filenames: true
-        types: [ file, lua ]

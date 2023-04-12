@@ -1,3 +1,4 @@
+local f = string.format
 local F = minetest.formspec_escape
 local show_formspec = minetest.show_formspec
 
@@ -66,42 +67,46 @@ function api.build_owner_formspec(shop)
 	local fs_parts = {
 		"size[8,11]",
 
-		("label[0,0.2;%s]"):format(FS("for sale:")),
-		("list[nodemeta:%s;give1;1,0;1,1;]"):format(fpos),
-		("list[nodemeta:%s;give2;2,0;1,1;]"):format(fpos),
-		("list[nodemeta:%s;give3;3,0;1,1;]"):format(fpos),
-		("list[nodemeta:%s;give4;4,0;1,1;]"):format(fpos),
-		("label[0,1.2;%s]"):format(FS("price:")),
-		("list[nodemeta:%s;pay1;1,1;1,1;]"):format(fpos),
-		("list[nodemeta:%s;pay2;2,1;1,1;]"):format(fpos),
-		("list[nodemeta:%s;pay3;3,1;1,1;]"):format(fpos),
-		("list[nodemeta:%s;pay4;4,1;1,1;]"):format(fpos),
+		f("label[0,0.2;%s]", FS("for sale:")),
+		f("list[nodemeta:%s;give1;1,0;1,1;]", fpos),
+		f("list[nodemeta:%s;give2;2,0;1,1;]", fpos),
+		f("list[nodemeta:%s;give3;3,0;1,1;]", fpos),
+		f("list[nodemeta:%s;give4;4,0;1,1;]", fpos),
+		f("label[0,1.2;%s]", FS("price:")),
+		f("list[nodemeta:%s;pay1;1,1;1,1;]", fpos),
+		f("list[nodemeta:%s;pay2;2,1;1,1;]", fpos),
+		f("list[nodemeta:%s;pay3;3,1;1,1;]", fpos),
+		f("list[nodemeta:%s;pay4;4,1;1,1;]", fpos),
 
-		("button[6,0;2,1;customer;%s]"):format(FS("customer view")),
-		("tooltip[customer;%s]"):format(FS("view the shop as a customer")),
+		f("button[6,0;2,1;customer;%s]", FS("customer view")),
+		f("tooltip[customer;%s]", FS("view the shop as a customer")),
 
-		("checkbox[6,0.9;strict_meta;%s;%s]"):format(FS("strict meta?"), tostring(is_strict_meta)),
-		("tooltip[strict_meta;%s]"):format(
+		f("checkbox[6,0.9;strict_meta;%s;%s]", FS("strict meta?"), tostring(is_strict_meta)),
+		f(
+			"tooltip[strict_meta;%s]",
 			FS("check this if you are buying or selling items with unique properties " .. "like written books or petz.")
 		),
-		("checkbox[6,1.2;private;%s;%s]"):format(FS("private?"), tostring(is_private)),
-		("tooltip[private;%s]"):format(
+		f("checkbox[6,1.2;private;%s;%s]", FS("private?"), tostring(is_private)),
+		f(
+			"tooltip[private;%s]",
 			FS("uncheck this if you want to share control of the shop with anyone in the " .. "protected area.")
 		),
-		("checkbox[6,1.5;freebies;%s;%s]"):format(FS("freebies?"), tostring(allow_freebies)),
-		("tooltip[freebies;%s]"):format(
+		f("checkbox[6,1.5;freebies;%s;%s]", FS("freebies?"), tostring(allow_freebies)),
+		f(
+			"tooltip[freebies;%s]",
 			FS("check this if you want to be able to give/receive items without " .. "an exchange")
 		),
 
 		"list[current_player;main;0,7.2;8,4;]",
-		("listring[nodemeta:%s;main]"):format(fpos),
+		f("listring[nodemeta:%s;main]", fpos),
 		"listring[current_player;main]",
 	}
 
 	if player_is_admin(owner) then
 		table.insert_all(fs_parts, {
-			("checkbox[6,0.6;is_unlimited;%s;%s]"):format(FS("unlimited?"), tostring(is_unlimited)),
-			("tooltip[is_unlimited;%s]"):format(
+			f("checkbox[6,0.6;is_unlimited;%s;%s]", FS("unlimited?"), tostring(is_unlimited)),
+			f(
+				"tooltip[is_unlimited;%s]",
 				FS("check this allow exchanges ex nihilo. " .. "shop contents will be ignored")
 			),
 		})
@@ -109,32 +114,32 @@ function api.build_owner_formspec(shop)
 
 	if history_max ~= 0 then
 		table.insert_all(fs_parts, {
-			("button[5,2;2.5,1;history;%s]"):format(FS("purchase history")),
-			("tooltip[history;%s]"):format(FS("view a log of purchases from the shop")),
+			f("button[5,2;2.5,1;history;%s]", FS("purchase history")),
+			f("tooltip[history;%s]", FS("view a log of purchases from the shop")),
 		})
 	end
 
 	if is_unlimited then
-		table.insert(fs_parts, ("label[0.5,2.5;%s]"):format(FS("Stock is unlimited")))
+		table.insert(fs_parts, f("label[0.5,2.5;%s]", FS("Stock is unlimited")))
 	else
 		table.insert_all(fs_parts, {
-			("list[nodemeta:%s;main;0,3;8,4;]"):format(fpos),
-			("button_exit[5,0;1,1;trefill;%s]"):format(FS("refill")),
-			("button_exit[5,1;1,1;tsend;%s]"):format(FS("send")),
+			f("list[nodemeta:%s;main;0,3;8,4;]", fpos),
+			f("button_exit[5,0;1,1;trefill;%s]", FS("refill")),
+			f("button_exit[5,1;1,1;tsend;%s]", FS("send")),
 		})
 
 		if send then
 			local title = F(send:get_title())
-			table.insert(fs_parts, ("tooltip[tsend;%s]"):format(FS("payments sent to @1", title)))
+			table.insert(fs_parts, f("tooltip[tsend;%s]", FS("payments sent to @1", title)))
 		else
-			table.insert(fs_parts, ("tooltip[tsend;%s]"):format(FS("click to set send storage")))
+			table.insert(fs_parts, f("tooltip[tsend;%s]", FS("click to set send storage")))
 		end
 
 		if refill then
 			local title = F(refill:get_title())
-			table.insert(fs_parts, ("tooltip[trefill;%s]"):format(FS("automatically refilled from @1", title)))
+			table.insert(fs_parts, f("tooltip[trefill;%s]", FS("automatically refilled from @1", title)))
 		else
-			table.insert(fs_parts, ("tooltip[trefill;%s]"):format(FS("click to set refill storage")))
+			table.insert(fs_parts, f("tooltip[trefill;%s]", FS("click to set refill storage")))
 		end
 	end
 
@@ -154,22 +159,23 @@ function api.build_client_formspec(shop)
 		"size[10.5,8]",
 		"style_type[image_button;bgcolor=#00000000;bgimg=blank.png;border=false]",
 		"list[current_player;main;0.375,3.125;8,4;]",
-		("label[0.375,0.625;%s]"):format(FS("for sale:")),
-		("label[0.375,1.875;%s]"):format(FS("price:")),
+		f("label[0.375,0.625;%s]", FS("for sale:")),
+		f("label[0.375,1.875;%s]", FS("price:")),
 	}
 
 	local function give_i(i)
 		if shop:can_exchange(i) then
 			local give_stack = shop:get_give_stack(i)
 			local give_parts = {
-				("list[nodemeta:%s;give%i;%f,0.375;1,1;]"):format(fpos, i, (i + 1) * (5 / 4) + (3 / 8)),
-				("image_button[%f,0.375;1,1;blank.png;buy%ia;]"):format((i + 1) * (5 / 4) + (3 / 8), i),
+				f("list[nodemeta:%s;give%i;%f,0.375;1,1;]", fpos, i, (i + 1) * (5 / 4) + (3 / 8)),
+				f("image_button[%f,0.375;1,1;blank.png;buy%ia;]", (i + 1) * (5 / 4) + (3 / 8), i),
 			}
 
 			if strict_meta then
 				table.insert(
 					give_parts,
-					("tooltip[buy%ia;%s\n%s]"):format(
+					f(
+						"tooltip[buy%ia;%s\n%s]",
 						i,
 						F(get_safe_short_description(give_stack)),
 						F(truncate(give_stack:to_string(), 50))
@@ -185,7 +191,7 @@ function api.build_client_formspec(shop)
 					description = item_name
 				end
 
-				table.insert(give_parts, ("tooltip[buy%ia;%s\n%s]"):format(i, F(description), F(item_name)))
+				table.insert(give_parts, f("tooltip[buy%ia;%s\n%s]", i, F(description), F(item_name)))
 			end
 
 			return table.concat(give_parts, "")
@@ -198,14 +204,15 @@ function api.build_client_formspec(shop)
 		if shop:can_exchange(i) then
 			local pay_stack = shop:get_pay_stack(i)
 			local pay_parts = {
-				("list[nodemeta:%s;pay%i;%f,1.625;1,1;]"):format(fpos, i, (i + 1) * (5 / 4) + (3 / 8)),
-				("image_button[%f,1.625;1,1;blank.png;buy%ib;]"):format((i + 1) * (5 / 4) + (3 / 8), i),
+				f("list[nodemeta:%s;pay%i;%f,1.625;1,1;]", fpos, i, (i + 1) * (5 / 4) + (3 / 8)),
+				f("image_button[%f,1.625;1,1;blank.png;buy%ib;]", (i + 1) * (5 / 4) + (3 / 8), i),
 			}
 
 			if strict_meta then
 				table.insert(
 					pay_parts,
-					("tooltip[buy%ib;%s\n%s]"):format(
+					f(
+						"tooltip[buy%ib;%s\n%s]",
 						i,
 						F(get_safe_short_description(pay_stack)),
 						F(truncate(pay_stack:to_string(), 50))
@@ -221,7 +228,7 @@ function api.build_client_formspec(shop)
 					description = item_name
 				end
 
-				table.insert(pay_parts, ("tooltip[buy%ib;%s\n%s]"):format(i, F(description), F(item_name)))
+				table.insert(pay_parts, f("tooltip[buy%ib;%s\n%s]", i, F(description), F(item_name)))
 			end
 
 			return table.concat(pay_parts, "")
@@ -244,16 +251,17 @@ function api.build_storage_formspec(storage)
 
 	local fs_parts = {
 		"size[12,9]",
-		("field[0.3,5.3;2,1;title;;%s]"):format(F(storage:get_title())),
+		f("field[0.3,5.3;2,1;title;;%s]", F(storage:get_title())),
 		"field_close_on_enter[title;false]",
-		("tooltip[title;%s]"):format(FS("used with connected smartshops")),
-		("button_exit[0,6;2,1;save;%s]"):format(FS("save")),
-		("list[nodemeta:%s;main;0,0;12,5;]"):format(fpos),
+		f("tooltip[title;%s]", FS("used with connected smartshops")),
+		f("button_exit[0,6;2,1;save;%s]", FS("save")),
+		f("list[nodemeta:%s;main;0,0;12,5;]", fpos),
 		"list[current_player;main;2,5;8,4;]",
-		("listring[nodemeta:%s;main]"):format(fpos),
+		f("listring[nodemeta:%s;main]", fpos),
 		"listring[current_player;main]",
-		("checkbox[0,7;private;%s;%s]"):format(FS("Private?"), tostring(is_private)),
-		("tooltip[private;%s]"):format(
+		f("checkbox[10,5;private;%s;%s]", FS("Private?"), tostring(is_private)),
+		f(
+			"tooltip[private;%s]",
 			FS("uncheck this if you want to share control of the storage with anyone in " .. "the protected area.")
 		),
 	}
@@ -271,7 +279,7 @@ local function format_item(item, count)
 	elseif count == 1 then
 		return item
 	else
-		return ("%i*%s"):format(count, item)
+		return f("%i*%s", count, item)
 	end
 end
 
@@ -280,7 +288,7 @@ function api.build_history_formspec(shop)
 	local fs_parts = {
 		"size[11,11]",
 		"button[5,10;1,1;close_history;X]",
-		("tooltip[close_history;%s]"):format(FS("close history")),
+		f("tooltip[close_history;%s]", FS("close history")),
 		"textlist[0,0;10.8,9.8;history;",
 	}
 
