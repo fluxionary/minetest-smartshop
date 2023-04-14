@@ -30,6 +30,7 @@ end
 function api.close_formspec(player)
 	local player_name = player:get_player_name()
 	pos_by_player_name[player_name] = nil
+	minetest.close_formspec(player_name, "smartshop:form")
 end
 
 minetest.register_on_leaveplayer(function(player)
@@ -124,8 +125,8 @@ function api.build_owner_formspec(shop)
 	else
 		table.insert_all(fs_parts, {
 			f("list[nodemeta:%s;main;0,3;8,4;]", fpos),
-			f("button_exit[5,0;1,1;trefill;%s]", FS("refill")),
-			f("button_exit[5,1;1,1;tsend;%s]", FS("send")),
+			f("button[5,0;1,1;trefill;%s]", FS("refill")),
+			f("button[5,1;1,1;tsend;%s]", FS("send")),
 		})
 
 		if send then
@@ -254,7 +255,7 @@ function api.build_storage_formspec(storage)
 		f("field[0.3,5.3;2,1;title;;%s]", F(storage:get_title())),
 		"field_close_on_enter[title;false]",
 		f("tooltip[title;%s]", FS("used with connected smartshops")),
-		f("button_exit[0,6;2,1;save;%s]", FS("save")),
+		f("button[0,6;2,1;save;%s]", FS("save")),
 		f("list[nodemeta:%s;main;0,0;12,5;]", fpos),
 		"list[current_player;main;2,5;8,4;]",
 		f("listring[nodemeta:%s;main]", fpos),

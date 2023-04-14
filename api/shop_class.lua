@@ -540,8 +540,10 @@ function shop_class:receive_fields(player, fields)
 		elseif fields.close_history then
 			self:show_formspec(player)
 		elseif fields.tsend then
+			api.close_formspec(player)
 			api.start_storage_linking(player, self, "send")
 		elseif fields.trefill then
+			api.close_formspec(player)
 			api.start_storage_linking(player, self, "refill")
 		elseif fields.customer then
 			self:show_formspec(player, true)
