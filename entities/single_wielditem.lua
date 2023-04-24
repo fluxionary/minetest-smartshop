@@ -16,31 +16,31 @@ local entity_offset = smartshop.entities.entity_offset
 
 local element_offset = {
 	{
-		vector.new(0.2, 0.2, -0.1),
-		vector.new(-0.2, 0.2, -0.1),
-		vector.new(0.2, -0.2, -0.1),
-		vector.new(-0.2, -0.2, -0.1),
+		vector.new(-0.2, 0.2, -0.145),
+		vector.new(0.2, 0.2, -0.145),
+		vector.new(-0.2, -0.2, -0.145),
+		vector.new(0.2, -0.2, -0.145),
 	},
 
 	{
-		vector.new(-0.1, 0.2, 0.2),
-		vector.new(-0.1, 0.2, -0.2),
-		vector.new(-0.1, -0.2, 0.2),
-		vector.new(-0.1, -0.2, -0.2),
+		vector.new(-0.145, 0.2, 0.2),
+		vector.new(-0.145, 0.2, -0.2),
+		vector.new(-0.145, -0.2, 0.2),
+		vector.new(-0.145, -0.2, -0.2),
 	},
 
 	{
-		vector.new(-0.2, 0.2, 0.1),
-		vector.new(0.2, 0.2, 0.1),
-		vector.new(-0.2, -0.2, 0.1),
-		vector.new(0.2, -0.2, 0.1),
+		vector.new(0.2, 0.2, 0.145),
+		vector.new(-0.2, 0.2, 0.145),
+		vector.new(0.2, -0.2, 0.145),
+		vector.new(-0.2, -0.2, 0.145),
 	},
 
 	{
-		vector.new(0.1, 0.2, -0.2),
-		vector.new(0.1, 0.2, 0.2),
-		vector.new(0.1, -0.2, -0.2),
-		vector.new(0.1, -0.2, 0.2),
+		vector.new(0.145, 0.2, -0.2),
+		vector.new(0.145, 0.2, 0.2),
+		vector.new(0.145, -0.2, -0.2),
+		vector.new(0.145, -0.2, 0.2),
 	},
 }
 
