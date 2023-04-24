@@ -19,7 +19,7 @@ local smartshop_def = {
 		type = "fixed",
 		fixed = { -0.5, -0.5, -0.0, 0.5, 0.5, 0.5 },
 	},
-	paramtype2 = "facedir",
+	paramtype2 = "4dir",
 	paramtype = "light",
 	sunlight_propagates = true,
 	light_source = 10,
@@ -40,7 +40,20 @@ local smartshop_def = {
 	can_dig = nodes.can_dig,
 	on_destruct = nodes.on_destruct,
 	on_blast = function() end, -- explosion-proof
-	on_rotate = false, -- disallow rotation via screwdriver (entities get confused)
+	on_rotate = function(pos, node, user, mode, new_param2)
+		if not smartshop.api.is_shop(pos) then
+			return false
+		end
+		local shop = smartshop.api.get_object(pos)
+		if not shop:is_owner(user) then
+			return false
+		end
+		node.param2 = new_param2 % 4
+		minetest.swap_node(pos, node)
+		smartshop.api.clear_entities(pos)
+		smartshop.api.update_entities(shop)
+		return true
+	end,
 }
 
 local function register_shop_variant(name, overrides)
