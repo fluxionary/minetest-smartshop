@@ -30,6 +30,19 @@ function entities.add_entity(shop, type, index)
 	end
 end
 
+minetest.register_lbm({
+	name = "smartshop:fix_orientation",
+	nodenames = { "group:smartshop" },
+	run_at_every_load = true,
+	action = function(pos, node)
+		-- make sure that shops w/ weird param2 are normal before creating entities
+		if node.param2 >= 4 then
+			node.param2 = node.param2 % 4
+			minetest.swap_node(pos, node)
+		end
+	end,
+})
+
 if smartshop.has.node_entity_queue then
 	node_entity_queue.api.register_node_entity_loader("group:smartshop", function(pos)
 		local shop = api.get_object(pos)
@@ -41,12 +54,6 @@ else
 		nodenames = { "group:smartshop" },
 		run_at_every_load = true,
 		action = function(pos, node)
-			-- make sure that shops w/ weird param2 are normal before creating entities
-			if node.param2 >= 4 then
-				node.param2 = node.param2 % 4
-				minetest.swap_node(pos, node)
-			end
-
 			local shop = api.get_object(pos)
 			api.update_entities(shop)
 		end,
