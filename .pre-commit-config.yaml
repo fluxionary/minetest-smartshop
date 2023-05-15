@@ -10,17 +10,25 @@ repos:
 
   - repo: local
     hooks:
+      - id: detect_debug
+        name: detect debug
+        language: pygrep
+        entry: DEBUG
+        pass_filenames: true
+        exclude: .pre-commit-config.yaml
+        fail_fast: true
       - id: stylua
         name: stylua
         language: system
         entry: stylua
         pass_filenames: true
         types: [ file, lua ]
+        fail_fast: true
       - id: luacheck
         name: luacheck
         language: system
         entry: luacheck
         pass_filenames: true
         types: [ file, lua ]
-        exclude: ^modtest/
         args: [ -q ]
+        fail_fast: true
