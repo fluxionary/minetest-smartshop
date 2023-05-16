@@ -19,7 +19,7 @@ local smartshop_def = {
 		type = "fixed",
 		fixed = { -0.5, -0.5, -0.0, 0.5, 0.5, 0.5 },
 	},
-	paramtype2 = "4dir",
+	paramtype2 = "facedir",
 	paramtype = "light",
 	sunlight_propagates = true,
 	light_source = 10,
