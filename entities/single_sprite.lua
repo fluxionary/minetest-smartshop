@@ -96,6 +96,10 @@ minetest.register_entity("smartshop:single_sprite", {
 
 		obj:set_properties({ textures = { get_wield_image(item) } })
 	end,
+
+	on_blast = function()
+		return false, false, {}
+	end,
 })
 
 local function get_entity_pos(shop_pos, param2, index)
