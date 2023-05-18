@@ -94,6 +94,10 @@ minetest.register_entity("smartshop:single_wielditem", {
 
 		obj:set_properties({ wield_item = item })
 	end,
+
+	on_blast = function()
+		return false, false, {}
+	end,
 })
 
 local function get_entity_pos(shop_pos, param2, index)

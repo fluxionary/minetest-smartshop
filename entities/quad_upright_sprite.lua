@@ -68,6 +68,10 @@ minetest.register_entity("smartshop:quad_upright_sprite", {
 
 		obj:set_properties({ textures = { api.get_quad_image(items) } })
 	end,
+
+	on_blast = function()
+		return false, false, {}
+	end,
 })
 
 local function get_items(shop)
