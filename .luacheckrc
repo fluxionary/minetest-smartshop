@@ -2,6 +2,10 @@ std = "lua51+luajit+minetest+smartshop"
 unused_args = false
 max_line_length = 120
 
+exclude_files = {
+    "modtest",
+}
+
 stds.minetest = {
 	read_globals = {
 		"DIR_DELIM",
