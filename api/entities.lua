@@ -91,11 +91,10 @@ function api.get_image_type(shop, index)
 		return "none"
 	end
 
-	local item_name = shop:get_give_stack(index):get_name()
+	local item = shop:get_give_stack(index)
+	local def = item:get_definition()
 
-	local def = minetest.registered_items[item_name]
-
-	if not def or item_name == "" then
+	if item:is_empty() or not item:is_known() then
 		return "none"
 	elseif (def.inventory_image or "") ~= "" or (def.wield_image or "") ~= "" then
 		return "sprite"

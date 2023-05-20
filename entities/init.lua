@@ -45,6 +45,12 @@ minetest.register_lbm({
 
 if smartshop.has.node_entity_queue then
 	node_entity_queue.api.register_node_entity_loader("group:smartshop", function(pos)
+		local node = minetest.get_node(pos)
+		-- make sure that shops w/ weird param2 are normal before creating entities
+		if node.param2 >= 4 then
+			node.param2 = node.param2 % 4
+			minetest.swap_node(pos, node)
+		end
 		local shop = api.get_object(pos)
 		api.update_entities(shop)
 	end)
