@@ -146,3 +146,14 @@ if smartshop.settings.enable_refund then
 		end,
 	})
 end
+
+-- we forgot to mark purchase history as private originally, so go through old shops and fix that
+minetest.register_lbm({
+	name = "smartshop:privatise_purchase_history",
+	nodenames = { "group:smartshop" },
+	run_at_every_load = false,
+	action = function(pos, node)
+		local shop = api.get_object(pos)
+		shop.meta:mark_as_private("purchase_history")
+	end,
+})

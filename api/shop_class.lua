@@ -258,6 +258,7 @@ function shop_class:log_purchase(player, i, mechanic)
 	end
 
 	self.meta:set_string("purchase_history", minetest.serialize(history))
+	self.meta:mark_as_private("purchase_history")
 end
 
 --------------------
