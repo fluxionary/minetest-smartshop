@@ -7,7 +7,7 @@ based on the original smartshop mod by AiTechEye
 # LICENSE
 
 CODE:
-* (c) flux AGPL v3
+* (c) flux LGPL v3
 * inspired by code (c) AiTechEye LGPL-2.1, though it's been rewritten from the ground up twice now...
 
 TEXTURES:
