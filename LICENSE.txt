@@ -1,3 +1,6 @@
+this license is for the code.
+any non-code media included in this repository is covered by the contents of MEDIA_LICENSE.txt.
+
                    GNU LESSER GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
