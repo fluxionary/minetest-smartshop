@@ -49,15 +49,21 @@ function node_class:get_owner()
 end
 
 function node_class:is_owner(player)
-	if minetest.is_player(player) then
-		player = player:get_player_name()
+	local player_name
+	if type(player) == "string" then
+		player_name = player
+	elseif futil.is_player(player) then
+		player_name = player:get_player_name()
+	else
+		return false
 	end
-	if player_is_admin(player) then
+
+	if player_is_admin(player_name) then
 		return true
 	elseif self:is_private() then
-		return player == self:get_owner()
+		return player_name == self:get_owner()
 	else
-		return not minetest.is_protected(self.pos, player)
+		return not minetest.is_protected(self.pos, player_name)
 	end
 end
 
