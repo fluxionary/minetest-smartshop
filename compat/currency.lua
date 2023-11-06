@@ -190,17 +190,17 @@ api.register_purchase_mechanic({
 	name = "smartshop:currency",
 	description = S("currency exchange"),
 	allow_purchase = function(player, shop, i)
-		local player_inv = api.get_player_inv(player)
-
 		local pay_stack = shop:get_pay_stack(i)
 		local give_stack = shop:get_give_stack(i)
+		local strict_meta = shop:is_strict_meta()
 
 		if not (currency.is_currency(pay_stack) or currency.is_currency(give_stack)) then
 			return
 		end
 
-		local tmp_shop_inv = shop:get_tmp_inv()
+		local player_inv = api.get_player_inv(player)
 		local tmp_player_inv = player_inv:get_tmp_inv()
+		local tmp_shop_inv = shop:get_tmp_inv()
 
 		local success = true
 		local player_removed, shop_removed
@@ -210,7 +210,7 @@ api.register_purchase_mechanic({
 			success = success and not player_removed:is_empty()
 		else
 			local count = pay_stack:get_count()
-			player_removed = tmp_player_inv:remove_item(pay_stack, "pay")
+			player_removed = tmp_player_inv:remove_item(pay_stack, strict_meta)
 			success = success and (count == player_removed:get_count())
 		end
 
@@ -244,7 +244,7 @@ api.register_purchase_mechanic({
 			return false
 		end
 
-		local player_remaining = tmp_player_inv:add_item(shop_removed, "give")
+		local player_remaining = tmp_player_inv:add_item(shop_removed)
 		success = success and player_remaining:is_empty()
 
 		shop:destroy_tmp_inv(tmp_shop_inv)
@@ -257,6 +257,7 @@ api.register_purchase_mechanic({
 
 		local pay_stack = shop:get_pay_stack(i)
 		local give_stack = shop:get_give_stack(i)
+		local strict_meta = shop:is_strict_meta()
 
 		local shop_removed
 		local shop_remaining
@@ -266,7 +267,7 @@ api.register_purchase_mechanic({
 		if currency.is_currency(pay_stack) then
 			player_removed = currency.remove_item(player_inv, pay_stack, "pay")
 		else
-			player_removed = player_inv:remove_item(pay_stack, "pay")
+			player_removed = player_inv:remove_item(pay_stack, strict_meta)
 		end
 
 		if currency.is_currency(give_stack) then
@@ -278,7 +279,7 @@ api.register_purchase_mechanic({
 		shop_removed, player_removed = api.do_transaction_transforms(player, shop, i, shop_removed, player_removed)
 
 		shop_remaining = shop:add_item(player_removed, "pay")
-		player_remaining = player_inv:add_item(shop_removed, "give")
+		player_remaining = player_inv:add_item(shop_removed)
 
 		check_shop_removed(shop, shop_removed, give_stack)
 		check_player_removed(player_inv, shop, player_removed, pay_stack)

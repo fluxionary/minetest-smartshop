@@ -16,24 +16,6 @@ function player_inv_class:_init(player)
 	inv_class._init(self, player:get_inventory())
 end
 
-function smartshop.api.get_player_inv(player)
-	return player_inv_class(player)
-end
-
---------------------
-
-function player_inv_class:contains_item(stack)
-	return inv_class.contains_item(self, stack, true)
-end
-
-function player_inv_class:remove_item(stack)
-	return inv_class.remove_item(self, stack, true)
-end
-
-function player_inv_class:get_count(stack, kind)
-	return inv_class.get_count(self, stack, true)
-end
-
-function player_inv_class:get_all_counts()
-	return inv_class.get_all_counts(self, true)
+function smartshop.api.get_player_inv(player, strict_meta)
+	return player_inv_class(player, strict_meta)
 end

@@ -12,3 +12,7 @@ smartshop.dofile("compat", "init")
 
 smartshop.dofile("crafting")
 smartshop.dofile("aliases")
+
+if smartshop.settings.enable_tests then
+	smartshop.dofile("tests", "init")
+end
