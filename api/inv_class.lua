@@ -84,6 +84,10 @@ function inv_class:remove_item(stack, match_meta)
 	return removed
 end
 
+function inv_class:get_lists()
+	return self.inv:get_lists()
+end
+
 --------------------
 
 function inv_class:get_tmp_inv()

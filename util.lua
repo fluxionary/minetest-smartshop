@@ -43,7 +43,13 @@ function util.check_shop_add_remainder(shop, remainder)
 	local owner = shop:get_owner()
 	local pos_as_string = shop:get_pos_as_string()
 
-	util.error("ERROR: %s's smartshop @ %s lost %q while adding", owner, pos_as_string, remainder:to_string())
+	util.error(
+		"ERROR: %s's smartshop @ %s lost %q while adding (shop inv=%s)",
+		owner,
+		pos_as_string,
+		remainder:to_string(),
+		dump(shop:get_lists())
+	)
 
 	return true
 end
@@ -57,11 +63,12 @@ function util.check_shop_remove_remainder(shop, remainder, expected)
 	local pos_as_string = shop:get_pos_as_string()
 
 	util.error(
-		"ERROR: %s's smartshop @ %s lost %q of %q while removing",
+		"ERROR: %s's smartshop @ %s lost %q of %q while removing (shop inv=%s)",
 		owner,
 		pos_as_string,
 		remainder:to_string(),
-		expected:to_string()
+		expected:to_string(),
+		dump(shop:get_lists())
 	)
 
 	return true
@@ -75,11 +82,13 @@ function util.check_player_add_remainder(player_inv, shop, remainder)
 	local player_name = player_inv.name
 
 	util.error(
-		"ERROR: %s lost %q on add using %s's shop @ %s",
+		"ERROR: %s lost %q on add using %s's shop @ %s (shop inv=%s) (player_inv=%s)",
 		player_name,
 		remainder:to_string(),
 		shop:get_owner(),
-		shop:get_pos_as_string()
+		shop:get_pos_as_string(),
+		dump(shop:get_lists()),
+		dump(player_inv:get_lists())
 	)
 
 	return true
@@ -93,12 +102,14 @@ function util.check_player_remove_remainder(player_inv, shop, remainder, expecte
 	local player_name = player_inv.name
 
 	util.error(
-		"ERROR: %s lost %q of %q on remove from %s's shop @ %s",
+		"ERROR: %s lost %q of %q on remove from %s's shop @ %s (shop inv=%s) (player_inv=%s)",
 		player_name,
 		remainder:to_string(),
 		expected:to_string(),
 		shop:get_owner(),
-		shop:get_pos_as_string()
+		shop:get_pos_as_string(),
+		dump(shop:get_lists()),
+		dump(player_inv:get_lists())
 	)
 
 	return true
