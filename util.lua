@@ -75,7 +75,7 @@ function util.check_player_add_remainder(player_inv, shop, remainder)
 	local player_name = player_inv.name
 
 	util.error(
-		"ERROR: %s lost %q on add using %'s shop @ %s",
+		"ERROR: %s lost %q on add using %s's shop @ %s",
 		player_name,
 		remainder:to_string(),
 		shop:get_owner(),
@@ -93,7 +93,7 @@ function util.check_player_remove_remainder(player_inv, shop, remainder, expecte
 	local player_name = player_inv.name
 
 	util.error(
-		"ERROR: %s lost %q of %q on remove from %'s shop @ %s",
+		"ERROR: %s lost %q of %q on remove from %s's shop @ %s",
 		player_name,
 		remainder:to_string(),
 		expected:to_string(),

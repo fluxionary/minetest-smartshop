@@ -17,6 +17,13 @@ repos:
         pass_filenames: true
         exclude: .pre-commit-config.yaml
         fail_fast: true
+      - id: date_version
+        name: date version
+        language: script
+        entry: .check_date.sh
+        files: mod.conf
+        always_run: true
+        fail_fast: true
       - id: stylua
         name: stylua
         language: system
