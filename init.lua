@@ -1,4 +1,4 @@
-futil.check_version({ year = 2024, month = 2, day = 18 }) -- FakeInventory:remove correction
+futil.check_version({ year = 2024, month = 2, day = 8 }) -- FakeInventory:remove correction
 
 smartshop = fmod.create()
 
