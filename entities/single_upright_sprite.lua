@@ -26,13 +26,15 @@ local element_offset = {
 }
 
 minetest.register_entity("smartshop:single_upright_sprite", {
-	hp_max = 1,
-	visual = "upright_sprite",
-	visual_size = { x = 0.9, y = 0.9 },
-	collisionbox = { 0, 0, 0, 0, 0, 0 },
-	physical = false,
-	textures = { "air" },
-	smartshop2 = true,
+	initial_properties = {
+		hp_max = 1,
+		visual = "upright_sprite",
+		visual_size = { x = 0.9, y = 0.9 },
+		collisionbox = { 0, 0, 0, 0, 0, 0 },
+		physical = false,
+		textures = { "air" },
+		smartshop2 = true,
+	},
 
 	get_staticdata = function(self)
 		return serialize({

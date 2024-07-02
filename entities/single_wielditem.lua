@@ -46,12 +46,14 @@ local element_offset = {
 
 -- for nodebox and mesh drawtypes without an inventory image, which can't be drawn well otherwise
 minetest.register_entity("smartshop:single_wielditem", {
-	visual = "wielditem",
-	visual_size = { x = 0.20, y = 0.20 },
-	collisionbox = { 0, 0, 0, 0, 0, 0 },
-	physical = false,
-	textures = { "air" },
-	smartshop2 = true,
+	initial_properties = {
+		visual = "wielditem",
+		visual_size = { x = 0.20, y = 0.20 },
+		collisionbox = { 0, 0, 0, 0, 0, 0 },
+		physical = false,
+		textures = { "air" },
+		smartshop2 = true,
+	},
 
 	get_staticdata = function(self)
 		return minetest.serialize({
