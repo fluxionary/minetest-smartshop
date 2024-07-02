@@ -52,8 +52,8 @@ minetest.register_entity("smartshop:single_wielditem", {
 		collisionbox = { 0, 0, 0, 0, 0, 0 },
 		physical = false,
 		textures = { "air" },
-		smartshop2 = true,
 	},
+	smartshop2 = true,
 
 	get_staticdata = function(self)
 		return minetest.serialize({
