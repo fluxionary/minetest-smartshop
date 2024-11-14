@@ -62,6 +62,172 @@ with e.g. shared protection areas.
 
 admin users also have the option to create a shop with unlimited inventory.
 
+## Digiline interface
+
+### get shop status
+
+```lua
+digiline_send('channel', {
+        type='get',
+        only_items_on_sale_or_buy = false
+    }
+)
+```
+
+Response is sent to the same channel the instruction is sent to. `only_items_on_sale_or_buy` field is optional, if this field is set to `true`, items not give or accept by shop is hidden in response. Response from shop looks like this:
+
+```lua
+{
+	inventory = {
+		{
+			metadata = "",
+			name = "smartshop:storage",
+			wear = 0,
+			meta = {
+				
+			},
+			count = 1
+		},
+		{
+			metadata = "",
+			name = "default:dirt",
+			wear = 0,
+			meta = {
+				
+			},
+			count = 3
+		},
+		{
+			metadata = "",
+			name = "default:dry_dirt",
+			wear = 0,
+			meta = {
+				
+			},
+			count = 32
+		},
+		{
+			metadata = "",
+			name = "mesecons_luacontroller:luacontroller0000",
+			wear = 0,
+			meta = {
+				
+			},
+			count = 1
+		}
+	},
+	type = "shop status",
+	offer = {
+		{
+			give = {
+				metadata = "",
+				name = "default:cobble",
+				wear = 0,
+				meta = {
+					
+				},
+				count = 7
+			},
+			stock = 16,
+			pay = {
+				metadata = "",
+				name = "default:dry_dirt",
+				wear = 0,
+				meta = {
+					
+				},
+				count = 2
+			}
+		},
+		{
+			give = {
+				metadata = "",
+				name = "default:dirt",
+				wear = 0,
+				meta = {
+					
+				},
+				count = 6
+			},
+			stock = 1,
+			pay = {
+				metadata = "",
+				name = "smartshop:storage",
+				wear = 0,
+				meta = {
+					
+				},
+				count = 1
+			}
+		},
+		{
+			give = {
+				metadata = "",
+				name = "currency:minegeld_5",
+				wear = 0,
+				meta = {
+					
+				},
+				count = 3
+			},
+			stock = 1,
+			pay = {
+				metadata = "",
+				name = "mesecons_luacontroller:luacontroller0000",
+				wear = 0,
+				meta = {
+					
+				},
+				count = 1
+			}
+		},
+		{
+			stock = 0
+		}
+	},
+	freebies = false,
+	strict_meta = false
+}
+```
+
+## set shop offer
+
+Following program will set third slot of offer, then this slot will receive three cobble for four dirt:
+
+```lua
+digiline_send('channel', {
+        type='set',
+        offer={
+            [3] = {give="basenodes:dirt",give_count=4,pay="basenodes:cobble",pay_count=3}
+        }
+    }
+)
+```
+
+## notify on run out of items
+
+When smart shop run out of items, or customer request an item which is already sold out, message will be sent by smartshop on the same channel set by owner of smartshop. Message is a table, and its fields should be like this:
+
+```lua
+{
+    type = "out of storage",
+    item = "basenodes:dirt",
+    offer_index = 2
+}
+```
+
+## notify on transaction completed
+
+When a transaction is completed, in other words, an item is sold and corresponding price is received, message will be sent by smartshop on the same channel set by owner of smartshop. Message is a table, and its fields should be like this:
+
+```lua
+{
+    type = "transaction complete",
+    item = "basenodes:dirt",
+    offer_index = 2
+}
+```
+
 # ADMIN DOCUMENTATION
 
 note: now requires [futil](https://github.com/fluxionary/minetest-futil)
