@@ -25,3 +25,7 @@ end
 if smartshop.has.tubelib then
 	smartshop.dofile("compat", "tubelib")
 end
+
+if smartshop.has.digilines then
+	smartshop.dofile("compat", "digilines")
+end
