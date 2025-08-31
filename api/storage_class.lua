@@ -77,7 +77,7 @@ function storage_class:receive_fields(player, fields)
 	end
 
 	if fields.title then
-		self:set_title(fields.title)
+		self:set_title("%s", fields.title)
 		changed = true
 	end
 
