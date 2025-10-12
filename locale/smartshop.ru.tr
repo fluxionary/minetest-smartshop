@@ -1,0 +1,56 @@
+# textdomain: smartshop
+
+
+
+### formspec.lua ###
+
+customer view=Покупатель
+view the shop as a customer=Посмотреть магазин с точки зрения покупателя.
+strict meta?=данные
+check this if you are buying or selling items with unique properties like written books or petz.=Выбирайте, если у вас есть предметы с уникальными свойствами, такими как написанные книги или питомцы.
+private?=личный
+uncheck this if you want to share control of the shop with anyone in the protected area.=Снимите отметку, если вы разрешаете другим игрокам в вашей защищенной зоне, управлением магазином.
+freebies?=халява
+check this if you want to be able to give/receive items without an exchange=Поставьте галочку, если вы хотите иметь возможность передавать/получать предметы без оплаты.
+unlimited?=безлимитный
+check this allow exchanges ex nihilo. shop contents will be ignored=Выбери, если хочешь сделать бесконечный товар, содержимое магазина будет игнорироваться
+purchase history=История покупок
+view a log of purchases from the shop=Просмотреть журнал покупок из магазина.
+Stock is unlimited=Бесконечный товар в магазине
+refill=Обн
+send=Соед
+payments sent to @1=соединено с @1
+click to set send storage=Нажми для соединения с хранилищем
+automatically refilled from @1=автоматическое пополнение из @1
+click to set refill storage=Нажмите, чтобы установить автоматическое пополнение хранилища.
+for sale:=товары
+price:=цены
+used with connected smartshops=используется с подключенными умными магазинами.
+save=сохранить
+Private?=личный
+uncheck this if you want to share control of the storage with anyone in the protected area.=Снимите отметку, если вы разрешаете другим игрокам в вашей защищенной зоне, управлением хранилищем.
+close history=закрыть историю
+@1 @2 bought @3 for @4=@1 @2 купил(а) @3 за @4
+
+### shop.lua ###
+Smartshop=Минимагазин
+
+### storage.lua ###
+Smartshop external storage=Дополнительное хранилище для минимагазина
+
+### shop_class.lua ###
+Shop by: @1=Магазин принадлежит: @1
+(Smartshop by @1)=(Магазин принадлежит: @1)
+This shop is over-full.=Этот магазин переполнен.
+This shop is sold out.=Этот магазин распродан.
+This shop is not configured.=Этот магазин не настроен.
+
+### storage_class.lua ###
+External storage by: @1=Дополнительное хранилище принадлежит: @1
+
+### storage_linking.lua ###
+Storage link attempt timed out, please try again.=Время ожидания связи с хранилищем истекло. Пожалуйста, попробуйте еще раз.
+Punch a smartshop storage node to link @1 storage=Нажмите на хранилище чтобы связать его с минимагазином.
+You do not own this storage!=У вас нет прав на это хранилище!
+Storage is too far from shop to link!=Хранилище слишком далеко от магазина для установки связи!
+@1 storage linked!=Хранилище присоединено!
